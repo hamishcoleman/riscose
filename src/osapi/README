@@ -1,7 +1,7 @@
 The *.osl files are from the OSLib distribution.  They're brought here
 one by one and added to Makefile.am's libosapi_a_SOURCES definition.
 
-`make' produces a .c and .h for each .o.  The .c is compiled into a .o
+`make' produces a .c and .h for each .osl.  The .c is compiled into a .o
 that ends up in libosapi.a.  Since both the .c and .h are automatically
 produced, they should *not* be edit by hand.  A `make clean' will remove
 them.

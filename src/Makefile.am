@@ -6,7 +6,7 @@ endif
 if ARM_SLEEVE
 arm = sleeve
 endif
-SUBDIRS = monty defmod include rom $(arm) osapi os oslib
+SUBDIRS = monty defmod include osapi oslib rom $(arm) os
 DIST_SUBDIRS = monty defmod include rom armul native sleeve osapi os \
     oslib
 

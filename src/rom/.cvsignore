@@ -1,5 +1,6 @@
 Makefile
 Makefile.in
 compilerom
+error.list
 rom.h
 romimage

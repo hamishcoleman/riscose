@@ -3,7 +3,7 @@ noinst_LIBRARIES = libosapi.a
 INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../include \
     -I$(srcdir)/../oslib
 
-SUFFIXES = .osl .c .h
+SUFFIXES = .osl .c .h .e
 
 .osl.c:
 	../defmod/defmod -riscose_osapi <$< >tmp
@@ -13,23 +13,27 @@ SUFFIXES = .osl .c .h
 	../defmod/defmod -riscose_header <$< >tmp
 	mv tmp $@
 
+.osl.e:
+	../defmod/defmod -riscose_errors <$< >tmp
+	mv tmp $@
+
 # FIXME: these end up in the `make dist' tar file and they shouldn't.
 # the .osl files should.
 
 BUILT_SOURCES = \
-    os.c os.h \
-    basictrans.c basictrans.h \
-    fileswitch.c fileswitch.h \
-    font.c font.h \
-    hourglass.c hourglass.h \
-    messagetrans.c messagetrans.h \
-    osbyte.c osbyte.h \
-    osfile.c osfile.h \
-    osheap.c osheap.h \
-    osmodule.c osmodule.h \
-    osspriteop.c osspriteop.h \
-    osword.c osword.h \
-    wimp.c wimp.h
+    os.c os.h os.e \
+    basictrans.c basictrans.h basictrans.e \
+    fileswitch.c fileswitch.h fileswitch.e \
+    font.c font.h font.e \
+    hourglass.c hourglass.h hourglass.e \
+    messagetrans.c messagetrans.h messagetrans.e \
+    osbyte.c osbyte.h osbyte.e \
+    osfile.c osfile.h osfile.e \
+    osheap.c osheap.h osheap.e \
+    osmodule.c osmodule.h osmodule.e \
+    osspriteop.c osspriteop.h osspriteop.e \
+    osword.c osword.h osword.e \
+    wimp.c wimp.h wimp.e
 libosapi_a_SOURCES = $(BUILT_SOURCES)
 $(BUILT_SOURCES): ../defmod/defmod
 

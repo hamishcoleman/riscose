@@ -54,6 +54,7 @@ TV    20000503    |bool| replaced by |osbool|
    #include "riscoseapi.h"
    #include "riscosetpl.h"
    #include "riscosehdr.h"
+   #include "riscoseerr.h"
 
 #define tracef(a)
 
@@ -939,7 +940,7 @@ struct def_s Union (struct def_s a, struct def_s b)
 int main (int argc, char *argv [])
 {
    int i;
-   enum {None, Riscose_OSAPI, Riscose_Template, Riscose_Header} option = None;
+   enum {None, Riscose_OSAPI, Riscose_Template, Riscose_Header, Riscose_Errors} option = None;
 
     (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
     *argv = progname;
@@ -962,6 +963,8 @@ int main (int argc, char *argv [])
          option = Riscose_Template;
       else if (strcmp (argv [i], "-riscose_header") == 0)
          option = Riscose_Header;
+      else if (strcmp (argv [i], "-riscose_errors") == 0)
+         option = Riscose_Errors;
       else if (strcmp (argv [i], "-v") == 0)
          Verbose = TRUE;
       else if (strcmp (argv [i], "-q") == 0)
@@ -982,7 +985,8 @@ int main (int argc, char *argv [])
                "<type> is one of:\n"
                "\t-riscose_osapi\t\t"     "riscose osapi .c file\n"
                "\t-riscose_template\t\t"     "riscose template .c file\n"
-               "\t-riscose_header\t\t"     "riscose osapi .h file\n",
+               "\t-riscose_header\t\t"     "riscose osapi .h file\n"
+               "\t-riscose_errors\t\t"     "riscose error definitions\n",
                stdout);
       } else {
             error("unknown option: %s\n", argv[i]);
@@ -1014,7 +1018,11 @@ int main (int argc, char *argv [])
       case Riscose_Header:
         riscose_header_output(Title, Author, needses,
             needsatends, consts, types, swis);
+      break;
 
+      case Riscose_Errors:
+        riscose_errors_output(Title, Author, needses,
+            needsatends, consts, types, swis);
       break;
 
       case None:

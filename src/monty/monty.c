@@ -7,6 +7,8 @@
 
 #define DEFINE_MONTY_GLOBALS
 #include "monty.h"
+#define DEFINE_ENUM_GLOBALS
+#include "enum.h"
 
 void debug(char *fmt, ...)
 {

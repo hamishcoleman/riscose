@@ -18,12 +18,15 @@
 
 /* ------------------------------------------------------------------ */
 
-int file_exists(char *path)
+int file_exists(char *path, struct stat *stp)
 {
     struct stat st;
     int exists;
 
-    exists = stat(path, &st) == 0 && S_ISREG(st.st_mode);
+    if (!stp) {
+        stp = &st;
+    }
+    exists = stat(path, stp) == 0 && S_ISREG(stp->st_mode);
 
     DEBUG(FILE, ("file_exists(\"%s\") returns %d\n", path, exists));
 
@@ -40,7 +43,7 @@ char *search_path(char **path, char *file)
 
     while (*path) {
         try = mstrprintf("%s/%s", **path ? *path : ".", file);
-        if (file_exists(try)) {
+        if (file_exists(try, NULL)) {
             return try;
         }
         efree(try);

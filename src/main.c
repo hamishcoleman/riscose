@@ -20,9 +20,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <sys/stat.h>
 
 #include <config.h>
 #include <monty/monty.h>
+#include <monty/file.h>
 #include "riscostypes.h"
 #include "module.h"
 #include "swi.h"
@@ -48,9 +50,10 @@ main(int argc, char **argv)
     };
   int module=0, c;
   int utility=0;
-  char *file = NULL;
+    char *file;
   mem_private *priv;
   WORD  count = 0, o;
+    struct stat st;
   
     (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
     *argv = progname;
@@ -95,11 +98,19 @@ main(int argc, char **argv)
 
     /* FIXME: should error if -m and -u given. */
     /* FIXME: what meaning does wimpslot have if -m or -u given? */
+    /* FIXME: shouldn't we be able to use the swis for loading and
+     * running absolutes, modules, etc.? */
   
     if (optind == argc) {
         error("no risc os executable specified\n");
     }
     file = argv[optind++];
+    if (!file_exists(file, &st)) {
+        error("file \"%s\" not found\n", file);
+    }
+    if (!st.st_size) {
+        error("file \"%s\" is empty\n", file);
+    }
 
   filehandles_init();
   mem_init();

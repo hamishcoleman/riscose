@@ -37,4 +37,26 @@ test `wc -c <tmp.2` -eq 0
 sed 1q tmp.1 | grep 'usage: riscose ' >/dev/null
 awk '/^    -/ {i++} END {i < 5}' tmp.1
 
-rm tmp.1 tmp.2
+# binary must exist.
+set +e
+rm -f tmp
+$r tmp >tmp.1 2>tmp.2
+e=$?
+set -e
+test $e -eq 1
+test `wc -c <tmp.1` -eq 0
+test `wc -l <tmp.2` -eq 1
+grep '^riscose: error: file "tmp" not found$' tmp.2 >/dev/null
+
+# binary can't be an empty file.
+set +e
+>tmp
+$r tmp >tmp.1 2>tmp.2
+e=$?
+set -e
+test $e -eq 1
+test `wc -c <tmp.1` -eq 0
+test `wc -l <tmp.2` -eq 1
+grep '^riscose: error: file "tmp" is empty$' tmp.2 >/dev/null
+
+rm tmp tmp.1 tmp.2

@@ -2,8 +2,9 @@
 
 /* $Id$ */
 
-/* returns true if path exists and it is a regular file. */
-int file_exists(char *path);
+/* returns true if path exists and it is a regular file.  if stp isn't
+ * NULL its contents are set to the result from stat(2). */
+int file_exists(char *path, struct stat *stp);
 
 /* searches path looking for file.  returns NULL if not found, else the
  * full path to file which should be efree'd. */

@@ -27,10 +27,6 @@
 #include <stdlib.h>
 
 /*From Support*/
-#ifndef realloc_H
-   #include "realloc.h"
-#endif
-
 #ifndef trace_H
    #include "trace.h"
 #endif
@@ -75,7 +71,7 @@
    #define m_ALLOC(size)                  malloc (size)
    #define m_CALLOC(count, size)          calloc (count, size)
    #define m_FREE(ptr, size)              free (ptr)
-   #define m_REALLOC(ptr, old_size, size) REALLOC (ptr, size)
+   #define m_REALLOC(ptr, old_size, size) realloc (ptr, size)
    #define m_SUMMARY()                    SKIP
    #define m_VALIDATE_ADDRESS(ptr)        ((void *) (ptr))
 #endif

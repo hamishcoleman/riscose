@@ -8,9 +8,14 @@ AC_PROG_RANLIB
 AC_PATH_PROG(PERL, perl)
 test -z "$PERL" && AC_MSG_ERROR([no acceptable $ac_word found in \$PATH])
 
+ARM=armul
+AC_ARG_ENABLE(arm,
+[  --enable-arm=ARM        Set the ARM emulation to use.  Choose one of
+                          armul, sleeve, or native [armul]],
+    ARM=$enableval)
 case "$ARM" in
 armul) ;;
-*) AC_MSG_ERROR([only ARM=armul handled at the moment])
+*) AC_MSG_ERROR([only --enable-arm=armul handled at the moment])
 esac
 AC_SUBST(ARM)
 

@@ -14,7 +14,6 @@ binaries I've used for testing at:
 
 So just dump it into the src/ folder for now and type:
 
-    ARM=armul; export ARM
     ./configure && make
     (cd src && riscose grep free) <README
 

@@ -704,7 +704,7 @@ SWI OS_Exit =
    (  NUMBER 0x11 "Passes control to the most recent exit handler",
       ENTRY
       (  R0 -> OS_Error: e,
-         R1 # 'ABEX',
+         R1 = .Int: abex,
          R2 = .Int: rc
    )  );
 

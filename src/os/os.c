@@ -446,15 +446,22 @@ os_error *xos_get_env (char **command,
  */
 
 os_error *xos_exit (os_error const *e,
+      int abex,
       int rc)
 {
   fprintf(stderr, "os_exit\n");
   fprintf(stderr, "  In: e = %x\n", (int) e);
+  fprintf(stderr, "  In: abex = %x\n", (int) abex);
   fprintf(stderr, "  In: rc = %x\n", (int) rc);
 
-  exit(e);
+    /* FIXME: what's the intended use of e?  What if an e and rc are
+     * specified? */
 
-  return 0;
+    if (abex == ('X' << 24 | 'E' << 16 | 'B' << 8 | 'A')) {
+        exit(rc > 0xff ? 0xff : rc);
+    }
+
+    exit(!!e);
 }
 
 /* ------------------------------------------------------------------------

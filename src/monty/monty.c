@@ -1,4 +1,4 @@
-/* $Id$ */
+/* monty.c -- central routines for the monty library. */
 
 #include <stdlib.h>
 #include <stdio.h>

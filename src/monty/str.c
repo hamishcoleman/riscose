@@ -1,7 +1,5 @@
 /* str.c -- provide an expanding string based on array.h. */
 
-/* $Id$ */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

@@ -6,9 +6,6 @@
 ** pick up a later version of the software.
 **
 **   A few basic RISC OS types
-**
-**   $Revision$
-**   $Date$
 */
 #ifndef _RISCOSE_TYPES_H
 #define _RISCOSE_TYPES_H

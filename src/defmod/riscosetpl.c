@@ -7,9 +7,6 @@
 ** pick up a later version of the software.
 **
 **   defmod backend to write module "template" files.
-**
-**   $Revision$
-**   $Date$
 */
 
 

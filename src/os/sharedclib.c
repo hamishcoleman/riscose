@@ -8,9 +8,6 @@
 **   Emulation of the RISC OS SharedCLibrary module.  Has bugs and needs
 **   tighter integration with whatever framework we decide upon for the rest
 **   of the OS.
-**
-**   $Revision$
-**   $Date$
 */
 #include <stdio.h>
 #include <string.h>

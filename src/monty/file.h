@@ -1,7 +1,5 @@
 /* file.h. */
 
-/* $Id$ */
-
 /* returns true if path exists and it is a regular file.  if stp isn't
  * NULL its contents are set to the result from stat(2). */
 int file_exists(char *path, struct stat *stp);

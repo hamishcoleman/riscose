@@ -7,9 +7,6 @@
 **
 **   The ARM emulation as riscose would like to see it; this is currently
 **   just a thin layer around the ARMulator.
-**
-**   $Revision$
-**   $Date$
 */
 #include "riscostypes.h"
 

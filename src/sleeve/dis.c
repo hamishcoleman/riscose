@@ -1,4 +1,4 @@
-/* $Id$
+/* dis.c
  *
  * Disassembling individual instructions
  *

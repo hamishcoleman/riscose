@@ -7,9 +7,6 @@
 **
 **   Facilities for loading RISC OS modules, running them, using their
 **   CLI commands, SWIs etc.
-**
-**   $Revision$
-**   $Date$
 */
 
 #include <stdio.h>

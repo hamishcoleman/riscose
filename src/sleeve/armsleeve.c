@@ -7,9 +7,6 @@
 **
 **   The ARM emulation as riscose would like to see it; this one assumes
 **   that you're linking to the Chris Rutter's `sleeve'.
-**
-**   $Revision$
-**   $Date$
 */
 #include <string.h>
 

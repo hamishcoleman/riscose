@@ -1,7 +1,5 @@
 /* enum.h -- provide enumeration images. */
 
-/* $Id$ */
-
 /* these macros allow a user to write ENUM_IMAGE(colour, sunken, image)
  * to get a character pointer to a string representing the value sunken
  * in the enumeration colour using the temporary character array image

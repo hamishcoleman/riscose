@@ -7,9 +7,6 @@
 ** pick up a later version of the software.
 **
 **   defmod backend to write C header files.
-**
-**   $Revision$
-**   $Date$
 */
 
 #include <ctype.h>

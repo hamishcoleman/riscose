@@ -1,7 +1,5 @@
 /* str.h -- provide an expanding string based on array.h. */
 
-/* $Id$ */
-
 /* a str is an expanding array of char from array.h.  you can access
  * all the bits of str and use array functions on it.  the typedef is just
  * for convenience, not abstraction. */

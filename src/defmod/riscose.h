@@ -4,9 +4,6 @@
 ** pick up a later version of the software.
 **
 **   riscose-specific bits of defmod that are used in more than one backend.
-**
-**   $Revision$
-**   $Date$
 */
 
 

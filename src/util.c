@@ -4,9 +4,6 @@
 **
 ** See http://riscose.sourceforge.net/ for terms of distribution, and to
 ** pick up a later version of the software.
-**
-**   $Revision$
-**   $Date$
 */
 #include <stdlib.h>
 #include <stdio.h>

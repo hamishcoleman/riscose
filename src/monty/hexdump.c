@@ -1,7 +1,5 @@
 /* hexdump.c -- provide hex dumping facilities. */
 
-/* $Id$ */
-
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>

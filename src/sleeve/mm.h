@@ -1,4 +1,4 @@
-/* $Id$
+/* mm.h
  *
  * Memory interface
  *

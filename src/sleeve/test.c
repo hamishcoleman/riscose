@@ -1,4 +1,4 @@
-/* $Id$
+/* test.c
  *
  * A straightforward shell and test rig for sleeve
  *

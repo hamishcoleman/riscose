@@ -1,4 +1,4 @@
-/* $Id$
+/* arm.h
  *
  * Basic type definitions
  *

@@ -1,4 +1,4 @@
-/* $Id$
+/* sleeve.h
  *
  * Sleeve ARM emulator
  *

@@ -8,9 +8,6 @@
 **   Rough emulation of the RISC OS memory map, with support for multiple
 **   `tasks' (which currently amounts to being able to switch between different
 **   application spaces, as the Wimp would require).
-**
-**   $Revision$
-**   $Date$
 */
 #ifndef _RISCOSE_MEM_H
 #define _RISCOSE_MEM_H

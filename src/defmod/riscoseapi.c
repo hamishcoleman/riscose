@@ -8,9 +8,6 @@
 **
 **   defmod backend to write osapi .c file from the ARM emulator world
 **   into OSLib-style function definitions.
-**
-**   $Revision$
-**   $Date$
 */
 
 #include <ctype.h>

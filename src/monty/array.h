@@ -1,7 +1,5 @@
 /* array.h -- extremely noddy, poor performance implementation. */
 
-/* $Id$ */
-
 /* the array routines aren't meant to hide the implementation from
  * you.  they are just providing some often needed funtionality.  so
  * feel free to access members of structs, etc.  */

@@ -1,7 +1,5 @@
 /* hexdump.h -- provide hex dumping facilities. */
 
-/* $Id$ */
-
 /* hexdump len bytes at p to fp with addressing column starting at
  * base. */
 int hexdump(FILE *fp, void *p, int len, int base);

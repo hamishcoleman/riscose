@@ -1,4 +1,4 @@
-/* $Id$
+/* mm.c
  *
  * Memory interface
  *

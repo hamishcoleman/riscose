@@ -1,7 +1,5 @@
 /* hash.h. */
 
-/* $Id$ */
-
 /* a hash table implementation.  a key is a variable length lump of
  * memory.  the hash routines don't make a copy of the key so make sure
  * it hangs around for as long as the hash entry exists.  the hash

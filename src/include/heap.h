@@ -9,9 +9,6 @@
 **   i.e. you allocate the memory, this'll manage it for you, keeping all its
 **   guts inside the block you've given it, and if you need to move the memory,
 **   these routines should cope.
-**
-**   $Revision$
-**   $Date$
 */
 #include "riscostypes.h"
 

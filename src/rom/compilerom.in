@@ -11,9 +11,6 @@
 #   memory at 0x3800000.  It also makes up the "rom.h" include file which
 #   SWI emulations can use to refer to error messages and other fixed
 #   resources in ROM when passing results back from SWIs.
-#
-#   $Revision$
-#   $Date$
 
 use strict;
 

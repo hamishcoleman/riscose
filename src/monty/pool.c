@@ -1,7 +1,5 @@
 /* pool.c -- maintain pools of memory ready for a quick dip. */
 
-/* $Id$ */
-
 #include <stdlib.h>
 #include <stdio.h>
 

@@ -1,7 +1,5 @@
 /* pool.h -- maintain pools of memory ready for a quick dip. */
 
-/* $Id$ */
-
 typedef struct pool_block {
     struct pool_block *next;
 } pool_block;

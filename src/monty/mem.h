@@ -1,7 +1,5 @@
 /* mem.h -- shortcuts to malloc and friends. */
 
-/* $Id$ */
-
 #undef EXTERN
 #ifdef DEFINE_MEM_GLOBALS
 #define EXTERN

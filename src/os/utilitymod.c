@@ -6,9 +6,6 @@
 ** pick up a later version of the software.
 **
 **   Module emulation for riscose
-**
-**   $Revision$
-**   $Date$
 */
 
 #include "../../config.h"

@@ -8,9 +8,6 @@
 **   The ARMulator calls swi_trap() when it hits a SWI; the rest is dressing.
 **   The main flaw at the moment is that there's no support for dynamically
 **   adding support for SWIs through loading modules.
-**
-**   $Revision$
-**   $Date$
 */
 
 #include <stdio.h>

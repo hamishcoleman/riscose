@@ -8,9 +8,6 @@
 **   The function that starts Riscose-- currently this also doubles as a
 **   task manager and command-line interpreter, which I'd like to split into
 **   separate files when they do something a bit less trivial.
-**
-**   $Revision$
-**   $Date$
 */
 #include <stdlib.h>
 #include <stdarg.h>

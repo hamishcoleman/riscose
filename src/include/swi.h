@@ -6,9 +6,6 @@
 ** pick up a later version of the software.
 **
 **   Constants and macros helpful when writing SWI handlers.
-**
-**   $Revision$
-**   $Date$
 */
 #define SWI_OS(x)    (((x)>>20)&15)
 #define SWI_WHERE(x) (((x)>>18)&3)

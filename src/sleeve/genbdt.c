@@ -1,4 +1,4 @@
-/* $Id$
+/* genbdt.c
  *
  * Generate C code for the block data transfer instructions
  *

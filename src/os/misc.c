@@ -9,9 +9,6 @@
 **   services module.  This implements OS_File, OS_Args, OS_Find and basically
 **   everything described in 2-9 to 2-194.  Previously known as osfileio.c
 **   osfile.c osargs.c etc.
-**
-**   $Revision$
-**   $Date$
 */
 
 #include <config.h>

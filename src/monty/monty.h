@@ -1,4 +1,4 @@
-/* $Id$ */
+/* monty.h -- central routines for the monty library. */
 
 #undef EXTERN
 #ifdef DEFINE_MONTY_GLOBALS

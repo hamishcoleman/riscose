@@ -8,9 +8,6 @@
 **   Redesign of heap.c which was too much effort to debug :-)  Similar
 **   algorithm, but more easily debuggable data structures, based on ideas
 **   that Ralph threw out to the mailing list.
-**
-**   $Revision$
-**   $Date$
 */
 
 #include <config.h>

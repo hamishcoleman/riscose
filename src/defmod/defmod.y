@@ -34,7 +34,6 @@ TV    20000503    |bool| replaced by |osbool|
    #include <stddef.h>
    #include <stdlib.h>
    #include <string.h>
-   #include <swis.h>
 
    /*From OSLib*/
    #include "bootstrap/types.h"

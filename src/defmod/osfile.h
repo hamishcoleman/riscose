@@ -21,8 +21,6 @@
    Foundation, Inc, 675 Mass Ave, Cambridge, MA 02139, U S A.
 */
 
-#include <swis.h>
-
 #ifndef types_H
    #include "types.h"
 #endif

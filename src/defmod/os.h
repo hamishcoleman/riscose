@@ -22,7 +22,6 @@
 */
 
 #include <kernel.h>
-#include <swis.h>
 
 #ifndef types_H
    #include "bootstrap/types.h"

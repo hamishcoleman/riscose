@@ -84,16 +84,6 @@ TV    20000503    |bool| replaced by |osbool|
 
 #define VERSION_INFO Module_FullVersion " [" Module_Date "]"
 
-/* Set this to 1 to make APCS 3/32 the default */
-#define DEFAULT_TO_APCS_32 0
-#if DEFAULT_TO_APCS_32
-#  define HELP_STRING_26 ""
-#  define HELP_STRING_32 "  [default]"
-#else
-#  define HELP_STRING_26 "  [default]"
-#  define HELP_STRING_32 ""
-#endif
-
 int yydebug;
 
    static lookup_t needses, needsatends, consts, types, swis;
@@ -950,7 +940,6 @@ int main (int argc, char *argv [])
 {
    int i;
    enum {None, Riscose_OSAPI, Riscose_Template, Riscose_Header} option = None;
-   enum {APCS26, APCS32} mode = DEFAULT_TO_APCS_32 ? APCS32 : APCS26;
 
     lookup_new(&needses, 16);
     lookup_new(&needsatends, 16);
@@ -985,22 +974,12 @@ int main (int argc, char *argv [])
                "Purpose: generate output from a module interface file\n"
                "-v\t\t"             "verbose\n"
                "-q\t\t"             "quiet\n"
-               "-26bit\t\t"         "generate 26 bit code" HELP_STRING_26 "\n"
-               "-32bit\t\t"         "generate 32 bit code" HELP_STRING_32 "\n"
 
                "<type> is one of:\n"
                "\t-riscose_osapi\t\t"     "riscose osapi .c file\n"
                "\t-riscose_template\t\t"     "riscose template .c file\n"
                "\t-riscose_header\t\t"     "riscose osapi .h file\n",
                stdout);
-      }
-      else if (strcmp (argv [i], "-26bit") == 0)
-      {
-         mode = APCS26;
-      }
-      else if (strcmp (argv [i], "-32bit") == 0)
-      {
-         mode = APCS32;
       }
 
       i++;

@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "monty/monty.h"
+
 /*From Support*/
 #include "lookup.h"
 
@@ -316,18 +318,18 @@ osbool def_inlinable
    if (s->absent) return FALSE;
 
    /*Input registers must be a leading subsequence of (R0, R1, R2, R3).*/
-   if (!(s->i == NONE || s->i == 1u || s->i == 3u || s->i == 7u ||
+   if (!(s->i == 0 || s->i == 1u || s->i == 3u || s->i == 7u ||
          s->i == 0xFu))
       return FALSE;
 
    /*Output registers must be R0 or nothing.*/
-   if (!(s->o == NONE || s->o == 1u)) return FALSE;
+   if (!(s->o == 0 || s->o == 1u)) return FALSE;
 
    /*Corrupted registers must be among {R0, R1, R2, R3}.*/
-   if ((s->c & ~0xFu) != NONE) return FALSE;
+   if ((s->c & ~0xFu) != 0) return FALSE;
 
    /*No constants can be provided.*/
-   if (s->k != NONE) return FALSE;
+   if (s->k != 0) return FALSE;
 
    /*No flags can be provided on input.*/
    if (s->f_in) return FALSE;
@@ -336,7 +338,7 @@ osbool def_inlinable
    if (s->f_out) return FALSE;
 
    /*The returned register must be R0 or nothing.*/
-   if (!(s->value == NONE || s->value == 1u)) return FALSE;
+   if (!(s->value == 0 || s->value == 1u)) return FALSE;
 
    return TRUE;
 }

@@ -17,6 +17,8 @@
 #include <stdlib.h>
 #include <errno.h>
 
+#include "monty/monty.h"
+
 #include "types.h"
 
 #include "lookup.h"

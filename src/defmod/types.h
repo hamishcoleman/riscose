@@ -25,31 +25,10 @@ typedef unsigned int bits, bytes;
 typedef int osbool;
 typedef unsigned char byte;
 
-#ifndef NULL
-   #define NULL ((void *) 0)
-#endif
-
-#define FALSE ((osbool) 0)
-#define TRUE  ((osbool) 1)
-
-#define NONE ((bits) 0)
-#define ALL  (~(bits) 0)
-
-#define SKIP 0
-   /*may be used as a "don't care" value for |int|, |... *|, |bits| etc*/
-
-#define UNKNOWN 1
-   /*may be used to declare arrays of unknown size*/
-
 #define AS .
-#define ASREF ->
    /*may be used for components of a union*/
 
 #define _ ,
    /*may be used to separate arguments of a macro*/
-
-/*These may be used to suppress compiler warnings*/
-#define NOT_USED(x) {x = x;}
-#define UNSET(x)    {(void) &x;}
 
 #endif

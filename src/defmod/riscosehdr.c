@@ -16,6 +16,8 @@
 #include <time.h>
 #include <errno.h>
 
+#include "monty/monty.h"
+
 #include "types.h"
 
 #include "lookup.h"
@@ -60,7 +62,7 @@ static char *Op
       break;
    }
 
-   return SKIP;
+   return 0;
 }
 /*-----------------------------------------------------------------------*/
 
@@ -859,7 +861,7 @@ void riscose_header_output
 
       if (!s->absent && is_swi(swi))
       {
-         int result = s->value != NONE? def_bit_index (s->value, 0): -1;
+         int result = s->value ? def_bit_index(s->value, 0) : -1;
             /*number of register returned as result*/
 
          if (start)
@@ -941,7 +943,7 @@ void riscose_header_output
          {
             first = TRUE;
             for (i = 0; i < 10; i++)
-               if ((s->i & 1 << i) != NONE)
+               if (s->i & 1 << i)
                {
                   if (first)
                      if ((rc = fprintf (file, "%s\n", comment)) < 0)
@@ -969,7 +971,7 @@ void riscose_header_output
 
             first = TRUE;
             for (i = 0; i < 10; i++)
-               if ((s->o & 1 << i) != NONE)
+               if (s->o & 1 << i)
                {
                   if (first)
                      if ((rc = fprintf (file, "%s\n", comment)) < 0)
@@ -1015,7 +1017,7 @@ void riscose_header_output
             /*First locate the register pointing to the block.*/
             first = TRUE;
             for (i = 0; i < 10; i++)
-               if ((s->i & 1 << i) != NONE)
+               if (s->i & 1 << i)
                {
                   int cpt;
 
@@ -1039,7 +1041,7 @@ void riscose_header_output
                }
          }
 
-         if (s->value != NONE)
+         if (s->value)
          {
             char name [10];
 
@@ -1059,9 +1061,9 @@ void riscose_header_output
          first = TRUE;
          for (i = 0; i < 10; i++)
          {
-            if ((s->k & 1 << i) != NONE)
+            if (s->k & 1 << i)
             {
-               char *op = (s->i & 1 << i) == NONE? "=": Op (s->op [i]);
+               char *op = (s->i & 1 << i) == 0 ? "=" : Op (s->op [i]);
 
                if (first)
                {

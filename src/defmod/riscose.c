@@ -11,6 +11,8 @@
 /* ANSI */
 #include <string.h>
 
+#include "monty/monty.h"
+
 /* OSLib */
 #include "types.h"
 

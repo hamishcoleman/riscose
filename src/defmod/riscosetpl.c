@@ -16,6 +16,8 @@
 #include <time.h>
 #include <errno.h>
 
+#include "monty/monty.h"
+
 #include "types.h"
 
 #include "lookup.h"
@@ -51,7 +53,7 @@ static char *Op
       break;
    }
 
-   return SKIP;
+   return 0;
 }
 /*-----------------------------------------------------------------------*/
 
@@ -371,7 +373,7 @@ void riscose_template_output
 
       if (!s->absent && is_swi(swi))
       {
-         int result = s->value != NONE? def_bit_index (s->value, 0): -1;
+         int result = s->value ? def_bit_index(s->value, 0) : -1;
             /*number of register returned as result*/
 
          def_as_extern (c_name, swi);

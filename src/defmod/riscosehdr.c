@@ -15,7 +15,6 @@
 #include <string.h>
 #include <time.h>
 #include <errno.h>
-#include <kernel.h>      /* TV 980115 */
 
 #include "types.h"
 #include "macros.h"

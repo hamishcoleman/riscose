@@ -21,8 +21,6 @@
    Foundation, Inc, 675 Mass Ave, Cambridge, MA 02139, U S A.
 */
 
-#include <kernel.h>
-
 typedef unsigned int bits, bytes;
 typedef int osbool;
 typedef unsigned char byte;

@@ -21,14 +21,15 @@
    Foundation, Inc, 675 Mass Ave, Cambridge, MA 02139, U S A.
 */
 
-#include <kernel.h>
-
 #ifndef types_H
    #include "types.h"
 #endif
 
-typedef _kernel_oserror os_error;
 #define os_ERROR_LIMIT 252
+typedef struct {
+  int errnum;
+  char errmess[os_ERROR_LIMIT];
+} os_error;
 
 #define os_GLOBAL_NO_ANY 9
 #define os_GLOBAL_NO_MEM 49

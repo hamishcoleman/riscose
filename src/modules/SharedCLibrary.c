@@ -111,12 +111,15 @@ void fill_statics(WORD addr) /* 4-252 */
   mem_free(MEM_TOHOST(riscos_stdout));
   mem_free(MEM_TOHOST(riscos_stderr));
 
+  
+  
   for (ch = 0; ch < 256; ch++)
     {
       int msk;
       msk  = isspace(ch) ? 1 : 0;
       msk |= ispunct(ch) ? 2 : 0;
-      msk |= isblank(ch) ? 4 : 0; /* FIXME: compilation warning */
+	  /* FIXME: Use isblank() if available?  Or is this better? */
+	  msk |= (ch == 32 || ch == 9) ? 4 : 0;
       msk |= islower(ch) ? 8 : 0;
       msk |= isupper(ch) ? 16 : 0;
       msk |= isdigit(ch) ? 32 : 0;
@@ -140,11 +143,19 @@ int countpercents(char *str)
 ** system implements va_list, and might want rewriting.
 */
 static char**
-prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf)
+prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf, WORD is_vararg)
 {
   char **arm_va_list = malloc((countpercents(str)+1)*sizeof(char*));
   int arg=0;
+  int* varargs;
+  int vararg_n = 0;
+  int this_arg;
   
+  if (is_vararg)
+    varargs = (int*) MEM_TOHOST(ARM_APCS_ARG(apcs_arg)) + 6;
+  else
+    varargs = NULL; /* avoid compiler warning */
+
   while (*str)
     switch (*str++)
       {
@@ -154,11 +165,21 @@ prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf)
         if (*str == '-')                   str++;
         while (strchr("0123456789", *str)) str++;
         while (strchr("hlLqjzt", *str))    str++;
+
+        if (is_vararg) {
+          this_arg = varargs[vararg_n];
+          vararg_n++;
+        } else {
+          this_arg = ARM_APCS_ARG(apcs_arg);
+          apcs_arg++;
+        }
+
         if (*str++ == 's' || is_scanf)
-          arm_va_list[arg++] = MEM_TOHOST(ARM_APCS_ARG(apcs_arg));
+          arm_va_list[arg++] = MEM_TOHOST(this_arg);
         else
-          arm_va_list[arg++] = (char*) ARM_APCS_ARG(apcs_arg);
-        apcs_arg++; /* best not use post-increment with macros! */
+          arm_va_list[arg++] = (char*) this_arg;
+
+        break;
         
       default:
         continue;
@@ -484,27 +505,27 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB__SPRINTF:
     case CLIB_CLIB_SPRINTF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0, 0);
       ARM_SET_R0(vsprintf(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), arm_va_list));
       free(arm_va_list);
       return 0;
     
     case CLIB_CLIB_SCANF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 1);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 1, 0);
       ARM_SET_R0(scanf(MEM_TOHOST(ARM_R0), arm_va_list));
       free(arm_va_list);
       return 0;
     
     case CLIB_CLIB__PRINTF:
     case CLIB_CLIB_PRINTF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 0, 0);
       ARM_SET_R0(vprintf(MEM_TOHOST(ARM_R0), arm_va_list));
       free(arm_va_list);
       return 0;
       
     case CLIB_CLIB__FPRINTF:
     case CLIB_CLIB_FPRINTF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0, 0);
       ARM_SET_R0(vfprintf(clib_file_real(ARM_R0),
                           MEM_TOHOST(ARM_R1),
                           arm_va_list));
@@ -513,7 +534,7 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB__VPRINTF:
     case CLIB_CLIB_VPRINTF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 2, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 0, 1);
       ARM_SET_R0(vfprintf(stdout,
                           MEM_TOHOST(ARM_R0),
                           arm_va_list));
@@ -521,7 +542,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
       
     case CLIB_CLIB_VFPRINTF: /* 4-312 */
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0, 1);
       ARM_SET_R0(vfprintf(clib_file_real(ARM_R0),
                      MEM_TOHOST(ARM_R1),
                      arm_va_list));

@@ -199,10 +199,15 @@ remap_it(WORD base, WORD oldsize, WORD newsize)
 void
 mem_init(void)
 {
+    char *image;
+
   mem = emalloc(sizeof(mem_state));
   mem->tasks    = emalloc(MAX_TASKS * sizeof(mem_wimp_task));
   mem->task_current = -1;
-  
+
+    /* FIXME: should look for it by installation prefix. */
+    image = "rom/romimage";
+
 #ifdef CONFIG_MEM_ONE2ONE
 #ifndef NATIVE
   map_it(MMAP_APP_BASE, 1<<20);
@@ -212,10 +217,10 @@ mem_init(void)
   map_it(MMAP_ROM_BASE, MMAP_ROM_SIZE);
   mem->rma      = MEM_TOHOST(MMAP_RMA_BASE);
   mem->rom      = MEM_TOHOST(MMAP_ROM_BASE);
-  load_rom("rom/ROMimage", MEM_TOHOST(MMAP_ROM_BASE));
+    load_rom(image, MEM_TOHOST(MMAP_ROM_BASE));
 #else
   mem->rma      = emalloc(RMA_START_SIZE);
-  mem->rom      = load_rom("rom/ROMimage", 0);
+    mem->rom      = load_rom(image, 0);
 #endif
   mem->rma_size = RMA_START_SIZE;
   

@@ -64,3 +64,6 @@ void	arm_set_reg(WORD num, WORD val);
 
 void	arm_clear_v();
 void	arm_set_v();
+
+void	arm_clear_c();
+void	arm_set_c();

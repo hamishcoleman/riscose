@@ -99,6 +99,18 @@ arm_set_v(void)
   arm->VFlag = 1;
 }
 
+void
+arm_clear_c(void)
+{
+  arm->CFlag = 0;
+}
+
+void
+arm_set_c(void)
+{
+  arm->CFlag = 1;
+}
+
 /******************* Glue code for ARMulator follows *********************/
 
 unsigned inline

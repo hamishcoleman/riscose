@@ -54,3 +54,18 @@ void osfile(void);
 
 void swi_init(void);
 void swi_trap(WORD num);
+
+struct swi_chunk
+{
+  int base;
+  const char *prefix;
+  const char **names;
+  WORD (*fn)(WORD);
+};
+
+extern struct swi_chunk *chunks;
+
+#define DECLARE_SWI_CHUNK(nr, prefix, names, fn)		\
+	struct swi_chunk __chunk_##nr				\
+		__attribute__ (( section ("swi." #nr))) =	\
+	{ 0x##nr, prefix, names, fn };				\

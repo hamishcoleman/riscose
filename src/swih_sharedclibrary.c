@@ -471,3 +471,12 @@ swih_sharedclibrary_entry(WORD num)
     }
   return 0;
 }
+
+static const char *sharedclibrary_names[256] =
+{
+  "LibInitAPCS_A",
+  "LibInitAPCS_R",
+  "LibInitModule"
+};
+
+DECLARE_SWI_CHUNK(00080680, "SharedCLibrary", sharedclibrary_names, swih_sharedclibrary);

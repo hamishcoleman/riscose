@@ -23,6 +23,7 @@
 #include "swih_all.h"
 
 static swi_handler * handler;
+extern struct swi_chunk __chunk_00000000;
 
 void
 swi_init(void)
@@ -31,30 +32,52 @@ swi_init(void)
 }
 
 void
+swi_number_to_name(WORD num, char *buf)
+{
+  WORD chunk = SWI_CHUNK(num);
+  struct swi_chunk *c;
+  for (c = &__chunk_00000000; chunk > c->base; c++)
+    ;
+  if (chunk == c->base)
+    {
+      WORD nr = num & 0x3f;
+      if (c->names && c->names[nr])
+	sprintf(buf, "%s_%s", c->prefix, c->names[nr]);
+      else
+	sprintf(buf, "%s_&%x", c->prefix, num);
+    }
+  else
+    sprintf(buf, "&%x", num);
+}
+
+void
 swi_trap(WORD num)
 {
   WORD e;
+  struct swi_chunk *c;
+  WORD chunk = SWI_CHUNK(num);
     
   if (SWI_OS(num) == SWI_OS_TRAP)
     {
      WORD r;
      
+#ifndef NATIVE
      if (num == SWI_MAGIC_RETURN)
        { arm_return(); return; }
+#endif
      if (((r = swih_sharedclibrary_entry(num)) & SWIH_EXIT_HANDLED) == 0)
        arm_set_pc(ARM_R14);
      r &= !3;
      return;
     }
-    
-  switch (SWI_CHUNK(num))
-    {
-    case 0 ... 0x200:  e=swih_os(num); break;
-    case 0x80680:      e=swih_sharedclibrary(num); break;
-    default:
-      e=ERR_EM_UNHANDLEDSWI;
-      break;
-    }
+
+  for (c = &__chunk_00000000; chunk > c->base; c++)
+    ;
+
+  if (chunk == c->base)
+    e = c->fn(num);
+  else
+    e = ERR_EM_UNHANDLEDSWI;
   
   arm_clear_v();
   if (e)
@@ -66,8 +89,13 @@ swi_trap(WORD num)
        }
      else
        {
-        printf("Untrapped SWI %08x\n", (unsigned)SWI_NUM(num));
+	char buf[64];
+	swi_number_to_name(SWI_NUM(num), buf);
+        printf("Untrapped SWI %s at %08x\n", buf, ARM_R15);
         exit(1);
        }
     }
 }
+
+struct swi_chunk __lastchunk __attribute__ (( section ("swi.last"))) =
+	{ 0xffffffff, NULL, NULL };

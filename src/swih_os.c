@@ -18,6 +18,15 @@
 #include "arm.h"
 #include "swi.h"
 #include "rom.h"
+#include "vdu.h"
+#include "map.h"
+
+WORD
+swih_os_writei(WORD num)
+{
+  vdu(num & 0xff);
+  return 0;
+}
 
 WORD
 swih_os(WORD num)
@@ -28,23 +37,45 @@ swih_os(WORD num)
     {
     
     case 0x0 : /* OS_WriteC */
-      putc(ARM_R0, stdout);
+      vdu(ARM_R0);
       return 0;
 
     case 0x1 : /* OS_WriteS */
-      printf("OS_WriteS called");
-      return 0;
+      {
+	WORD pc = ARM_R15 & 0x02fffffc, psr = ARM_R15 & 0xfc000003;
+	char *p = (char *)MEM_TOHOST(pc);
+	while (*p)
+	  {
+	    vdu(*(p++));
+	    pc++;
+	  }
+	pc = (pc + 3) & ~3;
+	ARM_SET_R15(pc | psr);
+	return 0;
+      }
     
     case 0x2 : /* OS_Write0 */
-      printf(MEM_TOHOST(ARM_R0));
+      {
+	char *p = (char *)MEM_TOHOST(ARM_R0);
+	while (*p)
+	  vdu(*(p++));
+      }
+      return 0;
+      
+    case 0x6:
+      osbyte();
       return 0;
     
+    case 0x7:
+      fprintf(stderr, "[OS_Word %d]", ARM_R0);
+      return 0;
+
     case 0x8: /* OS_File */
       osfile();
       return 0;
     
-    case 0x100 ... 0x1ff : /* OS_WriteI */
-      putc(num & 0xff, stdout);
+    case 0xf:
+      fprintf(stderr, "OS_Control called");
       return 0;
     
     case 0x46 : /* OS_WriteN */
@@ -52,9 +83,9 @@ swih_os(WORD num)
         putc(* ((char*)MEM_TOHOST(ARM_R0)+c), stdout);
       
     case 0x10: /* OS_GetEnv */
-      arm_set_reg(0, (WORD) mem_get_private());
+      arm_set_reg(0, (WORD) MMAP_USRSTACK_BASE);
       arm_set_reg(1, 0x8000 + mem_get_wimpslot());
-      arm_set_reg(2, (WORD) mem_get_private()+256);
+      arm_set_reg(2, (WORD) MMAP_USRSTACK_BASE+256);
       return 0;
     
     case 0x11: /* OS_Exit */
@@ -72,3 +103,56 @@ swih_os(WORD num)
     }
   return ERR_EM_UNHANDLEDSWI;
 }
+
+static const char *os_names[64] =
+{
+  "WriteC",  "WriteS", "Write0", "NewLine", "ReadC", "CLI", "Byte", "Word",
+  "File", "Args", "BGet", "BPut", "GBPB", "Find", "ReadLine", "Control",
+  "GetEnv", "Exit", "SetEnv", "IntOn", "IntOff", "CallBack", "EnterOS",
+  "BreakPt", "BreakCtrl", "UnusedSWI", "UpdateMEMC", "SetCallBack", "Mouse",
+  "Heap", "Module", "Claim", "Release", "ReadUnsigned", "GenerateEvent",
+  "ReadVarVal", "SetVarVal", "GSInit", "GSRead", "GSTrans", "BinaryToDecimal",
+  "FSControl", "ChangeDyamicArea", "GenerateError", "ReadEscapeState",
+  "EvaluateExpression", "SpriteOp", "ReadPalette", "ServiceCall",
+  "ReadVduVariables", "ReadPoint", "UpCall", "CallAVector", "ReadModeVariable",
+  "RemoveCursors", "RestoreCursors", "SWINumberToString", "SWINumberFromString",
+  "ValidateAddress", "CallAfter", "CallEvery", "RemoveTickerEvent",
+  "InstallKeyHandler", "CheckModeValid"
+};
+
+static const char *os_names_40[64] =
+{
+  "ChangeEnvironment", "ClaimScreenMemory", "ReadMonotonicTime", "SubstituteArgs",
+  "PrettyPrint","Plot", "WriteN", "AddToVector", "WriteEnv", "ReadArgs", 
+  "ReadRAMFsLimits", "ClaimDeviceVector", "ReleaseDeviceVector", 
+  "DelinkApplication", "RelinkApplication", "HeapSort", "ExitAndDie", 
+  "ReadMemMapInfo", "ReadMemMapEntries", "SetMemMapEntries", "AddCallBack", 
+  "ReadDefaultHandler", "SetECFOrigin", "SerialOp", "ReadSysInfo", "Confirm", 
+  "ChangedBox", "CRC", "ReadDynamicArea", "PrintChar", "ChangeRedirection", 
+  "RemoveCallBack", "FindMemMapEntries", "SetColour"
+};
+
+static const char *os_names_c0[64] =
+{
+  "ConvertStandardDateAndTime", "ConvertDateAndTime",
+  NULL, NULL, NULL, NULL, NULL, NULL,
+  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+  "ConvertHex1", "ConvertHex2", "ConvertHex4", "ConvertHex6", "ConvertHex8",
+  "ConvertCardinal1", "ConvertCardinal2", "ConvertCardinal3", "ConvertCardinal4",
+  "ConvertInteger1", "ConvertInteger2", "ConvertInteger3", "ConvertInteger4",
+  "ConvertBinary1", "ConvertBinary2", "ConvertBinary3", "ConvertBinary4",
+  "ConvertSpacedCardinal1", "ConvertSpacedCardinal2", "ConvertSpacedCardinal3", 
+  "ConvertSpacedCardinal4", "ConvertSpacedInteger1", "ConvertSpacedInteger2",
+  "ConvertSpacedInteger3", "ConvertSpacedInteger4", "ConvertFixedNetStation",
+  "ConvertNetStation", "ConvertFixedFileSize", "ConvertFileSize", NULL, NULL, NULL,
+  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+  NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+};
+
+DECLARE_SWI_CHUNK(00000000, "OS", os_names, swih_os);
+DECLARE_SWI_CHUNK(00000040, "OS", os_names_40, swih_os);
+DECLARE_SWI_CHUNK(000000C0, "OS", os_names_c0, swih_os);
+DECLARE_SWI_CHUNK(00000100, "OS_WriteI", NULL, swih_os_writei);
+DECLARE_SWI_CHUNK(00000140, "OS_WriteI", NULL, swih_os_writei);
+DECLARE_SWI_CHUNK(00000180, "OS_WriteI", NULL, swih_os_writei);
+DECLARE_SWI_CHUNK(000001C0, "OS_WriteI", NULL, swih_os_writei);

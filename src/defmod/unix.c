@@ -258,43 +258,6 @@ int riscos_scan_hex
 }
 /*------------------------------------------------------------------------*/
 
-int riscos_scan_fixed
-(
-   char *s,
-   int  *mul_out,
-   int  div
-)
-{
-   int   mul = 0, place, sgn = 1;
-   char *cc = s;
-
-   tracef ("riscos_scan_fixed (s \"%s\", div %d)\n" _ s _ div);
-
-   /*Skip leading spaces.*/
-   cc += strspn (s, " \t\xA0");
-      /*Fix MED-4986: '\n' is a terminator! J R C 16th Mar 1995*/
-
-   if (*cc == '-') sgn = -1, cc++;
-
-   for (; ISDIGIT (*cc); cc++)
-      mul = 10*mul + DIGIT (*cc);
-
-   tracef ("SGN %d, INT %d\n" _ sgn _ mul);
-   mul *= div;
-
-   if (strncmp (cc, Decimal_Point, Decimal_Point_Len) == 0)
-      cc += Decimal_Point_Len;
-
-   /*Add in the fractional part too.*/
-   for (place = 10; ISDIGIT (*cc); cc++, place *= 10)
-      mul += div*DIGIT (*cc)/place;
-   tracef ("MUL %d\n" _ mul);
-
-   if (mul_out != NULL) *mul_out = sgn*mul;
-   return cc - s;
-}
-/*------------------------------------------------------------------------*/
-
 static _kernel_oserror last_error_v;
 static _kernel_oserror *last_error;
 

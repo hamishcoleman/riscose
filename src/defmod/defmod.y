@@ -43,7 +43,6 @@ TV    20000503    |bool| replaced by |osbool|
    #include "bootstrap/osfind.h"
 
    /*From Support*/
-   #include "hostfs.h"
    #include "lookup.h"
    #include "trace.h"
 

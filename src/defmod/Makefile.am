@@ -3,7 +3,7 @@ SUBDIRS = bootstrap
 noinst_PROGRAMS = defmod
 
 defmod_SOURCES = \
-    def.c def.h defmod.y hostfs.h kernel.h lookup.c lookup.h macros.h \
+    def.c def.h defmod.y kernel.h lookup.c lookup.h macros.h \
     main.h m.h os.h riscoseapi.c riscoseapi.h riscose.c riscose.h \
     riscosehdr.c riscosehdr.h riscosetpl.c riscosetpl.h riscosever.h \
     riscos.h trace.h unix.c x.c x.h

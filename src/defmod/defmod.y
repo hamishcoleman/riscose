@@ -58,6 +58,13 @@ TV    20000503    |bool| replaced by |osbool|
 
 #define tracef(a)
 
+/* The larger of two values. */
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
+/* The hexadecimal digit corresponding to a character. */
+#define XDIGIT(c) ((byte) (c) < 'A'? (c) - '0': \
+      (byte) (c) < 'a'? (c) - 'A' + 10: (c) - 'a' + 10)
+
 #define Module_MajorVersion_CMHG        6.22
 #define Module_MinorVersion_CMHG        
 #define Module_Date_CMHG                07 Jun 2001
@@ -640,7 +647,7 @@ ID: id_start id_cont_SEQUENCE_OPTION ws
 
 NUM: num ws;
 
-REG: r digit ws {$$ = DIGIT ($2);};
+REG: r digit ws {$$ = $2 - '0';};
 
 DESCRIPTION: '"' wordchar_SEQUENCE word_SEQUENCE_OPTION '"' ws
       {strcatw ($$, $2, $3);};
@@ -867,11 +874,11 @@ word_SEQUENCE_OPTION: word_SEQUENCE {strcpy ($$, $1);} |
 ws_item_SEQUENCE_OPTION: ws_item_SEQUENCE {} | EMPTY {};
 
 /*sequence*/
-bit_SEQUENCE: bit {$$ = DIGIT ($1);} |
-      bit_SEQUENCE bit {$$ = $1 << 1 | DIGIT ($2);};
+bit_SEQUENCE: bit {$$ = $1 - '0';} |
+      bit_SEQUENCE bit {$$ = $1 << 1 | $2 - '0';};
 commentchar_SEQUENCE: commentchar {} | commentchar_SEQUENCE commentchar {};
-digit_SEQUENCE: digit {$$ = DIGIT ($1);} |
-      digit_SEQUENCE digit {$$ = 10*$1 + DIGIT ($2);};
+digit_SEQUENCE: digit {$$ = $1 - '0';} |
+      digit_SEQUENCE digit {$$ = 10*$1 + $2 - '0';};
 hexit_SEQUENCE: hexit {$$ = XDIGIT ($1);} |
       hexit_SEQUENCE hexit {$$ = 16*$1 + XDIGIT ($2);};
 id_cont_SEQUENCE: id_cont {$$ [0] = $1; $$ [1] = '\0';} |
@@ -1229,14 +1236,11 @@ int yylex(void)
     return c;
 }
 
+void yyerror(char *s)
+{
+    fprintf(stderr, "%s at line %d\n", s, Line_No);
 
-void yyerror (char *s)
-{  os_error error;
-
-   (void) NCOPY (error.errmess, s, sizeof error.errmess - 1);
-   fprintf (stderr, "%s at line %d\n", error.errmess, Line_No);
-   Parse_Error = TRUE;
+    exit(1);
 }
 
 int yydebug = 0;
-

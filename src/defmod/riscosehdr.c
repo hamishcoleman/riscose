@@ -254,13 +254,16 @@ static int Print_Decl
 
       case def_TYPE_ROW:
       {
-         char v1 [def_ID_LIMIT + 1], v2 [MAX (DEC_WIDTH + 1, 8)];
+         char v1 [def_ID_LIMIT + 1], v2a[DEC_WIDTH + 1];
+         char *v2;
 
          if (t->data AS row.count == 1)
-            strcpy (v2, "UNKNOWN");
-         else
+            v2 = "UNKNOWN";
+         else {
+            v2 = v2a;
             if ((rc = sprintf (v2, "%d", t->data AS row.count)) < 0)
                goto finish;
+         }
 
          if (v == NULL || v [0] == '/')
          {

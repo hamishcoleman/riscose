@@ -1,7 +1,7 @@
 #! @BINAWK@ -f
 
 BEGIN {
-    for (i = 0; i < 0x10; i++) {
+    for (i = 0; i < 16; i++) {
         t[sprintf("%x", i)] = i
     }
 }

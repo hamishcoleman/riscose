@@ -420,7 +420,7 @@ static const char *clib_kern_names[] =
 #define CLIB_CLIB___FLSBUF 0x0116d
 #define CLIB_CLIB_PUTC 0x0116e
 #define CLIB_CLIB_PUTCHAR 0x0116f
-#define CLIB_CLIB_PURS 0x01170
+#define CLIB_CLIB_PUTS 0x01170
 #define CLIB_CLIB_UNGETC 0x01171
 #define CLIB_CLIB_FREAD 0x01172
 #define CLIB_CLIB_FWRITE 0x01173

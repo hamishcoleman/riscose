@@ -55,15 +55,12 @@ os_error *xos_byte (osbyte_op op,
 	*r1_out = 0xff;
       break;
       
-    case 129:
+    case osbyte_IN_KEY:
       if (r2 == 0xff)
 	{
-	  if (r1 == 0)
-	    {
-	      /* Read OS version */
-	      if (r1_out)
-		*r1_out = 0xa0;
-	      if (r2_out)
+	    if (r1 == 0) {
+                /* Read OS version. */
+		*r1_out = 0xa4;  /* Archimedes RISC-OS 3.10/3.11 */
 		*r2_out = 0;
 	    }
 	  else if (r1 < 0x80)
@@ -116,4 +113,3 @@ os_error *xos_byte (osbyte_op op,
   fprintf(stderr, "  Out: r2_out = %x\n", (int) *r2_out);
   return 0;
 }
-

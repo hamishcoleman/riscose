@@ -1,0 +1,7 @@
+#! /bin/sh
+
+$srcdir/armas <$srcdir/os_byte.aa >tmp
+../src/riscose tmp
+e=$?
+rm tmp
+exit $e

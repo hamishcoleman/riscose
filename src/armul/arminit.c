@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include "armdefs.h"
 #include "armemu.h"
-#include "util.h"
+#include <monty/mem.h>
 
 /***************************************************************************\
 *                 Definitions for the emulator architecture                 *
@@ -68,7 +68,7 @@ ARMul_State *ARMul_NewState(void)
 {ARMul_State *state ;
  unsigned i, j ;
 
- state = (ARMul_State *)xmalloc(sizeof(ARMul_State)) ;
+    NEW(state);
 
  state->Emulate = RUN ;
  for (i = 0 ; i < 16 ; i++) {

@@ -23,9 +23,9 @@
   #include <sys/mman.h>
 #endif
 
+#include <monty/mem.h>
 #include "map.h"
 #include "mem.h"
-#include "util.h"
 #include "swi.h"
 #include "heap.h"
 
@@ -158,7 +158,7 @@ load_rom(char *file, BYTE *address)
     abort();
   }
   if (address == NULL)
-    rom = xmalloc(s.st_size);
+    rom = emalloc(s.st_size);
   else
     rom = address;
   f = open(file, O_RDONLY);
@@ -199,8 +199,8 @@ remap_it(WORD base, WORD oldsize, WORD newsize)
 void
 mem_init(void)
 {
-  mem = xmalloc(sizeof(mem_state));
-  mem->tasks    = xmalloc(MAX_TASKS * sizeof(mem_wimp_task));
+  mem = emalloc(sizeof(mem_state));
+  mem->tasks    = emalloc(MAX_TASKS * sizeof(mem_wimp_task));
   mem->task_current = -1;
   
 #ifdef CONFIG_MEM_ONE2ONE
@@ -214,7 +214,7 @@ mem_init(void)
   mem->rom      = MEM_TOHOST(MMAP_ROM_BASE);
   load_rom("rom/ROMimage", MEM_TOHOST(MMAP_ROM_BASE));
 #else
-  mem->rma      = xmalloc(RMA_START_SIZE);
+  mem->rma      = emalloc(RMA_START_SIZE);
   mem->rom      = load_rom("rom/ROMimage", 0);
 #endif
   mem->rma_size = RMA_START_SIZE;
@@ -295,8 +295,8 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
       {
        mem->tasks[c].wimpslot = wimpslot;
        mem->tasks[c].info     = info;
-       mem->tasks[c].stack    = xmalloc(MMAP_USRSTACK_SIZE);
-       mem->tasks[c].env      = xmalloc(256);
+       mem->tasks[c].stack    = emalloc(MMAP_USRSTACK_SIZE);
+       mem->tasks[c].env      = emalloc(256);
 #ifdef NATIVE
        mem->tasks[c].app      = (void *)MMAP_SLOT_BASE + (c * 64 * MEG);
        map_it(mem->tasks[c].app, wimpslot);
@@ -304,7 +304,7 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
 #  ifdef CONFIG_MEM_ONE2ONE
        mem->tasks[c].app      = (void*) 0x8000; /* FIXME: Task switching won't work! */
 #  else
-       mem->tasks[c].app      = xmalloc(wimpslot);
+       mem->tasks[c].app      = emalloc(wimpslot);
 #  endif
 #endif
        if (image_filename != NULL)

@@ -46,7 +46,6 @@ TV    20000503    |bool| replaced by |osbool|
 
    /*Local*/
    #include "def.h"
-   #include "main.h"
    #include "riscoseapi.h"
    #include "riscosetpl.h"
    #include "riscosehdr.h"
@@ -70,6 +69,10 @@ TV    20000503    |bool| replaced by |osbool|
 #define Module_HelpVersion              "6.22 (07 Jun 2001)"
 
 #define VERSION_INFO Module_FullVersion " [" Module_Date "]"
+
+extern lookup_t main_byte_wide;
+
+extern int Quiet;
 
 /* Set this to 1 to make APCS 3/32 the default */
 #define DEFAULT_TO_APCS_32 0

@@ -42,7 +42,7 @@ swi_trap(WORD num)
      if (num == SWI_MAGIC_RETURN)
        { arm_return(); return; }
      if (((r = swih_sharedclibrary_entry(num)) & SWIH_EXIT_HANDLED) == 0)
-       arm_set_pc(arm_get_reg(14));
+       arm_set_pc(ARM_R14);
      r &= !3;
      return;
     }
@@ -62,7 +62,7 @@ swi_trap(WORD num)
      if (SWI_X(num))
        {
         arm_set_v();
-        arm_set_reg(0, e);
+        ARM_SET_R0(e);
        }
      else
        {

@@ -50,14 +50,14 @@ arm_set_pc(WORD addr)
 void
 arm_run_routine(WORD addr)
 {
-  WORD old_pc = arm_get_reg(15), old_r14 = arm_get_reg(14);
+  WORD old_pc = ARM_R15, old_r14 = ARM_R14;
   
-  arm_set_reg(14, 0x30);
+  ARM_SET_R14(0x30);
   ARMul_SetPC(arm, addr);
   arm_run_depth++;
   ARMul_DoProg(arm);
   arm_run_depth--;
-  arm_set_reg(14, old_r14);
+  ARM_SET_R14(old_r14);
   arm_set_pc(old_pc+4);
   if (arm_run_depth)
     arm->Emulate = RUN;
@@ -134,76 +134,76 @@ ARMul_MemoryExit(ARMul_State *state)
 }
 
 ARMword
-ARMul_LoadInstrS(ARMul_State *state,ARMword address)
+inline ARMul_LoadInstrS(ARMul_State *state,ARMword address)
 {
-  return mem_read_word(address);
+  return MEM_READ_WORD(address);
 }
 
-ARMword ARMul_LoadInstrN(ARMul_State *state,ARMword address)
+inline ARMword ARMul_LoadInstrN(ARMul_State *state,ARMword address)
 {
-  return mem_read_word(address);
+  return MEM_READ_WORD(address);
 }
-ARMword ARMul_LoadWordS(ARMul_State *state,ARMword address)
+inline ARMword ARMul_LoadWordS(ARMul_State *state,ARMword address)
 {
-  return mem_read_word(address);
+  return MEM_READ_WORD(address);
 }
-ARMword ARMul_LoadWordN(ARMul_State *state,ARMword address)
+inline ARMword ARMul_LoadWordN(ARMul_State *state,ARMword address)
 {
-  return mem_read_word(address);
+  return MEM_READ_WORD(address);
 }
-ARMword ARMul_LoadByte(ARMul_State *state,ARMword address)
+inline ARMword ARMul_LoadByte(ARMul_State *state,ARMword address)
 {
-  return mem_read_byte(address);
+  return MEM_READ_BYTE(address);
 }
-void ARMul_StoreWordS(ARMul_State *state,ARMword address, ARMword data)
+inline void ARMul_StoreWordS(ARMul_State *state,ARMword address, ARMword data)
 {
-  mem_write_word(address, data);
+  MEM_WRITE_WORD(address, data);
 }
-void ARMul_StoreWordN(ARMul_State *state, ARMword address, ARMword data)
+inline void ARMul_StoreWordN(ARMul_State *state, ARMword address, ARMword data)
 {
-  mem_write_word(address, data);
+  MEM_WRITE_WORD(address, data);
 }
-void ARMul_StoreByte(ARMul_State *state, ARMword address, ARMword data)
+inline void ARMul_StoreByte(ARMul_State *state, ARMword address, ARMword data)
 {
-  mem_write_byte(address, data);
+  MEM_WRITE_BYTE(address, data);
 }
 ARMword ARMul_SwapWord(ARMul_State *state, ARMword address, ARMword data)
 {
-  WORD t = mem_read_word(address);
-  mem_write_word(address, data);
+  WORD t = MEM_READ_WORD(address);
+  MEM_WRITE_WORD(address, data);
   
   return t;
 }
-ARMword ARMul_SwapByte(ARMul_State *state, ARMword address, ARMword data)
+inline ARMword ARMul_SwapByte(ARMul_State *state, ARMword address, ARMword data)
 {
-  BYTE t = mem_read_byte(address);
-  mem_write_byte(address, data);
+  BYTE t = MEM_READ_BYTE(address);
+  MEM_WRITE_BYTE(address, data);
   
   return t;
 }
-void ARMul_Icycles(ARMul_State *state, unsigned number, ARMword address)
+inline void ARMul_Icycles(ARMul_State *state, unsigned number, ARMword address)
 {
   state->NumIcycles += number ;
   ARMul_CLEARABORT ;
 }
-void ARMul_Ccycles(ARMul_State *state, unsigned number, ARMword address)
+inline void ARMul_Ccycles(ARMul_State *state, unsigned number, ARMword address)
 {
   state->NumCcycles += number ;
   ARMul_CLEARABORT ;
 }
-ARMword ARMul_ReadWord(ARMul_State *state, ARMword address)
+inline ARMword ARMul_ReadWord(ARMul_State *state, ARMword address)
 {
-  return mem_read_word(address);
+  return MEM_READ_WORD(address);
 }
-ARMword ARMul_ReadByte(ARMul_State *state, ARMword address)
+inline ARMword ARMul_ReadByte(ARMul_State *state, ARMword address)
 {
-  return mem_read_byte(address);
+  return MEM_READ_BYTE(address);
 }
-void ARMul_WriteWord(ARMul_State *state, ARMword address, ARMword data)
+inline void ARMul_WriteWord(ARMul_State *state, ARMword address, ARMword data)
 {
-  mem_write_word(address, data);
+  MEM_WRITE_WORD(address, data);
 }
-void ARMul_WriteByte(ARMul_State *state, ARMword address, ARMword data)
+inline void ARMul_WriteByte(ARMul_State *state, ARMword address, ARMword data)
 {
-  mem_write_byte(address, data);
+  MEM_WRITE_BYTE(address, data);
 }

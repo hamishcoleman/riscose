@@ -21,7 +21,7 @@
 void osfile(void)
 {
   struct stat file_info;
-  WORD reason = arm_get_reg(0);
+  WORD reason = ARM_R0;
   
   switch (reason)
     {
@@ -37,10 +37,10 @@ void osfile(void)
     case 13:
     case 15:
     case 17: /* FIXME: implement various path options */
-      if (stat(mem_chunk(arm_get_reg(1), 0), &file_info) == 0)
+      if (stat(MEM_TOHOST(ARM_R1), &file_info) == 0)
         {
-         arm_set_reg(0, (file_info.st_mode & S_IFDIR) == 0 ? 1 : 2);
-         arm_set_reg(4, file_info.st_size);
+         ARM_SET_R0((file_info.st_mode & S_IFDIR) == 0 ? 1 : 2);
+         ARM_SET_R4(file_info.st_size);
         }
       else
         arm_set_reg(0, 0); /* r0=0 means `not found' */

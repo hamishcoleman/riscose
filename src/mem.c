@@ -36,7 +36,7 @@ arm_backtrace(void);
 
 inline
 BYTE*
-mem_chunk(WORD arm_addr, WORD size)
+mem_f_tohost(WORD arm_addr)
 {
   switch(arm_addr)
     {
@@ -63,6 +63,13 @@ mem_chunk(WORD arm_addr, WORD size)
       arm_backtrace();
       exit(1);
     }
+}
+
+inline
+WORD
+mem_f_toarm(void *ptr)
+{
+  return 0;
 }
 
 static
@@ -126,22 +133,6 @@ mem_get_private(void)
 {
   return(mem->tasks[mem->task_current].stack);
 }
-
-WORD inline
-mem_read_word(WORD arm_addr)
-  { return *((WORD*)mem_chunk(arm_addr, 4)); }
-
-void inline
-mem_write_word(WORD arm_addr, WORD val)
-  { *((WORD*)mem_chunk(arm_addr, 4)) = val; }
-
-BYTE inline
-mem_read_byte(WORD arm_addr)
-  { return *(mem_chunk(arm_addr, 1)); }
-
-void inline
-mem_write_byte(WORD arm_addr, BYTE val)
-  { *(mem_chunk(arm_addr, 1)) = val; }
 
 WORD inline
 mem_task_which()
@@ -237,7 +228,7 @@ mem_load_file_at(const char * file, WORD arm_addr)
   if (f == -1)
     return ERR_MEM_BADFILE;
   
-  read(f, mem_chunk(arm_addr, s.st_size), s.st_size);
+  read(f, MEM_TOHOST(arm_addr), s.st_size);
   
   close(f);
   
@@ -259,10 +250,10 @@ arm_backtrace(void)
   printf("| pc = %08x\n", (unsigned) arm_get_reg(15));
   while (fp != 0)
     {
-     WORD lr = mem_read_word(fp-4);
+     WORD lr = MEM_READ_WORD(fp-4);
      
-     printf("| %08x\n", (unsigned)lr/*, mem_chunk(lr - mem_read_word(lr-4) - 4, 0)*/);
-     fp = mem_read_word(fp-12);
+     printf("| %08x\n", (unsigned)lr);
+     fp = MEM_READ_WORD(fp-12);
     }
   printf("+--->\n");
   

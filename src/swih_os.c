@@ -29,7 +29,7 @@ swih_os(WORD num)
     {
     
     case 0x0 : /* OS_WriteC */
-      putc(arm_get_reg(0), stdout);
+      putc(ARM_R0, stdout);
       return 0;
 
     case 0x1 : /* OS_WriteS */
@@ -37,7 +37,7 @@ swih_os(WORD num)
       return 0;
     
     case 0x2 : /* OS_Write0 */
-      printf(mem_chunk(arm_get_reg(0), 0));
+      printf(MEM_TOHOST(ARM_R0));
       return 0;
     
     case 0x8: /* OS_File */
@@ -50,7 +50,7 @@ swih_os(WORD num)
     
     case 0x46 : /* OS_WriteN */
       for(c=0; c!=arm_get_reg(1); c++)
-        putc(*(mem_chunk(arm_get_reg(0), 0)+c), stdout);
+        putc(* ((char*)MEM_TOHOST(ARM_R0)+c), stdout);
       
     case 0x10: /* OS_GetEnv */
       arm_set_reg(0, (WORD) mem_get_private());
@@ -66,9 +66,8 @@ swih_os(WORD num)
     case 0x2b: /* OS_GenerateError */ 
       
       fprintf(stderr, "*** Error from RISC OS (%08x): %s\n",
-	 (unsigned) *((WORD*)mem_chunk(arm_get_reg(0), 0)),
-	 (char*) mem_chunk(arm_get_reg(0)+4, 0)
-      );
+	 (unsigned) *((WORD*)MEM_TOHOST(ARM_R0)),
+	 (char*) MEM_TOHOST(ARM_R0)+4);
       exit(1);
       
     }

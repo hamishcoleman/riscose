@@ -1,5 +1,7 @@
 /* MB: comment this out if you don't want to see on-the-fly disassembly */
-/*#define ARMUL_SHOW_PROGRESS*/
+/*#define ARMUL_SHOW_INSTRUCTIONS*/
+/*#define ARMUL_SHOW_BRANCHES*/
+/*#define ARMUL_SHOW_SWIS*/
 
 /*  armemu.c -- Main instruction emulation:  ARM6 Instruction Emulator.
    Copyright (C) 1994 Advanced RISC Machines Ltd.
@@ -25,11 +27,9 @@
 #include "armsupp.h"
 
 void swiname(ARMword w, char *c, size_t s) { }
-#ifdef ARMUL_SHOW_PROGRESS
 #include "def.h"
 #include "instr.h"
 #include "mem.h"
-#endif
 
 static ARMword GetDPRegRHS (ARMul_State * state, ARMword instr);
 static ARMword GetDPSRegRHS (ARMul_State * state, ARMword instr);
@@ -183,7 +183,7 @@ ARMul_Emulate26 (register ARMul_State * state)
 
       state->NumInstrs++;
 
-#ifdef ARMUL_SHOW_PROGRESS
+#ifdef ARMUL_SHOW_INSTRUCTIONS
       {
         char *regs[16] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
                         "r8", "r9", "sl", "fp", "ip", "sp", "lr", "pc"};
@@ -2339,14 +2339,16 @@ ARMul_Emulate26 (register ARMul_State * state)
 	    case 0xb5:
 	    case 0xb6:
 	    case 0xb7:
-#ifdef ARMUL_SHOW_PROGRESS
+#ifdef ARMUL_SHOW_BRANCHES
               {
-               ARMword x = mem_read_word(pc+4+POSBRANCH);
+               ARMword x = MEM_READ_WORD(pc+4+POSBRANCH);
                BYTE *lbl;
                if ( (x & 0xffffff00) == 0xff000000)
                  {
-                  lbl = mem_chunk(pc+4+POSBRANCH - (x & 0xff), 0);
-                  printf("Branched to label %s\n", lbl);
+                  lbl = MEM_TOHOST(pc+4+POSBRANCH - (x & 0xff));
+                  printf("Branched to label %s", lbl);
+                  printf(" (%08lx %08lx %08lx %08lx)", state->Reg[0], state->Reg[1], state->Reg[2], state->Reg[3]);
+                  printf("\n");
                  }
               }
 #endif
@@ -2371,14 +2373,16 @@ ARMul_Emulate26 (register ARMul_State * state)
 	    case 0xbd:
 	    case 0xbe:
 	    case 0xbf:
-#ifdef ARMUL_SHOW_PROGRESS
+#ifdef ARMUL_SHOW_BRANCHES
               {
-               ARMword x = mem_read_word(pc+4+NEGBRANCH);
+               ARMword x = MEM_READ_WORD(pc+4+NEGBRANCH);
                BYTE *lbl;
                if ( (x & 0xffffff00) == 0xff000000)
                  {
-                  lbl = mem_chunk(pc+4+NEGBRANCH - (x & 0xff), 0);
-                  printf("Branched to label %s\n", lbl);
+                  lbl = MEM_TOHOST(pc+4+NEGBRANCH - (x & 0xff));
+                  printf("Branched to label %s", lbl);
+                  printf(" (%08lx %08lx %08lx %08lx)", state->Reg[0], state->Reg[1], state->Reg[2], state->Reg[3]);
+                  printf("\n");
                  }
               }
 #endif
@@ -2601,6 +2605,12 @@ ARMul_Emulate26 (register ARMul_State * state)
 		  ARMul_Abort (state, ARMul_PrefetchAbortV);
 		  break;
 		}
+
+#ifdef ARMUL_SHOW_SWIS
+            printf("SWI %08lx called ", BITS(0, 23));
+            printf("(%08lx %08lx %08lx %08lx)", state->Reg[0], state->Reg[1], state->Reg[2], state->Reg[3]);
+            printf("\n");
+#endif
 
 	      if (!ARMul_OSHandleSWI (state, BITS (0, 23)))
 		{

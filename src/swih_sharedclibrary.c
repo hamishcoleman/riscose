@@ -29,9 +29,9 @@
 static
 void fill_statics(WORD addr) /* 4-252 */
 {
-  FILE **riscos_stdin  = (FILE**) mem_chunk(addr+CLIB_SHARED_STDIN, sizeof(FILE*));
-  FILE **riscos_stdout = (FILE**) mem_chunk(addr+CLIB_SHARED_STDOUT, sizeof(FILE*));
-  FILE **riscos_stderr = (FILE**) mem_chunk(addr+CLIB_SHARED_STDERR, sizeof(FILE*));
+  FILE **riscos_stdin  = (FILE**) MEM_TOHOST(addr+CLIB_SHARED_STDIN);
+  FILE **riscos_stdout = (FILE**) MEM_TOHOST(addr+CLIB_SHARED_STDOUT);
+  FILE **riscos_stderr = (FILE**) MEM_TOHOST(addr+CLIB_SHARED_STDERR);
   
   *riscos_stdin  = stdin;
   *riscos_stdout = stdout;
@@ -57,7 +57,7 @@ void prepare_arm_va_list(char *str, WORD apcs_arg)
         while (strchr("0123456789", *str)) str++;
         while (strchr("hlLqjzt", *str))    str++;
         if (*str++ == 's')
-          arm_va_list[l++] = mem_chunk(ARM_APCS_ARG(apcs_arg), 0);
+          arm_va_list[l++] = MEM_TOHOST(ARM_APCS_ARG(apcs_arg));
         else
           arm_va_list[l++] = (char*) ARM_APCS_ARG(apcs_arg);
         apcs_arg++; /* best not use post-increment with macros! */
@@ -78,7 +78,7 @@ swih_sharedclibrary(WORD num)
   switch (SWI_NUM(num))
     {
     case 0x80681: /* SharedCLibrary_LibInitAPCS_R (4-249) */
-      stub_list = (WORD*)mem_chunk(arm_get_reg(0), 0);
+      stub_list = (WORD*)MEM_TOHOST(ARM_R0);
       c = 0;
       while (stub_list[c] != -1)
         {
@@ -88,7 +88,7 @@ swih_sharedclibrary(WORD num)
 	     if ((stub_list[c+1] - stub_list[c+2]) < (CLIB_KERN_JUMPPOINTS*4))
                return ERR_SHAREDCLIBRARY_VECTORTOOSMALL;
              for (v=0; v!=CLIB_KERN_JUMPPOINTS; v++)
-               mem_write_word(stub_list[c+1]+(v*4),
+               MEM_WRITE_WORD(stub_list[c+1]+(v*4),
                  0xef000000 | (SWI_OS_TRAP<<20) | (CLIB_KERN_BASE + v));
              
              break;
@@ -97,7 +97,7 @@ swih_sharedclibrary(WORD num)
 	     if ((stub_list[c+1] - stub_list[c+2]) < (CLIB_CLIB_JUMPPOINTS*4))
                return ERR_SHAREDCLIBRARY_VECTORTOOSMALL;
              for (v=0; v!=CLIB_CLIB_JUMPPOINTS; v++)
-               mem_write_word(stub_list[c+1]+(v*4),
+               MEM_WRITE_WORD(stub_list[c+1]+(v*4),
                  0xef000000 | (SWI_OS_TRAP<<20) | (CLIB_CLIB_BASE + v));
              
              fill_statics(stub_list[c+3]);
@@ -111,9 +111,9 @@ swih_sharedclibrary(WORD num)
            }
          c += 5;
         }
-      arm_set_reg(0, arm_get_reg(2));
-      arm_set_reg(2, arm_get_reg(1)+(arm_get_reg(6)>>16));
-      arm_set_reg(6, 6);
+      ARM_SET_R0(ARM_R2);
+      ARM_SET_R2(ARM_R1 + (ARM_R6 >> 16));
+      ARM_SET_R6(6);
       break;
 
     default:
@@ -130,15 +130,15 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_KERN_INIT: /* 4-268 */
       {
-       WORD *kernel_init = (WORD*)mem_chunk(arm_get_reg(0), 12);
+       WORD *kernel_init = (WORD*) MEM_TOHOST(ARM_R0);
        /*WORD image_base   = kernel_init[0];*/
        WORD c=0, limit   = kernel_init[2] - kernel_init[1];
-       WORD *language_description = (WORD*)mem_chunk(kernel_init[1], 0);
+       WORD *language_description = (WORD*) MEM_TOHOST(kernel_init[1]);
                
-       arm_set_reg(10, MMAP_USRSTACK_BASE+768);
-       arm_set_reg(11, 0);
-       arm_set_reg(12, 0);
-       arm_set_reg(13, MMAP_USRSTACK_BASE+ MMAP_USRSTACK_SIZE);
+       ARM_SET_R10(MMAP_USRSTACK_BASE+768);
+       ARM_SET_R11(0);
+       ARM_SET_R12(0);
+       ARM_SET_R13(MMAP_USRSTACK_BASE+ MMAP_USRSTACK_SIZE);
        while (c != limit)
          {
           if (language_description[c+4] != 0)
@@ -146,7 +146,7 @@ swih_sharedclibrary_entry(WORD num)
              /*printf("*** running routine at %08x\n", language_description[c+4]);*/
              arm_run_routine(language_description[c+4]);
              /*printf("*** finished running routine\n");*/
-             arm_set_pc(arm_get_reg(0));
+             arm_set_pc(ARM_R0);
              return SWIH_EXIT_HANDLED; /* BODGE! */
             }
           c += language_description[c]>>2;
@@ -160,10 +160,10 @@ swih_sharedclibrary_entry(WORD num)
     case CLIB_KERN_UDIV: /* 4-277 */
     case CLIB_CLIB_X$UDIVIDE:
       {
-        WORD div = arm_get_reg(1) / arm_get_reg(0);
-        WORD rem = arm_get_reg(1) % arm_get_reg(0);
-        arm_set_reg(0, div);
-        arm_set_reg(1, rem);
+        WORD div = ARM_R1 / ARM_R0;
+        WORD rem = ARM_R1 % ARM_R0;
+        ARM_SET_R0(div);
+        ARM_SET_R1(rem);
         return 0;
       }
     
@@ -173,7 +173,7 @@ swih_sharedclibrary_entry(WORD num)
     case CLIB_CLIB_EXIT: /* 4-322 */ 
     case CLIB_CLIB__EXIT:
       printf("*** finished!\n");
-      exit(arm_get_reg(0));
+      exit(ARM_R0);
       return 0;
     
     case CLIB_KERN_COMMAND_STRING: /* 4-272 */
@@ -184,43 +184,51 @@ swih_sharedclibrary_entry(WORD num)
       */
       {
         mem_private *p = mem_get_private();
-        arm_set_reg(0, MMAP_USRSTACK_BASE+((BYTE*)p->cli - (BYTE*)p));
+        ARM_SET_R0(MMAP_USRSTACK_BASE+((BYTE*)p->cli - (BYTE*)p));
         return 0;
       }
     
     case CLIB_KERN_OSFILE: /* 4-274 */
       {
-        WORD* osfile_block = (WORD*) mem_chunk(arm_get_reg(2), 0);
-        /* FIXME? should preserve registers?  But APCS says we can overwrite */
-        arm_set_reg(2, osfile_block[0]);
-        arm_set_reg(3, osfile_block[1]);
-        arm_set_reg(4, osfile_block[2]);
-        arm_set_reg(5, osfile_block[3]);
+        WORD* osfile_block = (WORD*) MEM_TOHOST(ARM_R2);
+        /* FIXME: more general solution for stashing registers needed? */
+        WORD r2 = ARM_R2,
+             r3 = ARM_R3,
+             r4 = ARM_R4,
+             r5 = ARM_R5;
+        ARM_SET_R2(osfile_block[0]);
+        ARM_SET_R3(osfile_block[1]);
+        ARM_SET_R4(osfile_block[2]);
+        ARM_SET_R5(osfile_block[3]);
         osfile();
-        osfile_block[0] = arm_get_reg(2);
-        osfile_block[1] = arm_get_reg(3);
-        osfile_block[2] = arm_get_reg(4);
-        osfile_block[3] = arm_get_reg(5);
+        osfile_block[0] = ARM_R2;
+        osfile_block[1] = ARM_R3;
+        osfile_block[2] = ARM_R4;
+        osfile_block[3] = ARM_R5;
+        ARM_SET_R2(r2);
+        ARM_SET_R3(r3);
+        ARM_SET_R4(r4);
+        ARM_SET_R5(r5);
       }
       return 0;
     
     case CLIB_KERN_UDIV10: /* 4-277 */
-      arm_set_reg(1, (unsigned) arm_get_reg(0) % 10);
-      arm_set_reg(0, (unsigned) arm_get_reg(0) / 10);
+      ARM_SET_R1((unsigned) ARM_R0 % 10);
+      ARM_SET_R0((unsigned) ARM_R0 / 10);
       return 0;
     
     case CLIB_KERN_SDIV10: /* 4-277 */
-      arm_set_reg(1, arm_get_reg(0) % 10);
-      arm_set_reg(0, arm_get_reg(0) / 10);
+      ARM_SET_R1(ARM_R0 % 10);
+      ARM_SET_R0(ARM_R0 / 10);
       return 0;
 
     case CLIB_CLIB__MAIN: /* 4-291 */
       {
         mem_private *p = mem_get_private();
         
-        arm_set_pc(arm_get_reg(1));
-        arm_set_reg(0, p->argc);
-        arm_set_reg(1, MMAP_USRSTACK_BASE+((BYTE*)p->argv - (BYTE*)p));
+        arm_set_pc(ARM_R1);
+        ARM_SET_R0(p->argc);
+        ARM_SET_R1(MMAP_USRSTACK_BASE+((BYTE*)p->argv - (BYTE*)p));
       }
       return SWIH_EXIT_HANDLED;
     
@@ -232,254 +240,250 @@ swih_sharedclibrary_entry(WORD num)
       /*return 0;*/
     
     case CLIB_CLIB_TOUPPER: /* 4-296 */
-      arm_set_reg(0, toupper(arm_get_reg(0)));
+      ARM_SET_R0(toupper(ARM_R0));
       return 0;
     
     case CLIB_CLIB_TOLOWER: /* 4-296 */
-      arm_set_reg(0, tolower(arm_get_reg(0)));
+      ARM_SET_R0(tolower(ARM_R0));
       return 0;
     
     case CLIB_CLIB_SETLOCALE: /* 4-298 */
       printf("setlocale called\n"); /* FIXME */ 
-      arm_set_reg(0, 0);
+      ARM_SET_R0(0);
       return 0;
     
     /* FIXME: These functions will only work on 32-bit machines! */
     
     case CLIB_CLIB_FFLUSH: /* 4-306 */
-      arm_set_reg(0, (WORD) fflush( *((FILE**)mem_chunk(arm_get_reg(0), 0)) ));
+      ARM_SET_R0((WORD) fflush( *((FILE**)MEM_TOHOST(ARM_R0)) ));
       return 0;
     
     case CLIB_CLIB_FOPEN: /* 4-306 */
-      printf("opening `%s' mode `%s'\n", mem_chunk(arm_get_reg(0), 0), mem_chunk(arm_get_reg(1), 0));
+      printf("opening `%s' mode `%s'\n", MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
       {
         WORD fp = mem_rma_alloc(sizeof(FILE*));
-        FILE **bury = (FILE**) mem_chunk(fp, 0);
+        FILE **bury = (FILE**) MEM_TOHOST(fp);
         
-        *bury = fopen(mem_chunk(arm_get_reg(0), 0),
-                      mem_chunk(arm_get_reg(1), 0));
-        arm_set_reg(0, *bury == NULL ? 0 : fp);
+        *bury = fopen(MEM_TOHOST(ARM_R0),
+                      MEM_TOHOST(ARM_R1));
+        ARM_SET_R0(*bury == NULL ? 0 : fp);
         /* FIXME: memory leak */
         return fp;
       }
-      /*arm_set_reg(0, (WORD) fopen(mem_chunk(arm_get_reg(0), 0),
-                                  mem_chunk(arm_get_reg(1), 0))
+      /*ARM_SET_R0((WORD) fopen(MEM_TOHOST(ARM_R0),
+                                  MEM_TOHOST(ARM_R1))
                  );*/
       return 0;
     
     case CLIB_CLIB_FCLOSE:
-      printf("closing FILE* @ %08x", (unsigned) arm_get_reg(0));
+      printf("closing FILE* @ %08x", (unsigned) ARM_R0);
       {
-        FILE **bury = (FILE**) mem_chunk(arm_get_reg(0), 0);
+        FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
         fclose(*bury);
-        /*mem_rma_free(arm_get_reg(0));*/
+        /*mem_rma_free(ARM_R0);*/
       }
-      /*arm_set_reg(0, (WORD) fclose((FILE*)arm_get_reg(0)));*/
+      /*ARM_SET_R0((WORD) fclose((FILE*)ARM_R0));*/
       return 0;
     
     case CLIB_CLIB_FREOPEN:
-      printf("reopening %s mode %s (old %08x)\n", mem_chunk(arm_get_reg(0), 0), mem_chunk(arm_get_reg(1), 0), (unsigned)arm_get_reg(2));
+      printf("reopening %s mode %s (old %08x)\n", MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), (unsigned)ARM_R2);
       {
-        FILE **bury = (FILE**) mem_chunk(arm_get_reg(2), 0);
-        *bury = freopen(mem_chunk(arm_get_reg(0), 0),
-                              mem_chunk(arm_get_reg(1), 0),
+        FILE **bury = (FILE**) MEM_TOHOST(ARM_R2);
+        *bury = freopen(MEM_TOHOST(ARM_R0),
+                              MEM_TOHOST(ARM_R1),
                               *bury);
-        arm_set_reg(0, *bury == NULL ? 0 : arm_get_reg(2));
+        ARM_SET_R0(*bury == NULL ? 0 : ARM_R2);
         /* FIXME: memory leak :-) */
       }
       return 0;
     
     case CLIB_CLIB_FREAD:
       {
-        FILE **bury = (FILE**) mem_chunk(arm_get_reg(3), 0);
-        arm_set_reg(0, fread(mem_chunk(arm_get_reg(0), 0), arm_get_reg(1), arm_get_reg(2), *bury));
-      return 0;
+        FILE **bury = (FILE**) MEM_TOHOST(ARM_R3);
+        ARM_SET_R0(fread(MEM_TOHOST(ARM_R0), ARM_R1, ARM_R2, *bury));
+        return 0;
       }
-      /*arm_set_reg(0, fread(mem_chunk(arm_get_reg(0), 0), arm_get_reg(1), arm_get_reg(2), (FILE*) arm_get_reg(3)));*/
-      return 0;
 
     case CLIB_CLIB__SPRINTF:
     case CLIB_CLIB_SPRINTF:
-      prepare_arm_va_list(mem_chunk(arm_get_reg(1), 0), 2);
-      vsprintf(mem_chunk(arm_get_reg(0), 0),
-               mem_chunk(arm_get_reg(1), 0),
+      prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2);
+      vsprintf(MEM_TOHOST(ARM_R0),
+               MEM_TOHOST(ARM_R1),
                arm_va_list);
       return 0;
     
     case CLIB_CLIB__PRINTF:
     case CLIB_CLIB_PRINTF:
-      prepare_arm_va_list(mem_chunk(arm_get_reg(0), 0), 1);
-      vprintf(mem_chunk(arm_get_reg(0), 0),
+      prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1);
+      vprintf(MEM_TOHOST(ARM_R0),
               arm_va_list);
-      /*printf(mem_chunk(arm_get_reg(0), 0), mem_chunk(arm_get_reg(1), 0), mem_chunk(arm_get_reg(2), 0));*/
       return 0;
       
     case CLIB_CLIB__FPRINTF:
     case CLIB_CLIB_FPRINTF:
       {
-       FILE **bury = (FILE**) mem_chunk(arm_get_reg(0), 0);
+       FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
        
-       prepare_arm_va_list(mem_chunk(arm_get_reg(1), 0), 2);
+       prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2);
        vfprintf(*bury,
-                mem_chunk(arm_get_reg(1), 0),
+                MEM_TOHOST(ARM_R1),
                 arm_va_list);
       }
-      /*printf(mem_chunk(arm_get_reg(1), 0), mem_chunk(arm_get_reg(2), 0), mem_chunk(arm_get_reg(3), 0));*/
       return 0;
 
     case CLIB_CLIB_VFPRINTF: /* 4-312 */
-      arm_set_reg(0, vfprintf( *((FILE**) mem_chunk(arm_get_reg(0), 0)),
-                     mem_chunk(arm_get_reg(1), 0),
-                     mem_chunk(arm_get_reg(2), 0))
+      ARM_SET_R0(vfprintf( *((FILE**) MEM_TOHOST(ARM_R0)),
+                     MEM_TOHOST(ARM_R1),
+                     MEM_TOHOST(ARM_R2))
                  );
       return 0;
 
     case CLIB_CLIB_FWRITE: /* 4-316 */
       {
-        FILE **bury = (FILE**) mem_chunk(arm_get_reg(3), 0);
-        arm_set_reg(0, fwrite(mem_chunk(arm_get_reg(0), 0), arm_get_reg(1), arm_get_reg(2), *bury));
+        FILE **bury = (FILE**) MEM_TOHOST(ARM_R3);
+        BYTE *data = MEM_TOHOST(ARM_R0);
+        WORD size = ARM_R1, nmemb = ARM_R2;
+        ARM_SET_R0(fwrite(data, size, nmemb, *bury));
       }
       return 0;
     
     case CLIB_CLIB_FSEEK: /* 4-316 */
       {
-        FILE **bury = (FILE**) mem_chunk(arm_get_reg(0), 0);
-        arm_set_reg(0, fseek(*bury, arm_get_reg(1), arm_get_reg(2)));
+        FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
+        ARM_SET_R0(fseek(*bury, ARM_R1, ARM_R2));
       }
       return 0;
     
     case CLIB_CLIB_FTELL: /* 4-317 */
       {
-        FILE **bury = (FILE**) mem_chunk(arm_get_reg(0), 0);
-        arm_set_reg(0, ftell(*bury));
+        FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
+        ARM_SET_R0(ftell(*bury));
       }
       return 0;
     
     case CLIB_CLIB___FILBUF: /* 4-318 */
-      arm_set_reg(0, getc( *((FILE**) mem_chunk(arm_get_reg(0), 0)) ));
+      ARM_SET_R0(getc( *((FILE**) MEM_TOHOST(ARM_R0)) ));
       return 0;
 
     case CLIB_CLIB_MALLOC: /* 4-320 */
       /* FIXME -- ought to be from app area */
-      arm_set_reg(0, mem_rma_alloc(arm_get_reg(0)));
+      ARM_SET_R0(mem_rma_alloc(ARM_R0));
       return 0;
     
     case CLIB_CLIB_CALLOC: /* 4-320 ? */
-      arm_set_reg(0, mem_rma_alloc(arm_get_reg(0)*arm_get_reg(1)));
+      ARM_SET_R0(mem_rma_alloc(ARM_R0*ARM_R1));
       return 0;
     
     case CLIB_CLIB_FREE: /* 4-321 */
       return 0;
     
     case CLIB_CLIB_REALLOC: /* 4-322 */
-      if (arm_get_reg(0) != 0)
-        arm_set_reg(0, mem_rma_resize(arm_get_reg(0), arm_get_reg(1)));
+      if (ARM_R0 != 0)
+        ARM_SET_R0(mem_rma_resize(ARM_R0, ARM_R1));
       else
-        arm_set_reg(0, mem_rma_alloc(arm_get_reg(1)));
+        ARM_SET_R0(mem_rma_alloc(ARM_R1));
       return 0;
     
     case CLIB_CLIB_GETENV: /* 4-323 */
-      printf("getenv called for %s\n", mem_chunk(arm_get_reg(0), 0));
-      arm_set_reg(0, 0);
+      printf("getenv called for %s\n", MEM_TOHOST(ARM_R0));
+      ARM_SET_R0(0);
       return 0;
       
     case CLIB_CLIB_STRNCPY: /* 4-328 */
-      strncpy(mem_chunk(arm_get_reg(0), 0),
-              mem_chunk(arm_get_reg(1), 0),
-              arm_get_reg(2));
+      strncpy(MEM_TOHOST(ARM_R0),
+              MEM_TOHOST(ARM_R1),
+              ARM_R2);
       return 0;
     
     case CLIB_CLIB_MEMCPY: /* 4-328 */
-      memcpy(mem_chunk(arm_get_reg(0), 0), mem_chunk(arm_get_reg(1), 0), arm_get_reg(2));
+      memcpy(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), ARM_R2);
       return 0;
     
     case CLIB_CLIB_MEMMOVE: /* 4-328 */
-      memmove(mem_chunk(arm_get_reg(0), 0), mem_chunk(arm_get_reg(1), 0), arm_get_reg(2));
+      memmove(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), ARM_R2);
       return 0;
     
     case CLIB_CLIB_STRCPY: /* 4-328 */
-      strcpy(mem_chunk(arm_get_reg(0), 0), mem_chunk(arm_get_reg(1), 0));
+      strcpy(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
       return 0;
     
     case CLIB_CLIB_STRCAT: /* 4-329 */
-      strcat(mem_chunk(arm_get_reg(0), 0), mem_chunk(arm_get_reg(1), 0));
+      strcat(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
       return 0;
     
     case CLIB_CLIB_STRCMP: /* 4-329 */
-      arm_set_reg(0, strcmp(mem_chunk(arm_get_reg(0), 0), mem_chunk(arm_get_reg(1), 0)));
+      ARM_SET_R0(strcmp(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1)));
       return 0;
     
     case CLIB_CLIB_STRNCMP: /* 4-329 ? */
-      arm_set_reg(0, strncmp(mem_chunk(arm_get_reg(0), 0), mem_chunk(arm_get_reg(1), 0), arm_get_reg(2)));
+      ARM_SET_R0(strncmp(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), ARM_R2));
       return 0;
     
     case CLIB_CLIB_MEMCHR: /* 4-330 */
       {
-        BYTE *found = memchr(mem_chunk(arm_get_reg(0), 0),
-                             arm_get_reg(1),
-                             arm_get_reg(2));
-        arm_set_reg(0, found == NULL ? NULL : arm_get_reg(0) + (found - mem_chunk(arm_get_reg(0), 0)));
+        BYTE *found = memchr(MEM_TOHOST(ARM_R0), ARM_R1, ARM_R2);
+        ARM_SET_R0(found == NULL ? NULL : ARM_R0 + (found - (BYTE*) MEM_TOHOST(ARM_R0)));
       }
       return 0;
     
     case CLIB_CLIB_STRPBRK: /* 4-330 ? */
       {
-       char *start = mem_chunk(arm_get_reg(0), 0);
-       char *c = strpbrk(start, mem_chunk(arm_get_reg(1), 0));
+       char *start = MEM_TOHOST(ARM_R0);
+       char *c = strpbrk(start, MEM_TOHOST(ARM_R1));
        if (c == NULL)
-         { arm_set_reg(0, 0); return 0; }
-       arm_set_reg(0, arm_get_reg(0)+(c-start));
+         { ARM_SET_R0(0); return 0; }
+       ARM_SET_R0(ARM_R0+(c-start));
        return 0;
       }
       return 0;
     
     case CLIB_CLIB_STRCHR: /* 4-330 ? */
       {
-       char *start = mem_chunk(arm_get_reg(0), 0);
-       char *c = strchr(start, arm_get_reg(1));
+       char *start = MEM_TOHOST(ARM_R0);
+       char *c = strchr(start, ARM_R1);
        if (c == NULL)
-         { arm_set_reg(0, 0); return 0; }
-       arm_set_reg(0, arm_get_reg(0)+(c-start));
+         { ARM_SET_R0(0); return 0; }
+       ARM_SET_R0(ARM_R0+(c-start));
        return 0;
       }
       return 0;
     
     case CLIB_CLIB_STRRCHR: /* 4-330 */
       {
-       char *start = mem_chunk(arm_get_reg(0), 0);
-       char *c = strrchr(start, arm_get_reg(1));
+       char *start = MEM_TOHOST(ARM_R0);
+       char *c = strrchr(start, ARM_R1);
        if (c == NULL)
-         { arm_set_reg(0, 0); return 0; }
-       arm_set_reg(0, arm_get_reg(0)+(c-start));
+         { ARM_SET_R0(0); return 0; }
+       ARM_SET_R0(ARM_R0+(c-start));
        return 0;
       }
     
     case CLIB_CLIB_MEMSET: /* 4-332 */
-      memset(mem_chunk(arm_get_reg(0), arm_get_reg(2)), arm_get_reg(1), arm_get_reg(2));
+      memset(MEM_TOHOST(ARM_R0), ARM_R1, ARM_R2);
       return 0;
     
     case CLIB_CLIB_STRLEN: /* 4-332 */
-      arm_set_reg(0, strlen(mem_chunk(arm_get_reg(0), 0)));
+      ARM_SET_R0(strlen(MEM_TOHOST(ARM_R0)));
       return 0;
     
     case CLIB_CLIB_CLOCK: /* 4-333 */
-      arm_set_reg(0, clock());
+      ARM_SET_R0(clock());
       return 0;
 
     case CLIB_CLIB_CTIME: /* 4-334 */
       {
         /* FIXME: relies on host having same time_t structure as RISC OS */
-        char *ctr = ctime((time_t*) mem_chunk(arm_get_reg(0), 0));
+        char *ctr = ctime((time_t*) MEM_TOHOST(ARM_R0));
         WORD riscos_ctr = mem_rma_alloc(strlen(ctr)+1);
-        arm_set_reg(0, riscos_ctr);
-        strcpy(mem_chunk(riscos_ctr, 0), ctr);
+        ARM_SET_R0(riscos_ctr);
+        strcpy(MEM_TOHOST(riscos_ctr), ctr);
       }
       return 0;
 
     case CLIB_CLIB_TIME: /* 4-334 */
-      arm_set_reg(0, (WORD) time(NULL));
-      if (arm_get_reg(1) != 0)
-        mem_write_word(arm_get_reg(1), arm_get_reg(0));
+      ARM_SET_R0((WORD) time(NULL));
+      if (ARM_R1 != 0)
+        MEM_WRITE_WORD(ARM_R1, ARM_R0);
       return 0;
 
     default:

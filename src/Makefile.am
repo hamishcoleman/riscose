@@ -13,7 +13,7 @@ DIST_SUBDIRS = monty defmod include rom armul native sleeve osapi os \
 bin_PROGRAMS = riscose
 noinst_PROGRAMS = heaptest
 
-riscose_SOURCES = main.c heap.c mem.c swi.c util.c
+riscose_SOURCES = heap.c main.c mem.c riscose.h swi.c util.c
 riscose_LDADD = osapi/libosapi.a os/libos.a \
     @ARM@/lib@ARM@.a monty/libmonty.a \
     -lncurses -lreadline

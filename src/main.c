@@ -21,9 +21,10 @@
 #include <assert.h>
 #include <sys/stat.h>
 
-#include <config.h>
-#include <monty/monty.h>
-#include <monty/file.h>
+#include "config.h"
+#include "monty/monty.h"
+#include "monty/file.h"
+#include "riscose.h"
 #include "riscostypes.h"
 #include "module.h"
 #include "swi.h"
@@ -74,6 +75,7 @@ main(int argc, char **argv)
 "    -v, --version     display version and exit.\n"
 "    -D, --debug=n     turn on debug flags `n', where n is a combination of\n"
 MONTY_DEBUG_HELP
+RISCOSE_DEBUG_HELP
 "    -m, --module      binary is a module.\n"
 "    -u, --utility     binary is a utility.\n"
 "    -w, --wimpslot=K  allocates K kilobytes for execution.\n"
@@ -87,7 +89,8 @@ MONTY_DEBUG_HELP
             if (string_to_int(optarg, &val)) {
                 montyopt.debug |= val;
             } else {
-                static char codes[] = MONTY_DEBUG_CODES;
+                static char codes[] = MONTY_DEBUG_CODES
+                    RISCOSE_DEBUG_CODES;
                 char *s;
                 char *found;
 

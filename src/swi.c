@@ -12,14 +12,15 @@
 
 #include <stdio.h>
 
-#include <monty/monty.h>
-#include <monty/mem.h>
-#include <monty/hash.h>
-
+#include "config.h"
+#include "monty/monty.h"
+#include "monty/mem.h"
+#include "monty/hash.h"
+#include "riscose.h"
 #include "riscostypes.h"
 #include "util.h"
 #include "arm.h"
-#include <rom/rom.h>
+#include "rom/rom.h"
 #include "swi.h"
 
 /* FIXME: should be in a header file. */
@@ -140,6 +141,7 @@ void swi_trap(WORD num)
     e = r->handler(num);
 
     /* Handle errors */
+    DEBUG(SWI, ("swi %s\n", r->name));
     arm_clear_v();
     if (e) {
         if (SWI_X(num)) {

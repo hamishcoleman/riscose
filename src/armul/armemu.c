@@ -188,7 +188,7 @@ ARMul_Emulate26 (register ARMul_State * state)
         fprintf(stderr, "(%02x) %08x | %08x | %s\n",
 		(unsigned)state->Mode,
 		(unsigned)pc,
-		(unsigned)*(int *) pc,
+		(unsigned)*(int *)MEM_TOHOST(pc),
 		p->text);
       }
 #endif

@@ -185,7 +185,11 @@ ARMul_Emulate26 (register ARMul_State * state)
         sDisOptions opts = {disopt_CommaSpace, regs};
         pInstruction p = instr_disassemble(instr, pc, &opts);
         
-        fprintf(stderr, "(%02x) %08x | %s\n", (unsigned)state->Mode, (unsigned)pc, p->text);
+        fprintf(stderr, "(%02x) %08x | %08x | %s\n",
+		(unsigned)state->Mode,
+		(unsigned)pc,
+		(unsigned)*(int *) pc,
+		p->text);
       }
 #endif
 

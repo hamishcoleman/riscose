@@ -413,10 +413,10 @@ void riscose_header_output
                start = FALSE;
          }
 
-         if ((rc = fprintf (file, "#undef  %s\n#define %-39s 0x%X\n", swi,
+         if ((rc = fprintf (file, "#define %-39s 0x%X\n",
                swi, s->swi)) < 0 ||
-               (rc = fprintf (file, "#undef  X%s\n#define X%-38s 0x%X\n",
-               swi, swi, s->swi | 1 << 17)) < 0)
+               (rc = fprintf (file, "#define X%-38s 0x%X\n",
+               swi, s->swi | 1 << 17)) < 0)
             goto finish;
       }
       else
@@ -434,8 +434,8 @@ void riscose_header_output
                   start = FALSE;
                }
 
-               if ((rc = fprintf (file, "#undef  %s\n#define %-39s 0x%X\n",
-                     swi, swi, s->constants [i])) < 0)
+               if ((rc = fprintf (file, "#define %-39s 0x%X\n",
+                     swi, s->constants [i])) < 0)
                   goto finish;
                break;
             }

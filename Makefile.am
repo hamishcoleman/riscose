@@ -2,4 +2,4 @@ AUTOMAKE_OPTIONS = foreign
 
 SUBDIRS = src
 
-EXTRA_DIST = ToDo
+EXTRA_DIST = TODO

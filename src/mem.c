@@ -99,6 +99,9 @@ inline
 BYTE*
 mem_f_tohost(WORD arm_addr)
 {
+    /* FIXME: replace switch with if-else to remove gcc dependency on
+     * `...'. */
+
   /*printf("converting %x\n", arm_addr);*/
   switch(arm_addr)
     {

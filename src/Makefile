@@ -43,7 +43,7 @@ OBJS = $(CORE) modules/libmodules.a kernel/libkernel.a \
 
 # ----------------------------------------------------------------------
 
-all: subs riscose heaptest
+all: subs riscose heap2.o heaptest
 
 # ----------------------------------------------------------------------
 

@@ -111,12 +111,7 @@ void riscose_header_output
 
    /*Emit the NEEDS declarations.*/
    context = 0;
-   while (TRUE)
-   {
-      lookup_enumerate(needses, &needs, NULL, &context);
-
-      if (context == 0) break;
-
+    while (lookup_enumerate(needses, &needs, NULL, &context)) {
       def_as_extern (c_name, needs);
       if ((rc = fprintf (file,
             "#ifndef %s_H\n"
@@ -131,11 +126,7 @@ void riscose_header_output
    /*Emit the constant declarations derived from the starred-swi parts.*/
    start = TRUE;
    context = 0;
-   while (TRUE)
-   {
-      lookup_enumerate(swis, &swi, (void **)&s, &context);
-      if (context == 0) break;
-
+    while (lookup_enumerate(swis, &swi, (void **)&s, &context)) {
       if (s->starred_swi)
       {
          if (start) {
@@ -174,11 +165,7 @@ void riscose_header_output
       that we can refer to these things before they are defined fully.*/
    start = TRUE;
    context = 0;
-   while (TRUE)
-   {
-      lookup_enumerate(types, &type, (void **) &t, &context);
-      if (context == 0) break;
-
+    while (lookup_enumerate(types, &type, (void **) &t, &context)) {
       if (t == NULL || t->tag == def_TYPE_STRUCT ||
             t->tag == def_TYPE_UNION || t->tag == def_TYPE_ABSTRACT)
       {
@@ -246,10 +233,7 @@ void riscose_header_output
   /* Emit non-abstract Type definitions */
    start = TRUE;
    context = 0;
-   while (TRUE)
-   {
-      lookup_enumerate(types, &type, (void **)&t, &context);
-      if (context == 0) break;
+    while (lookup_enumerate(types, &type, (void **)&t, &context)) {
 
       if (!(t == NULL || t->tag == def_TYPE_ABSTRACT))
       /* valid type definition */
@@ -469,11 +453,7 @@ void riscose_header_output
    /*Emit the CONST declarations.*/
    start = TRUE;
    context = 0;
-   while (TRUE)
-   {
-      lookup_enumerate(consts, &cnst, (void **)&c, &context);
-      if (context == 0) break;
-
+    while (lookup_enumerate(consts, &cnst, (void **)&c, &context)) {
       if (start)
       {
           print_title_comment("constant definitions");
@@ -561,15 +541,10 @@ void riscose_header_output
    /*Emit the SWI declarations.*/
    start = TRUE;
    context = 0;
-   while (TRUE)
-   {
+    while (lookup_enumerate(swis, &swi, (void **)&s, &context)) {
       osbool first;
 
-      lookup_enumerate(swis, &swi, (void **)&s, &context);
-
       check_for_wide_version(swis, &swi, &s, &context);
-
-      if (context == 0) break;
 
       if (!s->absent && is_swi(swi))
       {
@@ -955,12 +930,7 @@ void riscose_header_output
 
    /*Emit the NEEDSATEND declarations.*/
    context = 0;
-   while (TRUE)
-   {
-      lookup_enumerate(needsatends, &needsatend, NULL, &context);
-
-      if (context == 0) break;
-
+    while (lookup_enumerate(needsatends, &needsatend, NULL, &context)) {
       def_as_extern (c_name, needsatend);
       if ((rc = fprintf (file,
             "#ifndef %s_H\n"

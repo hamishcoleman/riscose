@@ -71,12 +71,8 @@ void riscose_template_output(char *title, char *author,
         "\n");
 
     context = 0;
-    while (1) {
-        lookup_enumerate(swis, &swi, (void **)&s, &context);
+    while (lookup_enumerate(swis, &swi, (void **)&s, &context)) {
         check_for_wide_version(swis, &swi, &s, &context);
-        if (context == 0) {
-            break;
-        }
 
         if (s->absent || !is_swi(swi)) {
             continue;

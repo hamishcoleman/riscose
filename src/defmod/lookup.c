@@ -204,7 +204,7 @@ finish:
 }
 /*------------------------------------------------------------------------*/
 
-void lookup_enumerate
+void *lookup_enumerate
 (
    lookup_t   t,
    char     **token,
@@ -226,5 +226,5 @@ void lookup_enumerate
       /*Not found.*/
       *context = NULL;
 
-   return;
+   return *context;
 }

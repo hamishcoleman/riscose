@@ -158,14 +158,8 @@ void riscose_osapi_output
 
    /* Write a marshalling SWI handler for each SWI */
    context = 0;
-   while (TRUE)
-   {
-      lookup_enumerate(swis, &swi, (void **)&s, &context);
-
+    while (lookup_enumerate(swis, &swi, (void **)&s, &context)) {
       check_for_wide_version(swis, &swi, &s, &context);
-
-      if (context == 0)
-        break;
 
       if (!s->absent && is_swi(swi))
       {
@@ -362,14 +356,9 @@ void riscose_osapi_output
    done_n = 0;
 
    context_a = 0;
-   while (TRUE)
-   {
-     lookup_enumerate(swis, &swi_a, (void **)&s_a, &context_a);
+    while (lookup_enumerate(swis, &swi_a, (void **)&s_a, &context_a)) {
 
      check_for_wide_version(swis, &swi_a, &s_a, &context_a);
-
-     if (context_a == 0)
-       break;
 
      /* Check to see if we've already done this SWI number. */
      n = 0;
@@ -388,14 +377,10 @@ void riscose_osapi_output
        context_b = context_a;
        pending_swi = NULL;
        if_written = FALSE;
-       while (TRUE)
-       {
-         lookup_enumerate(swis, &swi_b, (void **)&s_b, &context_b);
+            while (lookup_enumerate(swis, &swi_b, (void **)&s_b,
+                &context_b)) {
 
          check_for_wide_version(swis, &swi_b, &s_b, &context_b);
-
-         if (context_b == 0)
-           break;
 
          if (!s_b->absent && is_swi(swi_b) && s_a->swi == s_b->swi)
          {
@@ -492,16 +477,10 @@ void riscose_osapi_output
    fprintf(file, "  %s_swi_register_extra();\n", c_name);
 
    context_a = 0;
-   while (TRUE)
-   {
+    while (lookup_enumerate(swis, &swi_a, (void **) &s_a, &context_a)) {
      void *dbg;
 
-     lookup_enumerate(swis, &swi_a, (void **) &s_a, &context_a);
-
      check_for_wide_version(swis, &swi_a, &s_a, &context_a);
-
-     if (context_a == 0)
-       break;
 
      /* Check to see if we've already done this SWI number. */
      n = 0;

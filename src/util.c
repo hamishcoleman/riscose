@@ -5,8 +5,6 @@
 ** See http://riscose.sourceforge.net/ for terms of distribution, and to
 ** pick up a later version of the software.
 **
-**   Just a noddy xmalloc function for the moment.
-**
 **   $Revision$
 **   $Date$
 */
@@ -18,25 +16,22 @@
 #include <unistd.h>
 #include <fcntl.h>
 
+#include <monty/mem.h>
+
 #include "util.h"
 
-void *xmalloc(size_t size)
-{
-  void *p = malloc(size);
-  if (p)
-    {
-     bzero(p, size);
-     return p;
-    }
-  fprintf(stderr, "*** Couldn't allocate %d bytes\n", size);
-  exit(1);
-}
+/* FIXME:  poor name.  strncpy doesn't malloc, this does.  strncpy
+ * doesn't always terminate the new string, this does. */
 
 char *xstrncpy(char *src, int n)
 {
-  char *dst = xmalloc(n+1);
-  strncpy(dst, src, n);
-  return dst;
+    char *dst;
+
+    dst = emalloc(n + 1);
+    strncpy(dst, src, n);
+    dst[n] = '\0';
+
+    return dst;
 }
 
 int file_objecttype(char *name)

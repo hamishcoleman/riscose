@@ -5,8 +5,6 @@
 ** See http://riscose.sourceforge.net/ for terms of distribution, and to
 ** pick up a later version of the software.
 **
-**   Just a noddy xmalloc function for the moment.
-**
 **   $Revision$
 **   $Date$
 */
@@ -15,7 +13,6 @@
 
 #include <stddef.h>
 
-void *xmalloc(size_t size);
 char *xstrncpy(char *src, int n);
 #define xstrcpybetween(start, end) xstrncpy((start), (end)-(start))
 

@@ -66,258 +66,6 @@ static char *Op
 }
 /*-----------------------------------------------------------------------*/
 
-/*Prints a declaration of |v| as an object of type |t|, using |tag| as the
-   structure tag. If |var|, emit 'N' instead of 'UNKNOWN' and escape
-   newlines.*/
-
-static int Print_Decl
-(
-   FILE  *file,
-   def_t  t,
-   char  *tag,
-   char  *v,
-   osbool var,
-   int    nest
-)
-{
-   int rc = 0;
-
-   switch (t->tag)
-   {
-      case def_TYPE_INT:
-         if ((rc = fprintf (file, v == NULL? "int": "int %s", v)) < 0)
-            goto finish;
-      break;
-
-      case def_TYPE_SHORT:
-         if ((rc = fprintf (file, v == NULL? "short": "short %s", v)) < 0)
-            goto finish;
-      break;
-
-      case def_TYPE_BYTE:
-         if ((rc = fprintf (file, v == NULL? "byte": "byte %s", v)) < 0)
-            goto finish;
-      break;
-
-      case def_TYPE_CHAR:
-         if ((rc = fprintf (file, v == NULL? "char": "char %s", v)) < 0)
-            goto finish;
-      break;
-
-      case def_TYPE_BITS:
-         if ((rc = fprintf (file, v == NULL? "bits": "bits %s", v)) < 0)
-            goto finish;
-      break;
-
-      case def_TYPE_BYTES:
-         if ((rc = fprintf (file, v == NULL? "bytes": "bytes %s", v)) < 0)
-            goto finish;
-      break;
-
-      case def_TYPE_BOOL:
-         if ((rc = fprintf (file, v == NULL? "osbool": "osbool %s", v)) < 0)
-            goto finish;
-      break;
-
-      case def_TYPE_REF:
-      {
-         char v1 [def_ID_LIMIT + 1];
-
-         if (v == NULL || v [0] == '/')
-         {
-            if (v != NULL)
-            {
-               if ((rc = sprintf (v1, "*%s", v)) < 0)
-                  goto finish;
-            }
-            else
-            {
-               if ((rc = sprintf (v1, "*")) < 0)
-                  goto finish;
-            }
-         }
-         else
-         {
-            if ((rc = sprintf (v1, "*%s", v)) < 0) /*was (%s) 2nd Mar
-                  1994*/
-               goto finish;
-         }
-
-         if ((rc = Print_Decl (file, t->data AS ref, NULL, v1, var,
-               nest + 1)) < 0)
-            goto finish;
-      }
-      break;
-
-      case def_TYPE_STRING:
-         if ((rc = fprintf (file, "char %s", v)) < 0)
-            goto finish; /*v != NULL*/
-      break;
-
-      case def_TYPE_ASM:
-         if ((rc = fprintf (file, "void %s", v)) < 0)
-            goto finish; /*v != NULL*/
-      break;
-
-      case def_TYPE_DATA:
-         if ((rc = fprintf (file, "byte %s", v)) < 0)
-            goto finish; /*v != NULL*/
-      break;
-
-      case def_TYPE_STRUCT:
-      case def_TYPE_UNION:
-      {
-         int i;
-
-         if
-         (  (  rc =
-                  tag != NULL?
-                     fprintf
-                     (
-                        file,
-                        "%s %s%s\n%*s{  ",
-                        t->tag == def_TYPE_STRUCT? "struct":
-                        t->tag == def_TYPE_UNION?  "union": "list",
-                        var? " \\": "",
-                        tag,
-                        3*(nest + 1), ""
-                     ):
-                     fprintf
-                     (
-                        file,
-                        "%s%s\n%*s{  ",
-                        t->tag == def_TYPE_STRUCT? "struct":
-                        t->tag == def_TYPE_UNION?  "union": "list",
-                        var? " \\": "",
-                        3*(nest + 1), ""
-                     )
-            )
-            < 0
-         )
-            goto finish;
-
-         // variable-size data structure ending in ellipsis
-         if (t->tag == def_TYPE_STRUCT && t->data AS list.base)
-         {
-            char base [def_ID_LIMIT + 1];
-            def_as_macro (base,  t->data AS list.base->data AS id);
-            if ((rc = fprintf (file, "%s_MEMBERS%s\n%*s   ",
-                  base, var? " \\": "", 3*(nest + 1), "")) < 0)
-               goto finish;
-         }
-         for (i = 0; i < t->data AS list.count; i++)
-         {
-            if (i == t->data AS list.count - 1 &&
-                  t->tag == def_TYPE_STRUCT &&
-                  t->data AS list.ellipsis)
-            {
-               char v1 [def_ID_LIMIT + 1];
-
-               if ((rc = sprintf (v1, t->data AS list.members [i]->name [0]
-                     == '*'? "(%s) [%s]": "%s [%s]",
-                     t->data AS list.members [i]->name,
-                     !var? "UNKNOWN": "N")) < 0)
-                  goto finish;
-
-               if ((rc = Print_Decl (file, t->data AS list.members [i],
-                     NULL, v1, var, nest + 1)) < 0)
-                  goto finish;
-            }
-            else
-               if ((rc = Print_Decl (file, t->data AS list.members [i],
-                     NULL, t->data AS list.members [i]->name, var,
-                     nest + 1)) < 0)
-                  goto finish;
-
-            if ((rc = fprintf (file, ";%s\n%*s", var? " \\": "",
-                  3*(nest + 1), "")) < 0)
-               goto finish;
-
-            if (i != t->data AS list.count - 1)
-               if ((rc = fprintf (file, "   ")) < 0)
-                  goto finish;
-         }
-
-         if (v != NULL)
-         {
-            if ((rc = fprintf (file, "}%s\n%*s%s", var? " \\": "",
-                  3*(nest + 1), "", v)) < 0)
-               goto finish;
-         }
-         else
-         {
-            if ((rc = fprintf (file, "}")) < 0)
-               goto finish;
-         }
-      }
-      break;
-
-      case def_TYPE_ROW:
-      {
-         char v1 [def_ID_LIMIT + 1], v2a[20];
-         char *v2;
-
-         if (t->data AS row.count == 1)
-            v2 = "UNKNOWN";
-         else {
-            v2 = v2a;
-            if ((rc = sprintf (v2, "%d", t->data AS row.count)) < 0)
-               goto finish;
-         }
-
-         if (v == NULL || v [0] == '/')
-         {
-            if (v != NULL)
-            {
-               if ((rc = sprintf (v1, "%s [%s]", v, v2)) < 0)
-                  goto finish;
-            }
-            else
-            {
-               if ((rc = sprintf (v1, "[%s]", v2)) < 0)
-                  goto finish;
-            }
-         }
-         else
-         {
-            if ((rc = sprintf (v1, v [0] == '*'? "(%s) [%s]": "%s [%s]",
-                  v, v2)) < 0)
-               goto finish;
-         }
-
-         if ((rc = Print_Decl (file, t->data AS row.base, NULL, v1, var,
-               nest + 1)) < 0)
-            goto finish;
-      }
-      break;
-
-      case def_TYPE_VOID:
-         if ((rc = fprintf (file, v == NULL? "void": "void %s", v)) < 0)
-            goto finish;
-      break;
-
-      case def_TYPE_ID:
-      {
-         char c_name [def_ID_LIMIT + 1];
-
-         def_as_extern (c_name, t->data AS id);
-
-         if ((rc = fprintf (file, v == NULL? "%s": "%s %s", c_name, v)) <
-               0)
-            goto finish;
-      }
-      break;
-
-      case def_TYPE_LIST:
-      case def_TYPE_ABSTRACT:
-        /* Keep the compiler quiet */
-      break;
-   }
-
-finish:
-   return rc;
-}
-/*-----------------------------------------------------------------------*/
 void riscose_header_output
 (
    FILE     *file,
@@ -402,14 +150,8 @@ void riscose_header_output
 
       if (s->starred_swi)
       {
-         if (start)
-         {     if ((rc = fprintf (file,
-                   "/**********************************\n"
-                   " * SWI names and SWI reason codes *\n"
-                   " **********************************/\n"))
-                   < 0)
-                 goto finish;
-
+         if (start) {
+                print_title_comment(file, "swi names and reason codes");
                start = FALSE;
          }
 
@@ -425,12 +167,7 @@ void riscose_header_output
             {
                if (start)
                {
-                  if ((rc = fprintf (file,
-                        "/**********************************\n"
-                        " * SWI names and SWI reason codes *\n"
-                        " **********************************/\n"))
-                        < 0)
-                     goto finish;
+                   print_title_comment(file, "swi names and reason codes");
                   start = FALSE;
                }
 
@@ -459,11 +196,8 @@ void riscose_header_output
       {
          if (start)
          {
-            if ((rc = fprintf (file,
-                  "/************************************\n"
-                  " * Structure and union declarations *\n"
-                  " ************************************/\n")) < 0)
-               goto finish;
+                print_title_comment(file,
+                    "structure and union declarations");
             start = FALSE;
          }
 
@@ -535,12 +269,7 @@ void riscose_header_output
       {
          if (start) /* header */
          {
-            if ((rc = fprintf (file,
-                  "/********************\n"
-                  " * Type definitions *\n"
-                  " ********************/\n")) < 0)
-               goto finish;
-
+            print_title_comment(file, "type declarations");
             start = FALSE;
          }  /* end header */
 
@@ -629,12 +358,12 @@ void riscose_header_output
 
                /* emit a definition of the base structure (TV 20001021) */
                if ( (rc = fprintf( file,
-                                  "\n\n/* Base %s structure without variable part */"
-                                  "\nstruct %s_base\n   {  %s_MEMBERS\n   };",
-                                  c_name, c_name, macro_name
-                                 )
-                    ) < 0
-                  )
+                    "\n"
+                    "\n"
+                    "/* Base %s structure without variable part */\n"
+                    "struct %s_base {\n"
+                    "    %s_MEMBERS\n"
+                    "};", c_name, c_name, macro_name)) < 0)
                   goto finish;
 
                /* emit a structure definition consisting of the macro
@@ -760,11 +489,7 @@ void riscose_header_output
 
       if (start)
       {
-         if ((rc = fprintf (file,
-               "/************************\n"
-               " * Constant definitions *\n"
-               " ************************/\n")) < 0)
-            goto finish;
+          print_title_comment(file, "constant definitions");
          start = FALSE;
       }
 
@@ -866,12 +591,7 @@ void riscose_header_output
 
          if (start)
          {
-            if ((rc = fprintf (file,
-                     "/*************************\n"
-                     " * Function declarations *\n"
-                     " *************************/\n\n")) < 0)
-                  goto finish;
-
+            print_title_comment(file, "function definitions");
             start = FALSE;
          }
 

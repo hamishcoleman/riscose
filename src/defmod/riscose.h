@@ -21,3 +21,8 @@ extern osbool is_swi(char* s);
 ** everything unchanged.
 */
 extern void check_for_wide_version(lookup_t swis, char** swi, def_s* s, void** context);
+
+void print_title_comment(FILE *fp, char *s);
+
+int Print_Decl(FILE *file, def_t t, char *tag, char *v, osbool macro,
+    int nest);

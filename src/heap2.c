@@ -91,6 +91,23 @@ check_integrity(heap_t *h)
   assert(h->magic == MAGIC_BLOCK_VALUE);  
 }
 
+
+/*
+ *    Dump details of a heap to stderr.
+ */
+
+void
+heap_dump(heap_t *h)
+{
+  fprintf(stderr, "\nheap_t     Magic    Address    Size     Gap      Limit     Next\n");
+  while (h) {
+    fprintf(stderr, "%8p %8x %8p %8d %8d %8p %8p\n",
+                    h, h->magic, h->addr, h->size, GAP_SIZE(h), h->limit, h->next);
+    h = h->next;
+  }
+}
+
+
 void
 heap_init(heap_t* h, ULONG size)
 {
@@ -127,10 +144,17 @@ heap_describe(heap_t* h, ULONG *largest_ptr)
   return total;
 }
 
+
+
+/*
+ *    Put a new block (of data area size `size') in the gap of
+ *    an existing block `h'.  Return a pointer to the new block's data area.
+ */
+
 static BYTE*
 fill_gap(heap_t* h, ULONG size)
 {
-  heap_t *allocated = (heap_t*) h->data + ALIGN(h->size);
+  heap_t *allocated = (heap_t*) (h->data + ALIGN(h->size));
   
   assert(GAP_SIZE(h) >= TOTAL(size));
   assert(h->magic == MAGIC_BLOCK_VALUE);
@@ -138,11 +162,17 @@ fill_gap(heap_t* h, ULONG size)
   allocated->size  = size;
   allocated->addr  = (BYTE*) allocated;
   allocated->limit = h->limit;
-  allocated->next  = h;
+  allocated->next  = h->next;
   h->next = allocated;
 
   return allocated->data;
 }
+
+
+/*
+ *    Look for any empty blocks after `h'.  If there are any, join
+ *    them all together.
+ */
 
 static inline void
 coalesce_empty(heap_t* h)
@@ -157,6 +187,13 @@ coalesce_empty(heap_t* h)
 
   h->next = nonempty;
 }
+
+
+/*
+ *    Compact the heap.
+ *    Of course we don't want to do this if we are emulating OS_Heap,
+ *    since OS_Heap's blocks do not move once allocated!
+ */
 
 static heap_t*
 compact_blocks(heap_t* h)
@@ -181,6 +218,17 @@ heap_block_alloc(heap_t* h, ULONG size)
   ULONG   total_space;
   heap_t *cur;
   
+  /*
+   *    OS_Heap does not allow allocation of zero size blocks.
+   *    We disallow it too because it causes problems with our code;
+   *    allocated blocks of zero size cannot be distinguished from freed blocks
+   *    and so are liable to be coalesced and lost.
+   */
+
+  if (size == 0)
+    return NULL;
+
+
   RESHUFFLE(h);
   
   for (cur = h; cur && GAP_SIZE(cur) < TOTAL(size); cur = cur->next) {
@@ -193,7 +241,7 @@ heap_block_alloc(heap_t* h, ULONG size)
   }
   
   if (cur)
-    return fill_gap(h, size);
+    return fill_gap(cur, size);
   
   return NULL;
   
@@ -212,18 +260,24 @@ heap_block_free(heap_t* h, BYTE *data)
 
   assert(block->magic == MAGIC_BLOCK_VALUE);
   
-  h->size = 0;
+  block->size = 0;
 }
 
 BYTE*
 heap_block_resize(heap_t* h, BYTE *data, ULONG size)
 {
   heap_t *newblock, *block = BLOCKFROMPOINTER(data);
-  ULONG diff = (size - h->size); /* invalid but not used if (h->size > size) */
+  ULONG diff = (size - block->size); /* invalid but not used if (block->size > size) */
+
+  /* We don't allow zero-sized blocks; see heap_block_alloc */
+  if (size == 0)
+    return NULL;
+
+  assert(block->magic == MAGIC_BLOCK_VALUE);
 
   RESHUFFLE(h);
 
-  if (size <= block->size || GAP_SIZE(h) <= diff) {
+  if (size <= block->size || GAP_SIZE(block) >= diff) {
     /* Easy cases where the user wants to shrink the block, or extend it where
     ** the gap area is big enough to hold the extension.
     */

@@ -1,9 +1,17 @@
-# ARMul shared library Makefile
+#! /bin/make -f
 
-OBJS = armemu.o armsupp.o arminit.o instr.o arm.o
+LIB = libarmul.a
+OBJ = \
+    $(LIB)(arm.o) \
+    $(LIB)(armemu.o) \
+    $(LIB)(arminit.o) \
+    $(LIB)(armsupp.o) \
+    $(LIB)(instr.o) \
 
-all:	libarmul.a
+all: $(LIB)
 
-libarmul.a:	$(OBJS)
-	ar cr $@ $(OBJS)
-	ranlib $@
+$(LIB): $(OBJ)
+
+clean::
+	rm -f $(LIB)
+	rm -f `echo "$(OBJ)" | sed 's/$(LIB)(\([^.]*\.o\))/\1/g'`

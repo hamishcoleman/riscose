@@ -1,9 +1,18 @@
-# Kernel objects Makefile
+#! /bin/make -f
 
-OBJS = osmisc.o module.o osbyte.o osfile.o osmodule.o vdu.o
+LIB = libkernel.a
+OBJ = \
+    $(LIB)(module.o) \
+    $(LIB)(osbyte.o) \
+    $(LIB)(osfile.o) \
+    $(LIB)(osmisc.o) \
+    $(LIB)(osmodule.o) \
+    $(LIB)(vdu.o) \
 
-all:	libkernel.a
+all: $(LIB)
 
-libkernel.a:	$(OBJS)
-	ar cr $@ $(OBJS)
-	ranlib $@
+$(LIB): $(OBJ)
+
+clean::
+	rm -f $(LIB)
+	rm -f `echo "$(OBJ)" | sed 's/$(LIB)(\([^.]*\.o\))/\1/g'`

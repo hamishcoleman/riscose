@@ -1,10 +1,18 @@
-OBJS = mremap2.o run.o native-arm.o
+#! /bin/make -f
 
-all:	libnative.a
-
-%.o:	%.S
+%.o: %.S
 	$(CC) -c -o $@ $< 
 
-libnative.a:	$(OBJS)
-	ar cr $@ $(OBJS)
-	ranlib $@
+LIB = libnative.a
+OBJ = \
+    $(LIB)(mremap2.o) \
+    $(LIB)(native-arm.o) \
+    $(LIB)(run.o) \
+
+all: $(LIB)
+
+$(LIB): $(OBJ)
+
+clean::
+	rm -f $(LIB)
+	rm -f `echo "$(OBJ)" | sed 's/$(LIB)(\([^.]*\.o\))/\1/g'`

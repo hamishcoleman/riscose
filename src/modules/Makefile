@@ -1,9 +1,15 @@
-# Modules Makefile
+#! /bin/make -f
 
-OBJS = BasicTrans.o SharedCLibrary.o UtilityModule.o
+LIB = libmodules.a
+OBJ = \
+    $(LIB)(BasicTrans.o) \
+    $(LIB)(SharedCLibrary.o) \
+    $(LIB)(UtilityModule.o) \
 
-all:	libmodules.a
+all: $(LIB)
 
-libmodules.a:	$(OBJS)
-	ar cr $@ $(OBJS)
-	ranlib $@
+$(LIB): $(OBJ)
+
+clean::
+	rm -f $(LIB)
+	rm -f `echo "$(OBJ)" | sed 's/$(LIB)(\([^.]*\.o\))/\1/g'`

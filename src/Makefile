@@ -38,25 +38,39 @@ CORE = heap.o mem.o swi.o swichunk.o util.o
 OBJS = $(CORE) kernel/libkernel.a modules/libmodules.a \
     $(ARM_SELECT)/lib$(ARM_SELECT).a monty/libmonty.a
 
-all: subs riscose heaptest
-
 %.o:    %.c mem.h arm.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(ARM_SELECT)/lib$(ARM_SELECT).a: $(ARM_SELECT)/*.c $(ARM_SELECT)/*.h
-	$(MAKE) -C $(ARM_SELECT) 
+# ----------------------------------------------------------------------
+
+all: subs riscose heaptest
+
+# ----------------------------------------------------------------------
 
 subs:
-	cd rom && $(MAKE)
-	$(MAKE) -C kernel
-	$(MAKE) -C modules
 	cd monty && $(MAKE)
+	cd rom && $(MAKE)
+	cd kernel && $(MAKE)
+	cd modules && $(MAKE)
+	cd $(ARM_SELECT) && $(MAKE)
+
+clean::
+	cd monty && $(MAKE) $@
+	cd rom && $(MAKE) $@
+	cd kernel && $(MAKE) $@
+	cd modules && $(MAKE) $@
+	cd $(ARM_SELECT) && $(MAKE) $@
+
+# ----------------------------------------------------------------------
 
 riscose: main.o $(OBJS)
 	$(CC) -o $@ main.o $(OBJS) $(LDFLAGS) $(EXTRA_LDFLAGS)
 
 clean::
-	rm -f riscose
+	rm -f $(CORE)
+	rm -f riscose main.o
+
+# ----------------------------------------------------------------------
 
 # FIXME:  produce a new swichunk.c only if it would be different to the
 # existing one.  this stops swichunk.o being rebuilt and riscose being
@@ -67,20 +81,19 @@ swichunk.c::
 clean::
 	rm -f swichunk.c
 
+# ----------------------------------------------------------------------
+
 heaptest: heaptest.o $(OBJS)
 	$(CC) -o $@ heaptest.o $(OBJS) $(LDFLAGS)
 
 clean::
-	rm -f heaptest
+	rm -f heaptest heaptest.o
 
 ######## Utility targets
 
-clean::
-	cd rom && $(MAKE) $@
-	cd monty && $(MAKE) $@
-	find . -name '*.[ao]' -o -name '*~' | xargs rm -f
-
 # So you can run RISC OS binaries as if they're native
+
+# FIXME: not useful unless you're mattbee.
 
 binfmt:
 	echo ':riscos_aif:M:16:\x11\x00\x00\xEF::/home/mattbee/Projects/riscose/riscose/src/riscose:' >/proc/sys/fs/binfmt_misc/register

@@ -16,7 +16,6 @@
 #include <stddef.h>
 
 void *xmalloc(size_t size);
-char *xstrcpy(char *src);
 char *xstrncpy(char *src, int n);
 #define xstrcpybetween(start, end) xstrncpy((start), (end)-(start))
 

@@ -26,15 +26,6 @@
    #include "bootstrap/os.h"
 #endif
 
-#ifndef territory_H
-   #include "bootstrap/territory.h"
-#endif
-
- /* Function to change the territory in use for |riscos_{scan/format}_fixed.
-  */
-
-extern os_error *riscos_territory (territory_t);
-
  /* Macro to provide an assertion facility using Wimp_ReportError.
   */
 

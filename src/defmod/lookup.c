@@ -27,7 +27,6 @@
 
 /*From OSLib*/
 #include "bootstrap/os.h"
-#include "bootstrap/territory.h"
 
 /*From Support*/
 #include "lookup.h"

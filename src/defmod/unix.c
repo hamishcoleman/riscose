@@ -30,7 +30,6 @@
 /*From OSLib*/
 #include "macros.h"
 #include "os.h"
-#include "territory.h"
 
 /*From Support*/
 #include "m.h"
@@ -54,15 +53,6 @@ static os_error *Error_Lookup
    riscos_strcpy (e->errmess, token);
 
    return e;
-}
-/*------------------------------------------------------------------------*/
-
-os_error *riscos_territory
-(
-   territory_t t
-)
-{
-   return NULL;
 }
 /*------------------------------------------------------------------------*/
 

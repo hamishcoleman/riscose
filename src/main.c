@@ -16,6 +16,9 @@
 #include <stdarg.h>
 /* FIXME: can't rely on getopt.h being a GNU one accepting long
  * options. */
+/* FIXME: shouldn't use getopt because on GNU systems it re-orders argv
+ * so command-line options come first.  This is extremely unhelpful for
+ * riscose which wants args... after binary left alone. */
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
@@ -34,13 +37,6 @@ WORD wimpslot;
 
 static void usage(char *fmt, ...);
 static void utility_run(char *file, mem_private *priv);
-
-static void
-version(void)
-{
-    fprintf(stderr, "%s: version 0.01\n", progname);
-    exit(0);
-}
 
 int
 main(int argc, char **argv)
@@ -62,18 +58,32 @@ main(int argc, char **argv)
     (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
     debugf = verbosef = stderr;
 
-  wimpslot = 640*1024;
-  
-  while ((c = getopt_long(argc, argv, "hvumw:", long_options, NULL)) != EOF)
-    {
-     switch (c)
-       {
-       case 'h' : usage("help requested\n");
-       case 'v' : version();
-       case 'm' : module = 1; break;
-       case 'u' : utility = 1; break;
-       case 'w' : wimpslot = atoi(optarg); break;
-       }
+    wimpslot = 640*1024;
+
+    while ((c = getopt_long(argc, argv, "hvumw:", long_options,
+        NULL)) != EOF) {
+        switch (c) {
+        case 'h':
+            usage("help requested\n");
+            break;
+        case 'v':
+            fprintf(stderr, "%s: version 0.01\n", progname);
+            return 0;
+        case 'm':
+            module = 1;
+            break;
+        case 'u':
+            utility = 1;
+            break;
+        case 'w':
+            /* FIXME: needs better error checking. */
+            /* FIXME: perhaps units should be allowed. */
+            wimpslot = atoi(optarg);
+            break;
+        default: 
+            error("invalid option\n");
+            break;
+        }
     }
 
     /* FIXME: should error if -m and -u given. */

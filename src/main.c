@@ -21,6 +21,7 @@
 #include <string.h>
 #include <assert.h>
 
+#include <config.h>
 #include <monty/monty.h>
 #include "riscostypes.h"
 #include "module.h"
@@ -32,7 +33,6 @@
 
 WORD wimpslot;
 
-static void usage(char *fmt, ...);
 static void utility_run(char *file, mem_private *priv);
 
 int
@@ -53,6 +53,7 @@ main(int argc, char **argv)
   WORD  count = 0, o;
   
     (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
+    *argv = progname;
     debugf = verbosef = stderr;
 
     wimpslot = 640*1024;
@@ -61,10 +62,19 @@ main(int argc, char **argv)
         NULL)) != EOF) {
         switch (c) {
         case 'h':
-            usage("help requested\n");
-            break;
+            printf(
+"usage: %s [options] binary args...\n"
+"where options are:\n"
+"    -h, --help          request this help text.\n"
+"    -v, --version       display version and exit.\n"
+"    -m, --module        binary is a module.\n"
+"    -u, --utility       binary is a utility.\n"
+"    -w, --wimpslot=K    allocates K kilobytes for execution.\n"
+"binary is the risc os executable to run.  args are its arguments.\n",
+                progname);
+            return 0;
         case 'v':
-            fprintf(stderr, "%s: version 0.01\n", progname);
+            printf("%s: " PACKAGE " version " VERSION "\n", progname);
             return 0;
         case 'm':
             module = 1;
@@ -78,7 +88,7 @@ main(int argc, char **argv)
             wimpslot = atoi(optarg);
             break;
         default: 
-            error("invalid option\n");
+            error("try `%s -h' for more information.\n", progname);
             break;
         }
     }
@@ -87,7 +97,7 @@ main(int argc, char **argv)
     /* FIXME: what meaning does wimpslot have if -m or -u given? */
   
     if (optind == argc) {
-        usage("no risc os executable specified\n");
+        error("no risc os executable specified\n");
     }
     file = argv[optind++];
 
@@ -141,30 +151,6 @@ main(int argc, char **argv)
     }
 
   return 0;
-}
-
-static void usage(char *fmt, ...)
-{
-    va_list args;
-
-    va_start(args, fmt);
-
-    fprintf(stderr, "%s: ", progname);
-    vfprintf(stderr, fmt, args);
-    fprintf(stderr,
-"usage: %s [options] binary args...\n"
-"where options are:\n"
-"    -h, --help          request this help text.\n"
-"    -v, --version       display version and exit.\n"
-"    -m, --module        binary is a module.\n"
-"    -u, --utility       binary is a utility.\n"
-"    -w, --wimpslot=K    allocates K kilobytes for execution.\n"
-"binary is the risc os executable to run.  args are its arguments.\n",
-        progname);
-
-    va_end(args);
-
-    exit(1);
 }
 
 /* Loads 'file' into the RMA and runs it as a transient utility */

@@ -164,8 +164,12 @@ void riscose_osapi_output
       if (!s->absent && is_swi(swi))
       {
          /* SWI handler function definition */
+         /* FIXME --- we don't need to pass the SWI number in, really.  This
+         ** is a hangover from the old days.  This could be removed once all
+         ** SWI emulation code has been moved over to be OSLib-style.
+         */
          def_as_extern(c_name, swi);
-         fprintf(file, "WORD swih_%s(void)\n{\n", c_name);
+         fprintf(file, "WORD swih_%s(WORD n)\n{\n", c_name);
 
          /* Declare variables for the output registers that are used by this SWI */
          start = TRUE;
@@ -389,8 +393,13 @@ void riscose_osapi_output
              ** the same SWI number.
              */
 
+             /* FIXME --- the unnecessary parameter is just as unnecessary here
+             ** as it is in the FIXME above!  Similarly below when these
+             ** routines dispatch somewhere.
+             */
+
              def_as_extern(c_name, title);
-             fprintf(file, "\n\nWORD swih_%X(void)\n"
+             fprintf(file, "\n\nWORD swih_%X(WORD n)\n"
                            "{\n"
                            "  WORD e = 0;\n\n", s_a->swi);
 
@@ -401,7 +410,7 @@ void riscose_osapi_output
                condition(file, swi_a, s_a);
                if_written = TRUE;
                def_as_extern(c_name, swi_a);
-               fprintf(file, "\n    e = swih_%s();\n", c_name);
+               fprintf(file, "\n    e = swih_%s(0);\n", c_name);
              }
              else
                pending_swi = swi_a;
@@ -416,7 +425,7 @@ void riscose_osapi_output
              condition(file, swi_b, s_b);
              if_written = TRUE;
              def_as_extern(c_name, swi_b);
-             fprintf(file, "\n    e = swih_%s();\n", c_name);
+             fprintf(file, "\n    e = swih_%s(0);\n", c_name);
            }
            else
              pending_swi = swi_b;
@@ -428,7 +437,7 @@ void riscose_osapi_output
        if (pending_swi) {
          def_as_extern(c_name, pending_swi);
          fprintf(file, "  else\n"
-                       "    e = swih_%s();\n", c_name);
+                       "    e = swih_%s(0);\n", c_name);
        }
 
        /* If a routine was written, finish it off now. */

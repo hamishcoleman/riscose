@@ -45,6 +45,13 @@ macros to make the code more readable.  Or is there a better way...?
 Also, I ought to split off stolen code like the ARMulator and Gareth's
 instruction disassembler into separate directories.
 
+We often have new values for the four processor status registers, N, Z,
+C, and V, yet only have arm_clear_X() and arm_set_X() to do one flag at
+a time.  We need a routine implemented in armul, sleeve, and native,
+that lets us set some of them in one go and returns their new values.
+
+    psr arm_set_psr(psr and, psr xor);
+
 * The heap manager algorithm
 
 Is just naff and will slow programs down that allocate and deallocate lots

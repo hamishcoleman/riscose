@@ -1,0 +1,4 @@
+#! /bin/sh
+
+rm -f rom
+ln -s $srcdir/../src/rom

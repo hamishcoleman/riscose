@@ -40,6 +40,7 @@ AC_OUTPUT([ \
         src/rom/Makefile \
         src/rom/compilerom \
         src/sleeve/Makefile \
+        tests/Makefile \
         util/Makefile \
     ], \
     [chmod +x src/rom/compilerom]

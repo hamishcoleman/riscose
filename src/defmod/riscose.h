@@ -6,6 +6,13 @@
 **   riscose-specific bits of defmod that are used in more than one backend.
 */
 
+#undef EXTERN
+#ifdef DEFINE_RISCOSE_GLOBALS
+#define EXTERN
+#else
+#define EXTERN extern
+#endif
+
 
 
 /* Return TRUE if the given "SWI" name is actually a SWI rather than an upcall/event/
@@ -22,7 +29,17 @@ extern osbool is_swi(char* s);
 */
 extern void check_for_wide_version(lookup_t swis, char** swi, def_s* s, void** context);
 
-void print_title_comment(FILE *fp, char *s);
+void print_title_comment(char *s);
 
-int Print_Decl(FILE *file, def_t t, char *tag, char *v, osbool macro,
-    int nest);
+int Print_Decl(def_t t, char *tag, char *v, osbool macro, int nest);
+
+/* Make producing indented output easier and more terse. */
+EXTERN int dented;
+
+#define INDENT (dented += 4)
+#define OUTDENT (dented -= 4)
+#define DENT PF("%*s", dented, "")
+#define P(s) fputs((s), stdout)
+#define PF printf
+#define DP(s) DENT; P(s)
+#define DPF DENT; PF

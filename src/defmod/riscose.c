@@ -16,13 +16,12 @@
 #include "monty/array.h"
 #include "monty/str.h"
 
-/* OSLib */
 #include "types.h"
-
-/* defmod */
 #include "def.h"
 #include "lookup.h"
 
+#define DEFINE_RISCOSE_GLOBALS
+#include "riscose.h"
 
 /* Return TRUE if the given "SWI" name is actually a SWI rather than an upcall/event/
 ** etc. etc.
@@ -87,17 +86,12 @@ void check_for_wide_version(lookup_t swis, char** swi, def_s* s, void** context)
 
 /* ---- print_title_comment ----------------------------------------- */
 
-void print_title_comment(FILE *fp, char *s)
+void print_title_comment(char *s)
 {
-    int i;
+    static char d[] =
+        "------------------------------------------------------------";
 
-    fputs("/* ---- ", fp);
-    fputs(s, fp);
-    fputc(' ', fp);
-    for (i = 60 - strlen(s); i > 0; i--) {
-        fputc('-', fp);
-    }
-    fputs(" */\n\n", fp);
+    printf("/* ---- %s %.*s */\n\n", s, 60 - strlen(s), d);
 
     return;
 }
@@ -109,12 +103,15 @@ void print_title_comment(FILE *fp, char *s)
 
 #define INDENT 4 * (nest + 1), ""
 
-int Print_Decl(FILE *file, def_t t, char *tag, char *v, int macro,
+int Print_Decl(def_t t, char *tag, char *v, int macro,
     int nest)
 {
+    FILE *file;
     char *spcv;
     char *lineend;
     char *size;
+
+    file = stdout;
 
     spcv = v ? mstrprintf(" %s", v) : estrdup("");
     if (macro) {
@@ -152,7 +149,7 @@ int Print_Decl(FILE *file, def_t t, char *tag, char *v, int macro,
             char v1[def_ID_LIMIT + 1];
 
             sprintf(v1, "*%s", v ? v : "");
-            Print_Decl(file, t->data.ref, NULL, v1, macro, nest + 1);
+            Print_Decl(t->data.ref, NULL, v1, macro, nest + 1);
         }
         break;
     case def_TYPE_STRING:
@@ -194,10 +191,10 @@ int Print_Decl(FILE *file, def_t t, char *tag, char *v, int macro,
                         "(%s)[%s]" : "%s[%s]",
                         t->data.list.members[i]->name, size);
 
-                    Print_Decl(file, t->data.list.members[i], NULL, v1,
+                    Print_Decl(t->data.list.members[i], NULL, v1,
                         macro, nest + 1);
                 } else {
-                    Print_Decl(file, t->data.list.members[i], NULL,
+                    Print_Decl(t->data.list.members[i], NULL,
                         t->data.list.members[i]->name, macro, nest + 1);
                 }
 
@@ -234,7 +231,7 @@ int Print_Decl(FILE *file, def_t t, char *tag, char *v, int macro,
                 sprintf(v1, *v == '*' ? "(%s)[%s]" : "%s[%s]", v, v2);
             }
 
-            Print_Decl(file, t->data.row.base, NULL, v1, macro,
+            Print_Decl(t->data.row.base, NULL, v1, macro,
                 nest + 1);
         }
         break;

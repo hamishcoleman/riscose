@@ -1002,17 +1002,17 @@ int main (int argc, char *argv [])
    switch (option)
    {
       case Riscose_OSAPI:
-        riscose_osapi_output(stdout, Title, Author, needses,
+        riscose_osapi_output(Title, Author, needses,
             needsatends, consts, types, swis);
       break;
 
       case Riscose_Template:
-        riscose_template_output(stdout, Title, Author, needses,
+        riscose_template_output(Title, Author, needses,
             needsatends, consts, types, swis);
       break;
 
       case Riscose_Header:
-        riscose_header_output(stdout, Title, Author, needses,
+        riscose_header_output(Title, Author, needses,
             needsatends, consts, types, swis);
 
       break;

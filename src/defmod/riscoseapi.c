@@ -99,7 +99,6 @@ void condition(FILE* f, char* swi, def_s s)
 
 void riscose_osapi_output
 (
-   FILE     *file,
    char     *title,
    char     *author,
    lookup_t  needses,
@@ -109,6 +108,7 @@ void riscose_osapi_output
    lookup_t  swis
 )
 {
+   FILE     *file;
    char     *swi;
    char     *swi_a;
    char     *swi_b;
@@ -137,6 +137,7 @@ void riscose_osapi_output
    osbool    have_done;
    int       n;
 
+   file = stdout;
    def_as_extern (c_name, title);
 
    /* Banner */
@@ -162,7 +163,8 @@ void riscose_osapi_output
         "#include \"swi.h\"\n"
         "#include \"arm.h\"\n"
         "#include \"mem.h\"\n"
-        "#include \"%s.h\"\n", c_name);
+        "#include \"%s.h\"\n"
+        "\n", c_name);
 
    /* Write a marshalling SWI handler for each SWI */
    context = 0;
@@ -243,7 +245,7 @@ void riscose_osapi_output
 
              /* Cast */
              fprintf(file, "(");
-             Print_Decl(file, s->inputs[i], "", "", FALSE, 0);
+             Print_Decl(s->inputs[i], "", "", FALSE, 0);
              fprintf(file, (s->ri & (1 << i)) ? "*) " : ") ");
 
              /* Convert to a host address if this is a pointer */
@@ -273,7 +275,7 @@ void riscose_osapi_output
 
              /* Cast */
              fprintf(file, "(");
-             Print_Decl(file, s->outputs[i], "", "", FALSE, 0);
+             Print_Decl(s->outputs[i], "", "", FALSE, 0);
              fprintf(file, (s->ro & (1 << i)) ? "**) " : "*) ");
 
              fprintf(file, "&r%d", i);

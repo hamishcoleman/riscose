@@ -30,13 +30,13 @@
 #include "riscose.h"
 #include "riscosever.h"
 
-static void print_params(FILE *fp, bits b, bits rb, struct def_t **puts,
+static void print_params(bits b, bits rb, struct def_t **puts,
     char *arg_prefix);
-static char *print_sep(FILE *fp);
+static char *print_sep(int reset);
 
 /*-----------------------------------------------------------------------*/
 
-void riscose_template_output(FILE *file, char *title, char *author,
+void riscose_template_output(char *title, char *author,
     lookup_t needses, lookup_t needsatends, lookup_t consts,
     lookup_t types, lookup_t swis)
 {
@@ -47,33 +47,36 @@ void riscose_template_output(FILE *file, char *title, char *author,
     int i;
 
     def_as_extern(c_name, title);
-    fprintf(file,
+    PF(
         "/* os/%s.c\n"
-        "**\n"
-        "** See http://riscose.sf.net/ for terms of distribution, and to\n"
-        "** pick up a later version of the software.\n"
-        "**\n"
-        "**   Emulation of the %s SWIs.\n"
-        "**\n"
-        "**   Template written by defmod (riscose version %s)\n"
-        "*/\n"
+        " *\n"
+        " * See http://riscose.sf.net/ for terms of distribution, and to\n"
+        " * pick up a later version of the software.\n"
+        " *\n"
+        " * Emulation of the %s SWIs.\n"
+        " *\n"
+        " * Template written by defmod, riscose version %s. */\n"
         "\n", c_name, title, DEFMOD_RISCOSE_VERSION);
 
-    fprintf(file,
+    PF(
         "#include <stdio.h>\n"
         "\n"
         "#include \"monty/monty.h\"\n"
         "#include \"types.h\"\n"
-        "#include \"%s.h\"\n\n", c_name);
+        "#include \"%s.h\"\n"
+        "\n", c_name);
 
     strcat(c_name, "_swi_register_extra");
-    print_title_comment(file, c_name);
-    fprintf(file,
+    print_title_comment(c_name);
+    PF(
         "void %s(void)\n"
-        "{\n"
-        "    return;\n"
+        "{\n", c_name);
+    INDENT;
+    DP("return;\n");
+    OUTDENT;
+    P(
         "}\n"
-        "\n", c_name);
+        "\n");
 
     context = 0;
     while (1) {
@@ -89,21 +92,22 @@ void riscose_template_output(FILE *file, char *title, char *author,
 
         *c_name = 'x';
         def_as_extern(c_name + 1, swi);
-        print_title_comment(file, c_name);
+        print_title_comment(c_name);
 
-        fprintf(file, "os_error *%s(", c_name);
-        print_sep(NULL);
+        PF("os_error *%s(", c_name);
+        INDENT;
+        print_sep(TRUE);
 
         if (!def_using_block(s)) {
-            print_params(file, s->i, s->ri, s->inputs, "");
-            print_params(file, s->o, s->ro, s->outputs, "*");
+            print_params(s->i, s->ri, s->inputs, "");
+            print_params(s->o, s->ro, s->outputs, "*");
 
             if (s->f_out) {
                 struct def_t t;
 
-                print_sep(file);
+                print_sep(FALSE);
                 t.tag = def_TYPE_BITS;
-                Print_Decl(file, &t, NULL, "*psr", FALSE, 0);
+                Print_Decl(&t, NULL, "*psr", FALSE, 0);
             }
         } else {
             for (i = 0; i < 10; i++) {
@@ -116,31 +120,30 @@ void riscose_template_output(FILE *file, char *title, char *author,
                         def_t mem;
 
                         mem = def->data.list.members[cpt];
-                        print_sep(file);
-                        Print_Decl(file, mem, NULL, mem->name, FALSE,
-                            0);
+                        print_sep(FALSE);
+                        Print_Decl(mem, NULL, mem->name, FALSE, 0);
                     }
                     break;
                 }
             }
         }
 
-        if (!*print_sep(NULL)) {
-            fputs("void", file);
+        if (!*print_sep(TRUE)) {
+            P("void");
         }
-        fputs(")\n", file);
-        fprintf(file,
-            "{\n"
-            "    error(\"swi X%s unimplemented.\\n\");\n"
-            "\n"
-            "    return NULL;\n"
-            "}\n"
-            "\n", swi);
+        P(")\n");
+        OUTDENT;
+
+        P("{\n");
+        INDENT;
+        DPF("error(\"swi X%s unimplemented.\\n\");\n\n", swi);
+        DP("return NULL;\n");
+        OUTDENT;
+        P("}\n\n");
     }
 
-    if (ferror(file)) {
-        fputs("error writing to file", stderr);
-        exit(1);
+    if (ferror(stdout)) {
+        error("error writing to stdout");
     }
 
     return;
@@ -148,7 +151,7 @@ void riscose_template_output(FILE *file, char *title, char *author,
 
 /* ---- print_params ------------------------------------------------ */
 
-static void print_params(FILE *fp, bits b, bits rb, struct def_t **puts,
+static void print_params(bits b, bits rb, struct def_t **puts,
     char *arg_prefix)
 {
     int i;
@@ -156,10 +159,10 @@ static void print_params(FILE *fp, bits b, bits rb, struct def_t **puts,
 
     for (i = 0; i < 10; i++) {
         if (b & 1 << i) {
-            print_sep(fp);
+            print_sep(FALSE);
             sprintf(arg_name, "%s%s%s", arg_prefix,
                 ((rb & 1 << i) ? "*" : ""), puts[i]->name);
-            Print_Decl(fp, puts[i], NULL, arg_name, FALSE, 0);
+            Print_Decl(puts[i], NULL, arg_name, FALSE, 0);
         }
     }
 
@@ -168,17 +171,20 @@ static void print_params(FILE *fp, bits b, bits rb, struct def_t **puts,
 
 /* ---- print_sep --------------------------------------------------- */
 
-static char *print_sep(FILE *fp)
+static char *print_sep(int reset)
 {
     static char *s = "";
     char *olds;
 
     olds = s;
-    if (fp) {
-        fputs(s, fp);
-        s = ",\n    ";
-    } else {
+    if (reset) {
         s = "";
+    } else {
+        if (*s) {
+            fputs(s, stdout);
+            DENT;
+        }
+        s = ",\n";
     }
 
     return olds;

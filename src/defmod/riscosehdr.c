@@ -68,7 +68,6 @@ static char *Op
 
 void riscose_header_output
 (
-   FILE     *file,
    char     *title,
    char     *author,
    lookup_t  needses,
@@ -78,6 +77,7 @@ void riscose_header_output
    lookup_t  swis
 )
 {
+   FILE     *file;
    char     *needs, *needsatend, *cnst, *type, *swi, *comment;
    def_c     c;
    def_t     t;
@@ -88,6 +88,7 @@ void riscose_header_output
    time_t    now;
    osbool    start;
 
+   file = stdout;
    comment = " *";
 
    /* Emit some header stuff */
@@ -151,7 +152,7 @@ void riscose_header_output
       if (s->starred_swi)
       {
          if (start) {
-                print_title_comment(file, "swi names and reason codes");
+                print_title_comment("swi names and reason codes");
                start = FALSE;
          }
 
@@ -167,7 +168,7 @@ void riscose_header_output
             {
                if (start)
                {
-                   print_title_comment(file, "swi names and reason codes");
+                   print_title_comment("swi names and reason codes");
                   start = FALSE;
                }
 
@@ -196,8 +197,7 @@ void riscose_header_output
       {
          if (start)
          {
-                print_title_comment(file,
-                    "structure and union declarations");
+                print_title_comment("structure and union declarations");
             start = FALSE;
          }
 
@@ -269,7 +269,7 @@ void riscose_header_output
       {
          if (start) /* header */
          {
-            print_title_comment(file, "type declarations");
+            print_title_comment("type declarations");
             start = FALSE;
          }  /* end header */
 
@@ -349,7 +349,7 @@ void riscose_header_output
                {
                   if ((rc = fprintf (file, " \\\n   ")) < 0)
                      goto finish;
-                  if ((rc = Print_Decl (file, t->data AS list.members [i],
+                  if ((rc = Print_Decl (t->data AS list.members [i],
                         NULL, t->data AS list.members [i]->name, TRUE, 0)) < 0)
                      goto finish;
                   if ((rc = fprintf (file, ";")) < 0)
@@ -373,7 +373,7 @@ void riscose_header_output
                       "\nstruct %s\n   {  %s_MEMBERS\n      ",
                      c_name, macro_name)) < 0)
                   goto finish;
-               if ((rc = Print_Decl (file, t->data AS list.members [i],
+               if ((rc = Print_Decl (t->data AS list.members [i],
                      NULL, t->data AS list.members [i]->name, TRUE, 0)) < 0)
                   goto finish;
                if ((rc = fprintf (file, " [UNKNOWN];\n   }")) < 0)
@@ -381,7 +381,7 @@ void riscose_header_output
 
             } /* end variable-size structure definition */
             else
-               if ((rc = Print_Decl (file, t, c_name, NULL, FALSE, 0)) < 0)
+               if ((rc = Print_Decl (t, c_name, NULL, FALSE, 0)) < 0)
                   goto finish;
             if ((rc = fprintf (file, ";\n\n")) < 0)
                goto finish;
@@ -409,7 +409,7 @@ void riscose_header_output
                   if ((rc = fprintf (file, "%s_MEMBERS \\\n         ",
                         macro_name)) < 0)
                      goto finish;
-               if ((rc = Print_Decl (file, t->data AS list.members [i],
+               if ((rc = Print_Decl (t->data AS list.members [i],
                      NULL, t->data AS list.members [i]->name, TRUE, 0)) < 0)
                   goto finish;
                if ((rc = fprintf (file, " [N]; \\\n      }")) < 0)
@@ -462,7 +462,7 @@ void riscose_header_output
             if ((rc = fprintf (file, "typedef ")) < 0)
                goto finish;
 
-            if ((rc = Print_Decl (file, t, NULL, c_name, FALSE, 0)) < 0)
+            if ((rc = Print_Decl (t, NULL, c_name, FALSE, 0)) < 0)
                goto finish;
 
             if ((rc = fprintf (file, ";\n")) < 0)
@@ -489,7 +489,7 @@ void riscose_header_output
 
       if (start)
       {
-          print_title_comment(file, "constant definitions");
+          print_title_comment("constant definitions");
          start = FALSE;
       }
 
@@ -548,7 +548,7 @@ void riscose_header_output
             if ((rc = fprintf (file, "((")) < 0)
                goto finish;
 
-            if ((rc = Print_Decl (file, c->type, NULL, NULL, FALSE,
+            if ((rc = Print_Decl (c->type, NULL, NULL, FALSE,
                   0)) < 0)
                goto finish;
 
@@ -591,7 +591,7 @@ void riscose_header_output
 
          if (start)
          {
-            print_title_comment(file, "function definitions");
+            print_title_comment("function definitions");
             start = FALSE;
          }
 
@@ -875,7 +875,7 @@ void riscose_header_output
                         goto finish;
                   }
 
-                  if ((rc = Print_Decl (file, s->inputs [i], NULL,
+                  if ((rc = Print_Decl (s->inputs [i], NULL,
                         arg_name, FALSE, 0)) < 0)
                      goto finish;
                }
@@ -906,7 +906,7 @@ void riscose_header_output
                         goto finish;
                   }
 
-                  if ((rc = Print_Decl (file, s->outputs [i], NULL,
+                  if ((rc = Print_Decl (s->outputs [i], NULL,
                         arg_name, FALSE, 0)) < 0)
                      goto finish;
                }
@@ -924,7 +924,7 @@ void riscose_header_output
                   first = FALSE;
 
                t.tag = def_TYPE_BITS;
-               if ((rc = Print_Decl (file, &t, NULL,
+               if ((rc = Print_Decl (&t, NULL,
                      "*psr", FALSE, 0)) < 0)
                   goto finish;
             }
@@ -947,7 +947,7 @@ void riscose_header_output
                      else
                         first = FALSE;
 
-                     if ((rc = Print_Decl (file,
+                     if ((rc = Print_Decl (
                            s->inputs [i]->data AS list.members [cpt],
                            NULL, s->inputs [i]->data AS list.members
                            [cpt]->name, FALSE, 0)) < 0)

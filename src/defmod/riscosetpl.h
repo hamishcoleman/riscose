@@ -14,7 +14,6 @@
 #endif
 
 void riscose_template_output(
-                                FILE *,           /* file to receive output */
                                 char *title,      /* module title */
                                 char *author,     /* module author */
                                 lookup_t needses, /* lookup table for NEEDS files */

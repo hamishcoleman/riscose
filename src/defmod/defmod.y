@@ -941,6 +941,10 @@ int main (int argc, char *argv [])
    int i;
    enum {None, Riscose_OSAPI, Riscose_Template, Riscose_Header} option = None;
 
+    (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
+    *argv = progname;
+    debugf = verbosef = stderr;
+
     lookup_new(&needses, 16);
     lookup_new(&needsatends, 16);
     lookup_new(&consts, 16);
@@ -980,7 +984,9 @@ int main (int argc, char *argv [])
                "\t-riscose_template\t\t"     "riscose template .c file\n"
                "\t-riscose_header\t\t"     "riscose osapi .h file\n",
                stdout);
-      }
+      } else {
+            error("unknown option: %s\n", argv[i]);
+        }
 
       i++;
    }

@@ -35,8 +35,8 @@ export CC CFLAGS SRCDIR LDFLAGS
 
 CORE = heap.o mem.o swi.o swichunk.o util.o
 
-OBJS = $(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a \
-    modules/libmodules.a monty/libmonty.a
+OBJS = $(CORE) kernel/libkernel.a modules/libmodules.a \
+    $(ARM_SELECT)/lib$(ARM_SELECT).a monty/libmonty.a
 
 BIN = riscose
 
@@ -54,8 +54,8 @@ subs:
 	$(MAKE) -C modules
 	cd monty && $(MAKE)
 
-$(BIN):	main.o $(OBJS)
-	$(CC) -o $@ main.o $(OBJS) $(LDFLAGS)
+$(BIN):	$(MAIN) $(OBJS)
+	$(CC) -o $@ $(MAIN) $(OBJS) $(LDFLAGS)
 
 clean::
 	rm -f $(BIN)

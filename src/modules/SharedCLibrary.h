@@ -307,6 +307,7 @@ static const char *clib_kern_names[48] =
 #define CLIB_CLIB_UNCAUGHTTRAPHANDLER 0x01101
 #define CLIB_CLIB_EVENTHANDLER 0x01102
 #define CLIB_CLIB_UNHANDLEDEEVENTHANDLER 0x01103
+/* FIXME: dollar signs aren't valid preprocessor characters. */
 #define CLIB_CLIB_X$STACK_OVERFLOW 0x01104
 #define CLIB_CLIB_X$STACK_OVERFLOW_1 0x01105
 #define CLIB_CLIB_X$UDIVIDE 0x01106

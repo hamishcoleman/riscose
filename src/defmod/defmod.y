@@ -33,7 +33,14 @@ TV    20000503    |bool| replaced by |osbool|
    #include <ctype.h>
    #include <stddef.h>
    #include <stdlib.h>
+#include <stdio.h>
    #include <string.h>
+#include <errno.h>
+#include <unistd.h>
+#include <sys/stat.h>
+
+#include "monty/monty.h"
+#include "monty/file.h"
 
    /*From OSLib*/
    #include "types.h"
@@ -1101,10 +1108,7 @@ int main (int argc, char *argv [])
 
          i++;
 
-         if ((f = fopen(argv[i],"r")) == NULL) {
-            error = _kernel_last_oserror();
-            goto finish;
-         }
+         f = efopenr(argv[i]);
 
          cc = buffer;
          do
@@ -1112,8 +1116,9 @@ int main (int argc, char *argv [])
 
             *cc = c = getc(f);
             if (ferror(f)) {
-              error = _kernel_last_oserror();
-              goto finish;
+                fprintf(stderr, "defmod: getc from %s failed: %s\n",
+                    argv[i], strerror(errno));
+                exit(1);
             }
 
             if (feof(f)) *cc = ' ';

@@ -10,8 +10,5 @@ typedef struct {
 
 #define __swi(n)
 
-extern _kernel_oserror *_kernel_last_oserror(void);
-extern _kernel_oserror *_kernel_set_perror(void);
-
 # endif
 

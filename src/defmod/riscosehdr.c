@@ -9,10 +9,12 @@
 **   defmod backend to write C header files.
 */
 
+#include <stdlib.h>
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
 #include <time.h>
+#include <errno.h>
 #include <kernel.h>      /* TV 980115 */
 
 #include "types.h"
@@ -1280,6 +1282,10 @@ os_error *riscose_header_output
       goto finish;
 
 finish:
-   if (rc < 0) error = (os_error*)_kernel_last_oserror ();                /* TV 980115 */
+    if (rc < 0) {
+        fprintf(stderr, "defmod: %s %d %s %d\n", __FILE__, __LINE__,
+            strerror(errno), errno);
+        exit(1);
+    }
    return error;
 }

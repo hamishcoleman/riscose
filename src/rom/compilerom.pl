@@ -7,7 +7,7 @@
 # See http://riscose.sourceforge.net/ for terms of distribution, and to
 # pick up a later version of the software.
 #
-#   This script compiles the ROMimage file, which is mapped into the ARM's 
+#   This script compiles the romimage file, which is mapped into the ARM's 
 #   memory at 0x3800000.  It also makes up the "rom.h" include file which
 #   SWI emulations can use to refer to error messages and other fixed
 #   resources in ROM when passing results back from SWIs.
@@ -19,7 +19,7 @@ use strict;
 
 my $l;
 
-open ROM, ">ROMimage" or die "Couldn't open ROMimage for output";
+open ROM, ">romimage" or die "Couldn't open romimage for output";
 open ROMHDR, ">rom.h" or die "Couldn't open rom.h for output";
 print ROMHDR "/* Automatically generated file; do not edit manually */\n\n";
 
@@ -37,7 +37,8 @@ sub rom_current {
 #
 # Compile list of errors
 #
-open ERRORS, "error.list" or die "Couldn't find error.list file";
+@ARGV == 1 or die "usage: $0 error_list_file";
+open ERRORS, $ARGV[0] or die "Couldn't find $ARGV[0] file";
 $l=0; while (<ERRORS>)
 {
   $l++;

@@ -1,2 +1,4 @@
-ROMimage
+Makefile
+Makefile.in
 rom.h
+romimage

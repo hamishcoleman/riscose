@@ -14,9 +14,9 @@ binaries I've used for testing at:
 
 So just dump it into the src/ folder for now and type:
 
-    cd src
-    make CURDIR=`pwd`
-    ./riscose grep free </usr/doc/copyright/GPL 
+    ARM=armul; export ARM
+    ./configure && make
+    src/riscose grep free <README
 
 or something like that, i.e. the arguments to the riscose program are the
 name of the binary (currently only `Absolute' executables are supported),

@@ -1,0 +1,16 @@
+AC_INIT(src/mkswichunk.sh)
+AM_INIT_AUTOMAKE(riscose,0.01)
+AM_CONFIG_HEADER(config.h)
+AC_PROG_CC
+AC_PROG_RANLIB
+AC_SUBST(ARM)
+AC_OUTPUT( \
+        Makefile \
+        src/Makefile \
+        src/armul/Makefile \
+        src/kernel/Makefile \
+        src/include/Makefile \
+        src/modules/Makefile \
+        src/monty/Makefile \
+        src/rom/Makefile \
+    )

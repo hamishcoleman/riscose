@@ -23,14 +23,17 @@
 /*From CLib*/
 #include <limits.h>
 #include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
+
+#include "monty/monty.h"
+#include "monty/mem.h"
 
 /*From OSLib*/
 #include "os.h"
 
 /*From Support*/
 #include "lookup.h"
-#include "m.h"
 #include "trace.h"
 
 typedef
@@ -47,10 +50,6 @@ struct lookup_t
       Entry *entries;
    };
 
-static os_error nomem = {
-    os_GLOBAL_NO_MEM,
-    "NoMeM"
-};
 static os_error noany = {
     os_GLOBAL_NO_ANY,
     "NoAny"
@@ -69,17 +68,9 @@ os_error *lookup_new
    lookup_t  t;
 
 //   tracef ("lookup_new\n");
-   if ((t = m_ALLOC (sizeof *t)) == NULL)
-   {
-      error = &nomem;
-      goto finish;
-   }
+    NEW(t);
 
-   if ((t->entries = m_ALLOC (start_count*sizeof (Entry))) == NULL)
-   {
-      error = &nomem;
-      goto finish;
-   }
+    t->entries = emalloc(start_count * sizeof(Entry));
    t->count = start_count;
 
 //   tracef ("clearing out entries 0, ..., %d\n" _ t->count - 1);
@@ -94,8 +85,8 @@ finish:
 //      tracef ("ERROR: %s (error 0x%X)\n" _ error->errmess _ error->errnum);
       if (t != NULL)
       {
-         m_FREE (t->entries, 0);
-         m_FREE (t, sizeof *t);
+         efree(t->entries);
+         efree(t);
       }
    }
 
@@ -115,11 +106,10 @@ os_error *lookup_delete
       int i;
 
       for (i = 0; i < t->count && t->entries [i].token != NULL; i++)
-         m_FREE (t->entries [i].token,
-               strlen(t->entries [i].token) + 1);
+         efree(t->entries [i].token);
 
-      m_FREE (t->entries, t->count*sizeof (Entry));
-      m_FREE (t, sizeof *t);
+      efree(t->entries);
+      efree(t);
    }
 
    return NULL;
@@ -225,12 +215,7 @@ os_error *lookup_insert (lookup_t t, char *s, void *ptr)
 
 //      tracef ("extending the table to count %d (now at 0x%X)\n" _
 //            2*t->count _ t->entries);
-      if ((tmp = m_REALLOC (t->entries, t->count*sizeof (Entry),
-            2*t->count*sizeof (Entry))) == NULL)
-      {
-         error = &nomem;
-         goto finish;
-      }
+      tmp = erealloc(t->entries, 2*t->count*sizeof (Entry));
       t->entries = tmp;
 //      tracef ("table extended (now at 0x%X)\n" _ t->entries);
 
@@ -244,12 +229,9 @@ os_error *lookup_insert (lookup_t t, char *s, void *ptr)
 //      tracef ("new count %d\n" _ t->count);
    }
 
-   if (e->token == NULL && (e->token = m_ALLOC (strlen(s) + 1)) ==
-         NULL)
-   {
-      error = &nomem;
-      goto finish;
-   }
+    if (e->token == NULL) {
+        e->token = emalloc(strlen(s) + 1);
+    }
 
    strcpy(e->token, s); /*case may have changed*/
    e->ptr = ptr;

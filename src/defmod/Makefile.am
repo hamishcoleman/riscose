@@ -2,7 +2,7 @@ noinst_PROGRAMS = defmod
 
 defmod_SOURCES = \
     def.c def.h defmod.y lookup.c lookup.h macros.h \
-    m.h os.h riscoseapi.c riscoseapi.h riscose.c \
+    os.h riscoseapi.c riscoseapi.h riscose.c \
     riscose.h riscosehdr.c riscosehdr.h riscosetpl.c riscosetpl.h \
     riscosever.h trace.h types.h
 INCLUDES = -I$(srcdir)/..

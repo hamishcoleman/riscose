@@ -40,7 +40,6 @@ TV    20000503    |bool| replaced by |osbool|
    #include "bootstrap/fileswitch.h"
    #include "bootstrap/macros.h"
    #include "bootstrap/os.h"
-   #include "bootstrap/osfind.h"
 
    /*From Support*/
    #include "lookup.h"

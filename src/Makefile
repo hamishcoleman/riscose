@@ -56,7 +56,7 @@ $(BIN):	$(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a modules/libm
 ######## Utility targets
 
 clean:
-	-rm `find . -name '*.o' -o -name '*.a' -o -name '*~'` $(BIN) core ROMimage
+	rm -f `find . -name '*.o' -o -name '*.a' -o -name '*~'` $(BIN) core rom/ROMimage
 
 # So you can run RISC OS binaries as if they're native
 binfmt:

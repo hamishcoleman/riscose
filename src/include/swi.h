@@ -67,6 +67,9 @@ struct swi_chunk
 
 extern struct swi_chunk *chunks;
 
+/* nr must be exactly eight hexadecimal characters long using only
+ * lower case a-f as it is used for sorting swi chunks. */
+
 #define DECLARE_SWI_CHUNK(nr, prefix, names, fn)		\
 	struct swi_chunk __chunk_##nr				\
 		__attribute__ (( section ("swi." #nr))) =	\

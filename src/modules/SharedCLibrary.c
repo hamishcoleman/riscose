@@ -429,7 +429,8 @@ swih_sharedclibrary_entry(WORD num)
     
     case CLIB_CLIB_REALLOC: /* 4-322 */
       if (ARM_R0 != 0)
-        ARM_SET_R0(MEM_TOARM(mem_realloc(MEM_TOHOST(ARM_R0), ARM_R1)));
+        /* FIXME: invented third parameter value. */
+        ARM_SET_R0(MEM_TOARM(mem_realloc(MEM_TOHOST(ARM_R0), ARM_R1, 0)));
       else
         ARM_SET_R0(MEM_TOARM(mem_rma_alloc(ARM_R1)));
       return 0;

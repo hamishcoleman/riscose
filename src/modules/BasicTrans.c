@@ -18,5 +18,5 @@ swih_basictrans(WORD num)
 
 char *basictrans_names[] = { "HELP", "Error", "Message" };
 
-DECLARE_SWI_CHUNK(42c80, "BASICTrans", basictrans_names, swih_basictrans);
+DECLARE_SWI_CHUNK(00042c80, "BASICTrans", basictrans_names, swih_basictrans);
 

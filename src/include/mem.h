@@ -50,8 +50,8 @@ void*   mem_readonly_alloc(WORD size);
 /* Memory from the current task's heap (assuming a SharedCLib program) */
 void*   mem_taskheap_alloc(WORD size);
 
+void *mem_realloc(void *ptr, WORD size, int immovable);
 void	mem_free(void *ptr);
-void*   mem_resize(void *ptr, WORD newsize);
 
 int 	mem_load_file_at(const char * file, WORD arm_addr);
 

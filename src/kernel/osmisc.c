@@ -193,8 +193,8 @@ static const char *os_names_c0[64] =
 
 DECLARE_SWI_CHUNK(00000000, "OS", os_names, swih_os);
 DECLARE_SWI_CHUNK(00000040, "OS", os_names_40, swih_os);
-DECLARE_SWI_CHUNK(000000C0, "OS", os_names_c0, swih_os);
+DECLARE_SWI_CHUNK(000000c0, "OS", os_names_c0, swih_os);
 DECLARE_SWI_CHUNK(00000100, "OS_WriteI", NULL, swih_os_writei);
 DECLARE_SWI_CHUNK(00000140, "OS_WriteI", NULL, swih_os_writei);
 DECLARE_SWI_CHUNK(00000180, "OS_WriteI", NULL, swih_os_writei);
-DECLARE_SWI_CHUNK(000001C0, "OS_WriteI", NULL, swih_os_writei);
+DECLARE_SWI_CHUNK(000001c0, "OS_WriteI", NULL, swih_os_writei);

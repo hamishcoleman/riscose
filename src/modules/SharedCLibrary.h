@@ -12,7 +12,7 @@
 **   $Date$
 */
 
-static const char *clib_clib_names[183] =
+static const char *clib_clib_names[185] =
 {
   "CLIB_TRAPHANDLER",
   "CLIB_UNCAUGHTTRAPHANDLER",
@@ -196,7 +196,9 @@ static const char *clib_clib_names[183] =
   "CLIB__CLIB_FINALISEMODULE",
   "CLIB__CLIB_VERSION",
   "CLIB_FINALISE",
-  "CLIB_TMPNAM"
+  "CLIB_TMPNAM",
+  "CLIB_SWI",
+  "CLIB_SWIX"
 };
 static const char *clib_kern_names[48] =
 {
@@ -484,9 +486,11 @@ static const char *clib_kern_names[48] =
 #define CLIB_CLIB__CLIB_VERSION 0x011b4
 #define CLIB_CLIB_FINALISE 0x011b5
 #define CLIB_CLIB_TMPNAM 0x011b6
+#define CLIB_CLIB_SWI 0x011b7
+#define CLIB_CLIB_SWIX 0x011b8
 
 #define CLIB_KERN_JUMPPOINTS 48
-#define CLIB_CLIB_JUMPPOINTS 183
+#define CLIB_CLIB_JUMPPOINTS 185
 
 /* Shared library data offsets (4-252) */
 

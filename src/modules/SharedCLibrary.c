@@ -736,6 +736,124 @@ swih_sharedclibrary_entry(WORD num)
       ARM_SET_R0(MEM_TOARM(tmpnam(MEM_TOHOST(ARM_R0))));
       return 0;
 
+    case CLIB_CLIB_SWI:
+    case CLIB_CLIB_SWIX:
+      {
+        int i, n, r;
+        int swi_number = ARM_R0;
+        int flags = ARM_R1;
+        int block_reg = (flags & 0xf000) >> 12;
+        WORD* args;
+        int outputs;
+        int pc;
+        int block;
+        WORD preserve[10];
+
+        /* Drop the stack two words and put the args in r2 and r3 on */
+        ARM_SET_R13(ARM_R13 - 8);
+        args = MEM_TOHOST(ARM_R13);
+        args[0] = ARM_R2;
+        args[1] = ARM_R3;
+
+        /* Now we have all the arguments to swi[x] in order at `args'.
+        ** The order is: inputs, output addresses, PC output address, block args
+        */
+
+        /* If we are doing swix, set the X bit on the SWI number and fiddle
+        ** the flags so that we always return r0.
+        */
+        if (SWI_NUM(num) == CLIB_CLIB_SWIX)
+        {
+          swi_number |= 0x20000;
+          flags &= ~ 0xf0000;
+        }
+
+        /* Set up input registers.  In the process, we set `outputs' so that
+        ** it contains the offset of any outputs within the args list.
+        ** We also need to keep a note of the old values of any registers
+        ** that we change so that we can restore them later.
+        */
+        outputs = 0;
+        for (i = 0; i <= 9; i++)
+        {
+          if (flags & (1 << i))
+          {
+            preserve[i] = arm_get_reg(i);
+            arm_set_reg(i, args[outputs]);
+            outputs++;
+          }
+        }
+
+        /* Count past outputs so that we find any PC output register */
+        pc = outputs;
+        for (i = 0; i <= 9; i++)
+        {
+          if ( flags & (1 << (31 - i)) )
+            pc++;
+        }
+
+        /* Count past any PC output argument to get to the block args */
+        block = pc;
+        if (flags & (1 << 21))
+          block++;
+
+        /* Now we know where any block args are, so set up a register with them
+        ** if there are any.  Again, we need to preserve the register if
+        ** we corrupt it.
+        */
+        if (flags & (1 << 11))
+        {
+          preserve[block_reg] = arm_get_reg(block_reg);
+          arm_set_reg(block_reg, MEM_TOARM(args + block));
+        }
+
+        /* Call the SWI */
+        swi_trap(swi_number);
+
+        /* Put outputs into appropriate args */
+        fprintf(stderr, "SWIX: write outputs\n");
+        n = outputs;
+        for (i = 0; i <= 9; i++)
+        {
+          if ( flags & (1 << (31 - i)) )
+          {
+            MEM_WRITE_WORD(args[n], arm_get_reg(i));
+            n++;
+          }
+        }
+
+        fprintf(stderr, "SWIX: set up r0 return\n");
+        /* Return something in r0 */
+        r = (flags & 0xf0000) >> 16;
+        if (r <= 9)
+          ARM_SET_R0(arm_get_reg(r));
+        else if (r == 15)
+          ARM_SET_R0(ARM_R15_ALL);
+
+        fprintf(stderr, "SWIX: write PC output\n");
+        /* Write the PC output if required */
+        if (flags & (1 << 21))
+          MEM_WRITE_WORD(args[pc], ARM_R15_ALL);
+
+        fprintf(stderr, "SWIX: restore regs\n");
+        /* Restore any input or block input registers that we corrupted earlier */
+        for (i = 0; i <= 9; i++)
+        {
+          if (flags & (1 << i))
+            arm_set_reg(i, preserve[i]);
+        }
+        if (flags & (1 << 11))
+          arm_set_reg(block_reg, preserve[block_reg]);
+
+        /* Put the stack pointer back */
+        fprintf(stderr, "SWIX: restore SP\n");
+        ARM_SET_R13(ARM_R13 + 8);
+
+        fprintf(stderr, "SWIX: done\n");
+
+      }
+      return 0;
+
     default:
         error("unhandled clib swi %#08lx\n", SWI_NUM(num));
     }

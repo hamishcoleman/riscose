@@ -14,18 +14,21 @@ test -z "$PERL" && AC_MSG_ERROR([no acceptable $ac_word found in \$PATH])
 
 AC_DEFINE(CONF_DEBUGGING, 1, [enable -D command line debug option.])
 
-ARM=armul
 AC_ARG_ENABLE(arm,
 [  --enable-arm=ARM        Set the ARM emulation to use.  Choose one of
-                          armul, sleeve, or native [armul]],
-    ARM=$enableval)
-case "$ARM" in
-armul|sleeve) ;;
-*) AC_MSG_ERROR([only ARM=armul or ARM=sleeve handled at the moment])
-esac
+                          armul, sleeve, or native [[armul]]],
+[case "$enableval" in
+armul|sleeve|native) ARM=$enableval;;
+*) AC_MSG_ERROR([bad value ${enableval} for --enable-arm])
+esac],ARM=armul)
 AC_SUBST(ARM)
 AM_CONDITIONAL(ARM_ARMUL, test x$ARM = xarmul)
 AM_CONDITIONAL(ARM_SLEEVE, test x$ARM = xsleeve)
+AM_CONDITIONAL(ARM_NATIVE, test x$ARM = xnative)
+if test x$ARM = xnative; then
+    AC_DEFINE(NATIVE, 1, [synonym for ARM_NATIVE])
+    AC_DEFINE(CONFIG_MEM_ONE2ONE, 1, [synonym for ARM_NATIVE])
+fi
 
 # FIXME: we should only use readline if --with-readline is used, or at
 # least allow it to be disabled with --without-readline.

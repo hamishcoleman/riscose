@@ -18,19 +18,21 @@ ARM_SELECT = armul
 
 ######## Code / environment switches
 
+include $(ARM_SELECT)/Make-defs
+
 SRCDIR  = $(CURDIR)
 CC      = gcc
-CFLAGS  = -Wall -I. -I$(SRCDIR)/include $(DEFS) -g3
-LDFLAGS = -lncurses -lreadline
+CFLAGS  = -Wall -I. -I$(SRCDIR)/include -I$(ARM_SELECT) $(DEFS) -g3
+LDFLAGS = -lncurses -lreadline $(EXTRA_LDFLAGS)
 PREFIX  = /usr/local
 
 ######## Everything else
 
 export CC CFLAGS SRCDIR LDFLAGS
 
-CORE   = swi.o swichunk.o util.o main.o mem.o heap.o
+CORE   = swi.o swichunk.o util.o $(MAIN) mem.o heap.o
 
-OBJS = $(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a modules/libmodules.a
+OBJS = $(CORE) kernel/libkernel.a modules/libmodules.a $(ARM_SELECT)/lib$(ARM_SELECT).a
 
 BIN = riscose
 

@@ -248,17 +248,16 @@ mem_task_which()
 
 #ifdef NATIVE
 
-#define MREMAP_MAYMOVE 1
-#define MREMAP_FIXED 2
-
-extern int mremap2(void *, size_t, size_t, int, void *);
+#include "mremap2.h"
 
 void
 mem_task_switch(WORD n)
 {
   if (mem->task_current != -1)
     {
-      if (mremap2((void *)MMAP_APP_BASE, mem->tasks[mem->task_current].wimpslot,
+      /* Back in your box!  */
+      if (mremap2((void *)MMAP_APP_BASE, 
+		  mem->tasks[mem->task_current].wimpslot,
 		  mem->tasks[mem->task_current].wimpslot, 
 		  MREMAP_FIXED | MREMAP_MAYMOVE,
 		  mem->tasks[mem->task_current].app) < 0)
@@ -269,9 +268,11 @@ mem_task_switch(WORD n)
     }
   if (n != -1)
     {
-      if (mremap2(mem->tasks[n].app, mem->tasks[n].wimpslot,
-		  mem->tasks[n].wimpslot, MREMAP_FIXED | MREMAP_MAYMOVE,
-		  MMAP_APP_BASE) < 0)
+      if (mremap2(mem->tasks[n].app, 
+		  mem->tasks[n].wimpslot,
+		  mem->tasks[n].wimpslot, 
+		  MREMAP_FIXED | MREMAP_MAYMOVE,
+		  (void *)MMAP_APP_BASE) < 0)
 	{
 	  perror("mremap");
 	  exit(1);
@@ -298,7 +299,7 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
        mem->tasks[c].stack    = xmalloc(MMAP_USRSTACK_SIZE);
        mem->tasks[c].env      = xmalloc(256);
 #ifdef NATIVE
-       mem->tasks[c].app      = MMAP_SLOT_BASE + (c * 64 * MEG);
+       mem->tasks[c].app      = (void *)MMAP_SLOT_BASE + (c * 64 * MEG);
        map_it(mem->tasks[c].app, wimpslot);
 #else
 #  ifdef CONFIG_MEM_ONE2ONE

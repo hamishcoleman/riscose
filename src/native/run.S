@@ -1,12 +1,13 @@
-; native/run.S
-;
-; (c) Phil Blundell 2001
-;
-; See http://riscose.sourceforge.net/ for terms of distribution, and to
-; pick up a later version of the software.
-;
-; This is the native implementation of arm_run_routine.
-; Don't forget, it can be called recursively.
+/* native/run.S
+**
+** (c) Phil Blundell 2001
+**
+** See http://riscose.sourceforge.net/ for terms of distribution, and to
+** pick up a later version of the software.
+**
+** This is the native implementation of arm_run_routine.
+** Don't forget, it can be called recursively.
+*/
 
 	.globl	arm_run_routine
 	.type	arm_run_routine, %function

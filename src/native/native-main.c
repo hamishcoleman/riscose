@@ -32,7 +32,6 @@
 #include "swi.h"
 #include "map.h"
 #include "util.h"
-#include "place.h"
 #include "mem.h"
 #include "heap.h"
 

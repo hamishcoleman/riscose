@@ -1,4 +1,12 @@
-/* System call stub for mremap with five args */
+/* native/run.S
+**
+** (c) Phil Blundell 2001
+**
+** See http://riscose.sourceforge.net/ for terms of distribution, and to
+** pick up a later version of the software.
+**
+** System call stub for mremap with five args
+*/
 
 #define __NR_mremap 163
 

@@ -108,11 +108,13 @@ void gen (int type)
 
   if (type == LOAD) printf("    arm_word pc;\n");
 
-  printf("    if (insn & (1 << arm_PC))\n");
   if (type == LOAD)
-    printf("      if (!(insn & arm_INSN_BDT_S)) pc = c->r[arm_PC];\n\n");
+    /* printf("      if (insn & arm_INSN_BDT_S) pc = c->r[arm_PC];\n\n") */;
   else
+  {
+    printf("    if (insn & (1 << arm_PC))\n");
     printf("      c->r[arm_PC] += 12;\n\n");
+  }
 
   /* --- Do the actual work --- */
 
@@ -124,13 +126,15 @@ void gen (int type)
 
   /* --- Further PC funkiness --- */
 
-  printf("    if (insn & (1 << arm_PC))\n");
   if (type == LOAD)
-    printf("      if (!(insn & arm_INSN_BDT_S))\n"
+    /* printf("      /f (insn & arm_INSN_BDT_S)\n"
            "        c->r[arm_PC] = (c->r[arm_PC] & arm_PC_ADDRESS) | \n"
-           "          (pc & arm_PC_FLAGS);\n");
+           "          (pc & arm_PC_FLAGS);\n") */;
   else
+  { 
+    printf("    if (insn & (1 << arm_PC))\n");
     printf("      c->r[arm_PC] -= 12;\n");
+  }
 }
 
 int main (int argc, char *argv[])

@@ -139,7 +139,7 @@ arm_state arm_execute (arm_context *c, unsigned n)
                             "r8", "r9", "r10", "r11", "r12", "sp", "lr","pc" };
     static sDisOptions opts = {disopt_CommaSpace, regs};
     pInstruction p = instr_disassemble(insn, pc & arm_PC_ADDRESS, &opts);
-    fprintf(stderr, "%08X %08X  %s\n",
+    sleeve_dprintf(sleeve_OWNER_DECODE, "%08X %08X  %s\n",
                    pc & arm_PC_ADDRESS, insn, p->text);
   }
   #endif

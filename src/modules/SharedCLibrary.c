@@ -863,12 +863,12 @@ void sharedclibrary_swi_register(void)
   swi_register(0x80682, "SharedCLibrary_LibInitModule", swih_sharedclibrary);
   swi_register(0x80683, "SharedCLibrary_LibInitAPCS_32", swih_sharedclibrary);
 
-  for (i = 0; i < 183; i++) {
+  for (i = 0; i < CLIB_CLIB_JUMPPOINTS; i++) {
     sprintf(name, "clib_%s", clib_clib_names[i]);
     swi_register(0x301000 + i, name, swih_sharedclibrary_entry);
   }
 
-  for (i = 0; i < 48; i++) {
+  for (i = 0; i < CLIB_KERN_JUMPPOINTS; i++) {
     sprintf(name, "clib_%s", clib_kern_names[i]);
     swi_register(0x301100 + i, name, swih_sharedclibrary_entry);
   }

@@ -31,6 +31,7 @@ arm_run_routine:
 	ldr	ip, [sp], #4
 	add	ip, ip, #12
 	stmia	ip, {r0 - r11}
+	sub	ip, ip, #12
 	ldr	r0, 2f
 	str	ip, [r0]
 	ldmfd	sp!, {r4 - r11, pc}

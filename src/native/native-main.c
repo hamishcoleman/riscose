@@ -114,7 +114,7 @@ sigswi_handler(int sig, int _a2, int _a3, int _a4, struct siginfo *info,
 	       struct ucontext *uc)
 {
   struct sigcontext *sc = &uc->uc_mcontext;
-  int n = info->si_code;
+  int n = info->si_errno;
   context = (union context *)sc;
   where = sc;
 #ifdef DEBUG
@@ -145,7 +145,6 @@ sigsegv_handler(int sig, int _a2, int _a3, int _a4, struct siginfo *info,
 	       struct ucontext *uc)
 {
   struct sigcontext *sc = &uc->uc_mcontext;
-  int n = info->si_code;
   int core_file;
   context = (union context *)sc;
   where = sc;
@@ -226,7 +225,7 @@ arm_clear_c(void)
   context->r.regs[15] &= ~CC_C_BIT;
 }
 
-void cacheflush(unsigned long _beg, unsigned long _end)
+void arm_cacheflush(unsigned long _beg, unsigned long _end)
 {
   register unsigned long _flg __asm ("a3") = 0;
   __asm __volatile ("swi 0x9f0002		@ sys_cacheflush"	\
@@ -245,7 +244,6 @@ main(int argc, char **argv)
   
   int c;
   char *file;
-  int fd;
   mem_private *priv;
   WORD  count = 0, o;
   
@@ -271,6 +269,7 @@ main(int argc, char **argv)
   swi_init();
 
   mem_task_switch(mem_task_new(wimpslot, file, NULL));
+  arm_cacheflush(0x8000, 0x8000 + wimpslot);
 
   /* Set up unprocessed + processed command line storage thingies */
   o = optind;
@@ -291,13 +290,6 @@ main(int argc, char **argv)
     }
   priv->cli[strlen(priv->cli)-1] = 0;
   
-  fd = open(file, O_RDONLY);
-  if (fd < 0)
-    {
-      perror(file);
-      exit(1);
-    }
-  
   /* Install the signal handler */
   install_signal();
 
@@ -306,7 +298,6 @@ main(int argc, char **argv)
 
   /* Go for it */
   {
-    int tmp;
     __asm__ volatile (
 	"swi	0x9f0003		@ sys_usr26
 	adr	lr, 1f

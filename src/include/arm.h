@@ -77,3 +77,9 @@ void	arm_set_v();
 
 void	arm_clear_c();
 void	arm_set_c();
+
+#ifdef NATIVE
+extern void arm_cacheflush(WORD start, WORD end);
+#else
+#define arm_cacheflush(a,b)
+#endif

@@ -23,6 +23,7 @@
 #include "arm.h"
 #include "mem.h"
 #include "map.h"
+#include "stub.h"
 
 #include "SharedCLibrary.h"
 
@@ -131,6 +132,21 @@ void prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf)
   return;
 }
 
+#if defined(NATIVE) && defined(NATIVE_FASTCALL)
+static void
+sharedclibrary_build_stubs(WORD first, WORD num)
+{
+  WORD i;
+  for (i = first; i < (first + num); i++)
+    {
+      WORD addr = STUB_BASE + ((i - STUB_OFFSET) * STUB_SIZE);
+      MEM_WRITE_WORD(addr, 0xe3a0c000 | (i & 0xff));
+      MEM_WRITE_WORD(addr + 4, 0xe38cc000 | (12 << 8) | ((i & 0xff00) >> 8));
+      MEM_WRITE_WORD(addr + 8, 0xea000000 | ((STUB_DESTINATION - (addr + 16)) / 4));
+    }
+}
+#endif
+
 WORD
 swih_sharedclibrary(WORD num)
 {
@@ -139,6 +155,22 @@ swih_sharedclibrary(WORD num)
   switch (SWI_NUM(num))
     {
     case 0x80681: /* SharedCLibrary_LibInitAPCS_R (4-249) */
+#if defined(NATIVE) && defined(NATIVE_FASTCALL)
+      {
+	static int stubs_built;
+	if (! stubs_built)
+	  {
+	    extern void swi_stub_begin, swi_stub_end;
+	    map_it(STUB_BASE, 0x20000);
+	    memcpy((void *)STUB_DESTINATION, &swi_stub_begin, 
+		   &swi_stub_end - &swi_stub_begin);
+	    sharedclibrary_build_stubs(CLIB_KERN_BASE, CLIB_KERN_JUMPPOINTS);
+	    sharedclibrary_build_stubs(CLIB_CLIB_BASE, CLIB_CLIB_JUMPPOINTS);
+	    stubs_built = 1;
+	    arm_cacheflush(STUB_BASE, STUB_BASE + 0x20000);
+	  }
+      }
+#endif
       stub_list = (WORD*)MEM_TOHOST(ARM_R0);
       c = 0;
       while (stub_list[c] != -1)
@@ -146,23 +178,24 @@ swih_sharedclibrary(WORD num)
 	 switch (stub_list[c])
            {
 	   case 1  : /* Kernel module */
-	     if ((stub_list[c+1] - stub_list[c+2]) < (CLIB_KERN_JUMPPOINTS*4))
+	     if ((stub_list[c+2] - stub_list[c+1]) < (CLIB_KERN_JUMPPOINTS*4))
                return ERR_SHAREDCLIBRARY_VECTORTOOSMALL;
              for (v=0; v!=CLIB_KERN_JUMPPOINTS; v++)
                MEM_WRITE_WORD(stub_list[c+1]+(v*4),
-                 0xef000000 | (SWI_OS_TRAP<<20) | (CLIB_KERN_BASE + v));
-             
+			      CLIB_STUB(stub_list[c+1]+(v*4), CLIB_KERN_BASE + v));
+             arm_cacheflush(stub_list[c+1], stub_list[c+2]);
              break;
 
 	   case 2  : /* C Library module */
-	     if ((stub_list[c+1] - stub_list[c+2]) < (CLIB_CLIB_JUMPPOINTS*4))
+	     if ((stub_list[c+2] - stub_list[c+1]) < (CLIB_CLIB_JUMPPOINTS*4))
                return ERR_SHAREDCLIBRARY_VECTORTOOSMALL;
              for (v=0; v!=CLIB_CLIB_JUMPPOINTS; v++)
                MEM_WRITE_WORD(stub_list[c+1]+(v*4),
-                 0xef000000 | (SWI_OS_TRAP<<20) | (CLIB_CLIB_BASE + v));
+			      CLIB_STUB(stub_list[c+1]+(v*4), CLIB_CLIB_BASE + v));
              
+             arm_cacheflush(stub_list[c+1], stub_list[c+2]);
              fill_statics(stub_list[c+3]);
-             
+           
              break;
 
 	   default :
@@ -549,7 +582,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
 
     default:
-      fprintf(stderr, "Unhandled CLib SWI %08lx\n", num);
+      fprintf(stderr, "Unhandled CLib SWI %08lx\n", SWI_NUM(num));
       exit(1);
       return ERR_EM_UNHANDLEDSWI;
     }

@@ -170,7 +170,6 @@ load_rom(char *file, BYTE *address)
 
 #ifdef CONFIG_MEM_ONE2ONE
 #define MMAP_INIT_ERR(x) { printf("mmap_init: %s", (x)); exit(1); }
-static
 void
 map_it(WORD base, WORD size)
 {

@@ -57,6 +57,8 @@ int 	mem_load_file_at(const char * file, WORD arm_addr);
 
 WORD    mem_get_wimpslot(void);
 
+void    map_it(WORD base, WORD size);
+
 #ifdef CONFIG_MEM_ONE2ONE
 
   #define mem_get_private()  ((void*) MMAP_USRSTACK_BASE)

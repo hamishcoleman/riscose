@@ -197,7 +197,7 @@ static const char *os_names_c0[64] =
 };
 
 
-void osmisc_swi_register()
+void osmisc_swi_register(void)
 {
   int i;
   char name[0x40];

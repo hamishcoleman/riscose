@@ -153,7 +153,9 @@ void riscose_osapi_output
 
 
    /* Includes */
-   fprintf(file, "#include \"riscostypes.h\"\n"
+   fprintf(file, "#include <stdio.h>\n"
+                 "#include \"monty/monty.h\"\n"
+                 "#include \"riscostypes.h\"\n"
                  "#include \"swi.h\"\n"
                  "#include \"arm.h\"\n"
                  "#include \"mem.h\"\n");
@@ -209,6 +211,17 @@ void riscose_osapi_output
          /* Variable for the error return */
          fprintf(file, "  WORD e;\n\n");
 
+         /* Write some debugging messages; the routine name and the
+          * input registers */
+         fprintf(file, "  VERBOSE((\"%s\\n\"));\n", c_name);
+         for (i = 0; i < 10; i++)
+         {
+           if (s->i & (1 << i))
+             fprintf(file,
+                 "  VERBOSE((\"  In: r%d = %%x\\n\", ARM_R%d));\n", i,
+                 i);
+         }
+         fprintf(file, "\n");
 
          /* Begin the call to the actual function */
          fprintf(file, "  e = (WORD) x%s(", c_name);
@@ -277,6 +290,22 @@ void riscose_osapi_output
          }
          else
          {
+           /* Write debugging messages for the outputs */
+           for (i = 0; i < 10; i++)
+           {
+             if (s->o & (1 << i))
+             {
+               if ( s->outputs[i]->tag == def_TYPE_REF || (s->ro & (1 << i)) )
+                 fprintf(file, "  VERBOSE((\"  Out: r%d = %%x\\n\", "
+                               "MEM_TOARM((void *) r%d)));\n", i, i);
+               else
+                 fprintf(file,
+                    "  VERBOSE((\"  Out: r%d = %%x\\n\", r%d));\n", i, i);
+             }
+           }
+           if (s->o)
+             fprintf(file, "\n");
+
            /* FIXME --- are return registers altered in the event of an error?
            ** If not, we can just return e after sorting out the registers.
            */
@@ -285,10 +314,18 @@ void riscose_osapi_output
            fprintf(file, "  if (e)\n"
                          "    return e;\n");
 
-           /* Put return values in registers */
-           for (i = 0; i < 10; i++)
-             if (s->o & (1 << i))
-               fprintf(file, "  ARM_SET_R%d(r%d);\n", i, i);
+           /* Put return values in registers.  Note that if the output
+            * values are pointers we need to convert them back to ARM
+            * memory space.  */
+           for (i = 0; i < 10; i++) {
+             if (s->o & (1 << i)) {
+               if ( s->outputs[i]->tag == def_TYPE_REF || (s->ro & (1 << i)) )
+                 fprintf(file, "  ARM_SET_R%d(MEM_TOARM((void *)r%d));\n", i, i);
+               else
+                 fprintf(file, "  ARM_SET_R%d(r%d);\n", i, i);
+
+             }
+           }
 
            /* Sort out the PSR */
            /* FIXME --- we might need to sort out N and Z similarly here */

@@ -1,6 +1,7 @@
 noinst_LIBRARIES = libosapi.a
 
-INCLUDES = -I$(srcdir) -I$(srcdir)/../include -I$(srcdir)/../oslib
+INCLUDES = -I$(srcdir) -I$(srcdir)/.. -I$(srcdir)/../include \
+    -I$(srcdir)/../oslib
 
 SUFFIXES = .osl .c .h
 

@@ -252,7 +252,7 @@ os_error *lookup_insert (lookup_t t, char *s, void *ptr)
       goto finish;
    }
 
-   riscos_strcpy (e->token, s); /*case may have changed*/
+   strcpy(e->token, s); /*case may have changed*/
    e->ptr = ptr;
 
 finish:

@@ -58,24 +58,6 @@ int riscos_strlen
 }
 /*------------------------------------------------------------------------*/
 
-/*Copies a string in the traditional RiSC O S way.*/
-
-char *riscos_strcpy
-(
-   char *s1,
-   char *s
-)
-{
-   int i = 0;
-
-   while ((s1 [i] = s [i]) >= ' ')
-      i++;
-   s1 [i] = '\0';
-
-   return s1;
-}
-/*------------------------------------------------------------------------*/
-
 static _kernel_oserror last_error_v;
 static _kernel_oserror *last_error;
 
@@ -86,7 +68,7 @@ _kernel_oserror *_kernel_last_oserror(void)
   }
   else {
     last_error_v.errnum = 0;
-    riscos_strcpy(last_error_v.errmess, strerror(errno));
+    strcpy(last_error_v.errmess, strerror(errno));
     last_error = &last_error_v;
   }
 

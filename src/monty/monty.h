@@ -52,6 +52,13 @@ EXTERN monty_options montyopt;
  * a minus sign is a placeholder for future use. */
 #define MONTY_DEBUG_CODES "omhf----"
 
+/* a description of MONTY_DEBUG_CODES, suitable for output with -h. */
+#define MONTY_DEBUG_HELP \
+    "            1 o -- pool memory routines.\n" \
+    "            2 m -- memory routines.\n" \
+    "            4 h -- hash routines.\n" \
+    "            8 f -- file handling routines.\n" \
+
 /* debug code shouldn't disappear if CONF_DEBUGGING is false since the
  * compiler won't check it and turning on CONF_DEBUGGING would create
  * new compile errors. */

@@ -91,14 +91,18 @@ as its command-line arguments.
 Give brief help on command-line options on stderr and exit.  Output is
 similar to
 .Vb
-riscose: help requested
 usage: riscose [options] binary args...
 where options are:
-    -h, --help          request this help text.
-    -v, --version       display version and exit.
-    -m, --module        binary is a module.
-    -u, --utility       binary is a utility.
-    -w, --wimpslot=K    allocates K kilobytes for execution.
+    -h, --help        request this help text.
+    -v, --version     display version and exit.
+    -D, --debug=n     turn on debug flags `n', where n is a combination of
+            1 o -- pool memory routines.
+            2 m -- memory routines.
+            4 h -- hash routines.
+            8 f -- file handling routines.
+    -m, --module      binary is a module.
+    -u, --utility     binary is a utility.
+    -w, --wimpslot=K  allocates K kilobytes for execution.
 binary is the risc os executable to run.  args are its arguments.
 .Ve
 .TP

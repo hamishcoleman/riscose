@@ -11,6 +11,8 @@
 */
 #include <stdlib.h>
 #include <stdarg.h>
+#include <limits.h>
+#include <errno.h>
 /* FIXME: can't rely on getopt.h being a GNU one accepting long
  * options. */
 #include <getopt.h>
@@ -33,6 +35,7 @@
 WORD wimpslot;
 
 static void utility_run(char *file, mem_private *priv);
+static int string_to_int(char *s, int *i);
 
 int
 main(int argc, char **argv)
@@ -40,6 +43,7 @@ main(int argc, char **argv)
     static struct option long_options[] = {
         "help", no_argument, NULL, 'h',
         "version", no_argument, NULL, 'v',
+        "debug", required_argument, NULL, 'D',
         "module", no_argument, NULL, 'm',
         "utility", no_argument, NULL, 'u',
         "wimpslot", required_argument, NULL, 'w',
@@ -47,6 +51,7 @@ main(int argc, char **argv)
     };
   int module=0, c;
   int utility=0;
+    int val;
     char *file;
   mem_private *priv;
   WORD  count = 0, o;
@@ -58,24 +63,45 @@ main(int argc, char **argv)
 
     wimpslot = 640*1024;
 
-    while ((c = getopt_long(argc, argv, "+hvumw:", long_options,
+    while ((c = getopt_long(argc, argv, "+hvD:muw:", long_options,
         NULL)) != EOF) {
         switch (c) {
         case 'h':
             printf(
 "usage: %s [options] binary args...\n"
 "where options are:\n"
-"    -h, --help          request this help text.\n"
-"    -v, --version       display version and exit.\n"
-"    -m, --module        binary is a module.\n"
-"    -u, --utility       binary is a utility.\n"
-"    -w, --wimpslot=K    allocates K kilobytes for execution.\n"
+"    -h, --help        request this help text.\n"
+"    -v, --version     display version and exit.\n"
+"    -D, --debug=n     turn on debug flags `n', where n is a combination of\n"
+MONTY_DEBUG_HELP
+"    -m, --module      binary is a module.\n"
+"    -u, --utility     binary is a utility.\n"
+"    -w, --wimpslot=K  allocates K kilobytes for execution.\n"
 "binary is the risc os executable to run.  args are its arguments.\n",
                 progname);
             return 0;
         case 'v':
             printf("%s: " PACKAGE " version " VERSION "\n", progname);
             return 0;
+        case 'D':
+            if (string_to_int(optarg, &val)) {
+                montyopt.debug |= val;
+            } else {
+                static char codes[] = MONTY_DEBUG_CODES;
+                char *s;
+                char *found;
+
+                for (s = optarg; *s; s++) {
+                    if ((found = strchr(codes, *s)) == NULL ||
+                        *found == '-') {
+                        error("unknown -D code: %c in \"%s\"\n", *s,
+                            optarg);
+                    }
+                    montyopt.debug |= 1 << (found - codes);
+                }
+            }
+            debug("debug flags set to %#x\n", montyopt.debug);
+            break;
         case 'm':
             module = 1;
             break;
@@ -197,4 +223,22 @@ static void utility_run(char *file, mem_private *priv)
     printf("Utility returned an error (%ld):\n%s\n",
 	  ((WORD *) error)[0], error + 4);
   }
+}
+
+static int string_to_int(char *s, int *i)
+{
+    char *end;
+    long l;
+
+    /* FIXME: numeric conversion is hard to get right.  this could well
+     * be wrong. */
+
+    errno = 0;
+    l = strtol(s, &end, 0);
+    if (errno == ERANGE || *end || l < INT_MIN || l > INT_MAX) {
+        return 0;
+    }
+    *i = l;
+
+    return 1;
 }

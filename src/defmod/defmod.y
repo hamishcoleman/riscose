@@ -101,8 +101,6 @@ int yydebug;
       Author [256] = "Anon",
       Description [def_DESCRIPTION_LIMIT + 1] = "";
 
-   lookup_t main_byte_wide;
-
    static osbool Verbose = FALSE, Parse_Error = FALSE;
 
    int Quiet = 0;
@@ -960,7 +958,6 @@ int main (int argc, char *argv [])
     lookup_new(&consts, 16);
     lookup_new(&types, 16);
     lookup_new(&swis, 16);
-    lookup_new(&main_byte_wide, 16);
 
    yydebug = 0;
 
@@ -987,7 +984,6 @@ int main (int argc, char *argv [])
                "under certain conditions. See the file Copying for details.\n"
                "Usage: DefMod <type> [-v] [-help] "
                      "[-o <output-dir> | > <output-file>] "
-                     "[-byte_wide <byte-wide-file>] "
                      "[-26bit | -32bit] "
                      "< <module-interface-file>\n"
                "Purpose: generate output from a module interface file\n"
@@ -996,11 +992,6 @@ int main (int argc, char *argv [])
                "-o\t\t"             "is required when generating a "
                                     "directory\n"
                "<output-dir>\t"     "directory to create\n"
-               "-byte_wide\t"       "is required with -s or -l for a "
-                                    "module interface using byte-wide "
-                                    "types defined elsewhere\n"
-               "<byte-wide-file>\t" "file containing whitespace-separated "
-                                    "names of byte-wide types\n"
                "-26bit\t\t"         "generate 26 bit code" HELP_STRING_26 "\n"
                "-32bit\t\t"         "generate 32 bit code" HELP_STRING_32 "\n"
 
@@ -1009,55 +1000,6 @@ int main (int argc, char *argv [])
                "\t-riscose_template\t\t"     "riscose template .c file\n"
                "\t-riscose_header\t\t"     "riscose osapi .h file\n",
                stdout);
-      }
-      else if (strcmp (argv [i], "-byte_wide") == 0)
-      {  /*Add the contents of the given file to the byte wide table.*/
-         char buffer [256], *cc;
-         FILE *f;
-         enum {Copying, Skipping} state = Skipping;
-
-         i++;
-
-         f = efopenr(argv[i]);
-
-         cc = buffer;
-         do
-         {  int c;
-
-            *cc = c = getc(f);
-            if (ferror(f)) {
-                fprintf(stderr, "defmod: getc from %s failed: %s\n",
-                    argv[i], strerror(errno));
-                exit(1);
-            }
-
-            if (feof(f)) *cc = ' ';
-
-            switch (state)
-            {  case Skipping:
-                  if (!isspace (*cc))
-                  {  cc++;
-                     state = Copying;
-                  }
-               break;
-
-               case Copying:
-                  if (!isspace (*cc))
-                     cc++;
-                  else
-                  {  *cc = '\0';
-
-                     lookup_insert(main_byte_wide, buffer, (void *)1);
-
-                     cc = buffer;
-                     state = Skipping;
-                  }
-               break;
-            }
-         }
-         /* Loop termination condition depends on target ... */
-         while (!feof(f));
-         (void) fclose(f);
       }
       else if (strcmp (argv [i], "-26bit") == 0)
       {

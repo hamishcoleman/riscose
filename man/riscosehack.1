@@ -42,6 +42,11 @@ described in this man page.
 .
 For the moment, there are just a series of notes in random order.
 .
+.P
+#include files in sub-directories using "subdir/foo.h".  Don't add
+-Isubdir to the command line as that causes problems when more than one
+area has a foo.h.
+.
 .SS A Tour de Source
 .
 util contains support files for the

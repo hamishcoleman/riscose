@@ -16,8 +16,10 @@
 #include <stdlib.h>
 #include <assert.h>
 
+#include "config.h"
 #include <monty/monty.h>
 #include <monty/mem.h>
+#include "riscose.h"
 #include "riscostypes.h"
 #include "swi.h"
 #include <rom/rom.h>
@@ -500,6 +502,8 @@ WORD
 swih_sharedclibrary(WORD num)
 {
   WORD *stub_list, c, v;
+
+    DEBUG(SWI, ("sharedclib swi %#x\n", num));
 
   switch (SWI_NUM(num))
     {

@@ -16,9 +16,6 @@
 #include <stdarg.h>
 /* FIXME: can't rely on getopt.h being a GNU one accepting long
  * options. */
-/* FIXME: shouldn't use getopt because on GNU systems it re-orders argv
- * so command-line options come first.  This is extremely unhelpful for
- * riscose which wants args... after binary left alone. */
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
@@ -60,7 +57,7 @@ main(int argc, char **argv)
 
     wimpslot = 640*1024;
 
-    while ((c = getopt_long(argc, argv, "hvumw:", long_options,
+    while ((c = getopt_long(argc, argv, "+hvumw:", long_options,
         NULL)) != EOF) {
         switch (c) {
         case 'h':

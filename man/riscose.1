@@ -128,21 +128,15 @@ To use the
 program `riscosgrep' to search, case-insensitively, for `string'
 through all C files.
 .Vb
-riscose -- riscosgrep -i string *.c
+riscose riscosgrep -i string *.c
 .Ve
 .\"
 .SH BUGS
 .\"
-Many.  In particular, the use of getopt_long(3) means all command-line
-options are treated as belonging to
-.BR riscose ,
-instead of those after
-.I binary
-being ignored.  Use `--' to circumvent this;  see
-.SM EXAMPLES
-above.
+Many.
 .\"
 .SH SEE ALSO
 .\"
-riscose project at SourceForge, http://riscose.sourceforge.net/.  Red
-Squirrel Acorn hardware emulator, http://www.red-squirrel.org/.
+riscose project at SourceForge, http://riscose.sourceforge.net/.
+arcem Archimedes hardware emulator, http://arcem.sourceforge.net/.
+Red Squirrel Acorn hardware emulator, http://www.red-squirrel.org/.

@@ -15,18 +15,14 @@ binaries I've used for testing at:
 So just dump it into the src/ folder for now and type:
 
     ./configure && make
-    (cd src && riscose grep free) <README
+    (cd src && ./riscose grep free) <README
 
-or something like that, i.e. the arguments to the riscose program are the
-name of the binary (currently only `Absolute' executables are supported),
-followed by the arguments you want passed to the RISC OS binary.  If you
-need to pass arguments that start with dashes, you should use a double-dash
-so that the options parser doesn't think you want the options passed to
-riscose, rather than the program it's running, e.g.
+or something like that, i.e. the arguments to the riscose program are
+the name of the binary (currently only `Absolute' executables are
+supported), followed by the arguments you want passed to the RISC OS
+binary, e.g.
 
-  cat /usr/doc/copyright/GPL | ./riscose grep -- -n free
-
-Maybe that was obvious but it wasn't to me :-)
+    cd src && ./riscose grep -n free ../README
 
 If you're inspired by that, and know a bit about RISC OS check out the ToDo
 file, join the mailing list by emailing:

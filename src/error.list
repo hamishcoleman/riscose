@@ -1,0 +1,14 @@
+# If your SWI emulations need to pass back error blocks to the caller,
+# write them into this file in this format, one per line:
+#
+#   <symbolic name> <hex error number> <message>
+#
+# Then in your SWI emulation, #include "riscos_errors.h" and then call
+# riscos_error(symbolic_name) which returns the ARM address of the error
+# block to put into R0
+
+em_unhandledswi			0	Unhandled SWI
+em_branchzero			0	Branch through zero
+
+sharedclibrary_badchunkid	80680	Bad chunk ID
+sharedclibrary_vectortoosmall	80681	Vector list supplied too short

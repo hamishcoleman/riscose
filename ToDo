@@ -1,0 +1,52 @@
+Riscose -- To do list
+---------------------
+
+Bloody hell, lots!
+
+My first priority is to get command-line programs running properly before we
+move onto emulating the Wimp and other graphical bits and pieces.  But first
+we ought to fix bugs.  Anyhow, in rough order of priority, here's what needs
+doing:
+
+* SharedCLib file handling 
+
+Currently, when a RISC OS program calls fopen(), some memory is put aside in
+the RMA to hold a FILE* where the real Unix fopen() stores its filehandle. 
+Then we can at least point RISC OS to an FILE object.  I think UnixLib
+actually tries to read the data in this area, assuming it to be a RISC OS
+FILE object, which it ain't.  So programs that call UnixLib stat() fail
+after reading some weird results.  I'm not sure, firstly whether this is the
+problem, or whether we ought to just emulate a RISC OS FILE struct in toto.
+
+And if we're going down this route, I probably ought to make sure that it
+works with OS_Args so we've got a proper mapping between RISC OS filehandles
+and CLib FILE structs.  Oh, and I've not implemented any of OS_Args yet :-)
+
+I'm also pretty sure there's a bug or two in fwrite() / fread() since the
+unzip program gets funny results from them, and also seems to spew its
+diagnostic messages more than once, along with some top-bit set characters. 
+Hey ho.
+
+* The rest of SharedCLib
+
+There's still quite a few functions that aren't emulated, but the emulator
+will helpfully grind to a halt and tell you if that happens.  Then you just
+have to look up the number in clib_functions.h and write a trivial wrapper
+around the appropriate native function in swih_sharedclibrary.c .
+
+* Code cleanup!
+
+There's quite a lot of really mucky casts that have to go on so as we can
+(e.g.) hide native file handles in RISC OS memory and retrieve them later; I
+think this is just par for the course given that we're constantly
+translating between ARM + native address spaces, but I ought to write some
+macros to make the code more readable.  Or is there a better way...?
+
+Also, autoconf sounds like a good idea, and I ought to split off stolen code like the ARMulator and Gareth's instruction disassembler into separate directories.
+
+* The heap manager algorithm
+
+Is just naff and will slow programs down that allocate and deallocate lots
+of memory: when asked to allocate memory out of a heap, it just starts at
+the beginning of the list of allocated blocks and steps over 'til it hits
+he end or finds a suitable gap.

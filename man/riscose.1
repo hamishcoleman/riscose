@@ -1,0 +1,148 @@
+.\" $Id$
+.\"
+.\" verbatim start and end macros.
+.de Vb
+.ft CW
+.ps -1
+.vs -1
+.nf
+.in +4n
+.eo
+..
+.de Ve
+.ft R
+.ps
+.vs
+.fi
+.in
+.ec
+..
+.\"
+.TH riscose 1
+.\"
+.SH NAME
+.\"
+.B riscose \(em emulate the
+.SB RISC OS
+.B execution environment
+.\"
+.SH SYNOPSIS
+.\"
+.B riscose
+[
+.B -h
+|
+.B -v
+|
+.B -m
+|
+.B -u
+|
+.B -w
+.I kb
+]
+.I binary
+[
+.I args...\&
+]
+.\"
+.SH DESCRIPTION
+.\"
+.B riscose
+is a
+.SM "RISC OS"
+emulator.
+It treats
+.I binary
+as an
+.SM ARM
+executable suitable for execution on the Acorn
+.SM "RISC OS"
+operating system and either runs it, if the machine has an
+.SM ARM
+processor, or interprets its instructions.
+Calls from
+.I binary
+to
+.SM "RISC OS"
+using
+.SM SWI
+instructions are intercepted by
+.B riscose
+and emulated using native code.  That is, no
+.SM "RISC OS"
+modules are used by
+.BR riscose .
+.P
+.I binary
+is assumed to be an application (FIXME: right term?) unless one of the
+mutally-exclusive
+.B -m
+or
+.B -u
+options are given.
+.I binary
+sees
+.I args...\&
+as its command-line arguments.
+.\"
+.SH OPTIONS
+.\"
+.TP
+.B -h
+Give brief help on command-line options on stderr and exit.  Output is
+similar to
+.Vb
+riscose: help requested
+usage: riscose [options] binary args...
+where options are:
+    -h, --help          request this help text.
+    -v, --version       display version and exit.
+    -m, --module        binary is a module.
+    -u, --utility       binary is a utility.
+    -w, --wimpslot=K    allocates K kilobytes for execution.
+binary is the risc os executable to run.  args are its arguments.
+.Ve
+.TP
+.B -v
+Display version on stderr and exit.  Please supply this with any bug
+report.
+.TP
+.B -m
+.I binary
+is a module.
+.TP
+.B -u
+.I binary
+is a utility.
+.TP
+.BI "-w " kb
+Set wimpslot to
+.I kb
+kilobytes.  Default is 640.
+.\"
+.SH EXAMPLES
+.\"
+To use the
+.SM "RISC OS"
+program `riscosgrep' to search, case-insensitively, for `string'
+through all C files.
+.Vb
+riscose -- riscosgrep -i string *.c
+.Ve
+.\"
+.SH BUGS
+.\"
+Many.  In particular, the use of getopt_long(3) means all command-line
+options are treated as belonging to
+.BR riscose ,
+instead of those after
+.I binary
+being ignored.  Use `--' to circumvent this;  see
+.SM EXAMPLES
+above.
+.\"
+.SH SEE ALSO
+.\"
+riscose project at SourceForge, http://riscose.sourceforge.net/.  Red
+Squirrel Acorn hardware emulator, http://www.red-squirrel.org/.

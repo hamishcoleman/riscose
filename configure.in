@@ -13,6 +13,7 @@ esac
 AC_SUBST(ARM)
 AC_OUTPUT([ \
         Makefile \
+        man/Makefile \
         src/Makefile \
         src/armul/Makefile \
         src/kernel/Makefile \

@@ -13,7 +13,7 @@
 #include "riscostypes.h"
 #include "arm.h"
 #include "mem.h"
-#include "rom.h"
+#include <rom/rom.h>
 #include "util.h"
 
 #include <stdio.h>

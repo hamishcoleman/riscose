@@ -19,7 +19,7 @@
 #include "mem.h"
 #include "swi.h"
 #include "arm.h"
-#include "rom.h"
+#include <rom/rom.h>
 
 static ARMul_State *arm;
 

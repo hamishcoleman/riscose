@@ -1,7 +1,9 @@
 #! /bin/make -f
 
-ROMimage: error.list
+all: ROMimage rom.h
+
+ROMimage rom.h: error.list
 	./compilerom.pl
 
 clean::
-	rm -f ROMimage
+	rm -f ROMimage rom.h

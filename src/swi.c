@@ -18,7 +18,7 @@
 #include "riscostypes.h"
 #include "util.h"
 #include "arm.h"
-#include "rom.h"
+#include <rom/rom.h>
 #include "swi.h"
 
 /* FIXME: should be in a header file. */

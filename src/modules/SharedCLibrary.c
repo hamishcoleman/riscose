@@ -20,7 +20,7 @@
 #include <monty/monty.h>
 #include "riscostypes.h"
 #include "swi.h"
-#include "rom.h"
+#include <rom/rom.h>
 #include "arm.h"
 #include "mem.h"
 #include "map.h"

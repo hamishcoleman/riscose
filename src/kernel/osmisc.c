@@ -18,7 +18,7 @@
 #include "mem.h"
 #include "arm.h"
 #include "swi.h"
-#include "rom.h"
+#include <rom/rom.h>
 #include "vdu.h"
 #include "map.h"
 

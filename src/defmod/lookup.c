@@ -57,31 +57,6 @@ static os_error noany = {
     "NoAny"
 };
 
-#if 0
-/*------------------------------------------------------------------------*/
-static os_error *Trace (lookup_t t)
-
-{
-   int i;
-
-   tracef ("Trace\n");
-   tracef ("t 0x%X\n" _ t);
-   tracef ("count %d\n" _ t->count);
-   tracef ("t->entries 0x%X\n" _ t->entries);
-   for (i = 0; i < t->count; i++)
-      tracef ("%-3d: 0x%X, 0x%X\n" _ i _
-            ((int *) t->entries) [2*i] _ ((int *) t->entries) [2*i + 1]);
-   for (i = 0; i < t->count; i++)
-      if (t->entries [i].token != NULL)
-         tracef ("%-3d: %s (0x%X) -> 0x%X\n" _
-               i _ t->entries [i].token _ t->entries [i].token _
-               t->entries [i].ptr);
-      else
-         tracef ("%-3d: empty\n" _ i);
-
-   return NULL;
-}
-#endif
 /*------------------------------------------------------------------------*/
 
 os_error *lookup_new

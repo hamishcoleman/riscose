@@ -130,20 +130,6 @@ extern os_error *x__last_error (void);
 
 extern os_error *x_no_memory;
 
-#if 0
-#if TRACE
-   #define x_ALLOC(size)                  x__alloc (size)
-   #define x_CALLOC(count, size)          x__calloc (count, size)
-   #define x_FREE(ptr, size)              x__free (ptr, size)
-   #define x_REALLOC(ptr, old_size, size) x__realloc (ptr, old_size, size)
-#endif
-#else
-   #define x_ALLOC(size)                  x__alloc (size)
-   #define x_CALLOC(count, size)          x__calloc (count, size)
-   #define x_FREE(ptr)                	  x__free (ptr, 0)
-   #define x_REALLOC(ptr, size)       	  x__realloc (ptr, 0, size)
-#endif
-
 extern void *x__alloc (int size);
 extern void *x__calloc (int count, int size);
 extern void x__free (void *ptr, int size);

@@ -20,6 +20,8 @@ riscose_LDADD = modules/libmodules.a kernel/libkernel.a \
 heaptest_SOURCES = heaptest.c heap.c
 heaptest_LDADD = monty/libmonty.a
 
+EXTRA_DIST = .cvsignore
+
 # --one-to-one-mem-map
 # 
 # ARM_SELECT = armul

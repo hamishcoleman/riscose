@@ -1,5 +1,3 @@
 AUTOMAKE_OPTIONS = foreign
-
 SUBDIRS = util src tests man
-
-EXTRA_DIST = TODO configure
+EXTRA_DIST = .cvsignore TODO configure

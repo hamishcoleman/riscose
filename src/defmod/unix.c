@@ -240,24 +240,6 @@ char *riscos_format_fixed
 }
 /*------------------------------------------------------------------------*/
 
-int riscos_scan_dec
-(
-   char *s,
-   int  *i_out
-)
-{
-   int i, width;
-
-   tracef ("riscos_scan_dec\n");
-
-   if (sscanf (s, "%d%n", &i, &width) < 1)
-      return 0;
-
-   if (i_out != NULL) *i_out = i;
-   return width;
-}
-/*------------------------------------------------------------------------*/
-
 int riscos_scan_hex
 (
    char *s,

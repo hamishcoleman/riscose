@@ -73,9 +73,6 @@ extern char *riscos_format_fixed (char *s, int mul, int div, int width,
   * characters successfully read, 0 for error.
   */
 
-extern int riscos_scan_dec (char *s, int *i_out);
-      /*sscanf (s, "%d", i)*/
-
 extern int riscos_scan_hex (char *s, int *i_out);
       /*sscanf (s, "%x", i)*/
 

@@ -26,15 +26,6 @@
    #include "os.h"
 #endif
 
- /* Trivial functions to do things "the RISC O S way" rather than "the C
-  * way." This means treating strings as control-char terminated, rather
-  * than 0-terminated. These can be printed using a format of
-  * "%.*s" and passing in the length of the string, as calculated by
-  * |riscos_strlen|, as a argument to the printing function.
-  */
-
-extern int riscos_strlen (char *s);
-
  /* Functions to read back the items above - these return the number of
   * characters successfully read, 0 for error.
   */

@@ -117,7 +117,7 @@ os_error *lookup_delete
 
       for (i = 0; i < t->count && t->entries [i].token != NULL; i++)
          m_FREE (t->entries [i].token,
-               riscos_strlen (t->entries [i].token) + 1);
+               strlen(t->entries [i].token) + 1);
 
       m_FREE (t->entries, t->count*sizeof (Entry));
       m_FREE (t, sizeof *t);
@@ -245,7 +245,7 @@ os_error *lookup_insert (lookup_t t, char *s, void *ptr)
 //      tracef ("new count %d\n" _ t->count);
    }
 
-   if (e->token == NULL && (e->token = m_ALLOC (riscos_strlen (s) + 1)) ==
+   if (e->token == NULL && (e->token = m_ALLOC (strlen(s) + 1)) ==
          NULL)
    {
       error = &nomem;

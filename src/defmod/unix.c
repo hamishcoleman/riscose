@@ -42,22 +42,6 @@ static int   Decimal_Point_Len = 1;
 
 /*------------------------------------------------------------------------*/
 
-/*Calculates the length of a string in the traditional RiSC O S way.*/
-
-int riscos_strlen
-(
-   char *s
-)
-{
-   int l = 0;
-
-   while (s [l] >= ' ')
-      l++;
-
-   return l;
-}
-/*------------------------------------------------------------------------*/
-
 static _kernel_oserror last_error_v;
 static _kernel_oserror *last_error;
 

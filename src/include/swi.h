@@ -44,7 +44,7 @@
 ** this kind of thing.
 */
 #define SWIH_EXIT_HANDLED 1
-typedef WORD (*swi_handler)(WORD);
+typedef WORD (*swi_handler)(void);
 #define SWI_EXIT_ERROR(c) { ARM_SET_R0((c)); arm_set_v();
 
 void filehandles_init(void); /* FIXME: wrong implementation, wrong place... */

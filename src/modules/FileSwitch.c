@@ -47,7 +47,8 @@
 #include <string.h>
 #include <assert.h>
 
-#include "monty/monty.h"
+#include <monty/monty.h>
+#include <monty/mem.h>
 
 typedef union {
   /* Use number if number < MAXDRIVES, otherwise assume string pointer */
@@ -149,8 +150,7 @@ allocNewFS(char *name, char *startup)
   if (fsRegistered == MAXFILESYSTEMS);
     return -1;
 	
-  fileSystem[fsRegistered] = xmalloc(sizeof(fileSystem_info));
-  memset(fileSystem[fsRegistered], 0, sizeof(fileSystem_info));
+  NEW0(fileSystem[fsRegistered]);
   
   if (fsSelected == -1)
     fsSelected = fsRegistered;
@@ -237,11 +237,12 @@ parseFilename(char *src)
 {
   int badPathLine = 0, pathCount;
   char *scan;
-  fileSystem_nameParsed* p = xmalloc(sizeof(fileSystem_nameParsed));
+  fileSystem_nameParsed* p;
+
   assert(src);
   
   /* Start with a blank parse structure */
-  memset(p, 0, sizeof(fileSystem_nameParsed));
+  NEW0(p);
   
   /* Check for obscure syntaxes we don't support yet, see 2-11 -- NB warnings
   ** in this function are to be removed when we're surer that the code parses
@@ -294,7 +295,7 @@ parseFilename(char *src)
   /* Split path up */
   
   p->pathElements = countDots(scan)+1;
-  p->path = xmalloc(sizeof(char*) * p->pathElements);
+  p->path = emalloc(sizeof(char*) * p->pathElements);
   for (pathCount = 0; pathCount < p->pathElements; pathCount++)
   {
     char *scanEnd = strchr(scan, '.');
@@ -338,9 +339,11 @@ fileSystem_constructPath(char *base, int pathElements, char** path)
   totalLen = base ? 0 : strlen(base);
   
   for (c = 0; c < pathElements; c++)
+    /* FIXME: shouldn't +1 be outside strlen? */
     totalLen += strlen(replacePathElement(path[c])+1);
 	
-  dst = xmalloc(totalLen);
+  dst = emalloc(totalLen);
+  /* FIXME: base might be NULL else why above test? */
   strcpy(dst, base);
   for (c = 0; c < pathElements; c++)
   {

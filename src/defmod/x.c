@@ -107,28 +107,12 @@ static int Signals [] = { SIGINT,
 /*------------------------------------------------------------------------*/
 static os_error *Copy_Error (International_Error *ie)
 {
-#ifndef EXECUTE_ON_UNIX
-  messagetrans_control_block cb;
-#endif
   os_error *e;
 
    /*This code is what the SharedCLibrary does, except that this happens
       every time a message is to be looked up, and the module only opens
       the file at most once. We don't really care about this.*/
 
-#ifndef EXECUTE_ON_UNIX
-  if( xmessagetrans_open_file( &cb, "SharedCLibrary:Messages", NULL ) == NULL )
-  {
-    e = xmessagetrans_error_lookup( ie -> token,
-      	      	      	      	    &cb,
-      	      	      	            NULL,
-      	      	      	            0,
-      	      	      	            "SharedCLibrary",
-      	      	      	            NULL, NULL, NULL );
-      xmessagetrans_close_file( &cb );
-   }
-   else
-#endif
       e =  ie -> dflt;
 
    return e;
@@ -150,11 +134,7 @@ static void SigHandler( int iSignal )
   switch( iSignal )
   {
     case SIGINT:
-#ifdef EXECUTE_ON_UNIX
       pxError = Error_Escape;
-#else
-      pxError = xmessagetrans_error_lookup( Error_Escape, NULL, NULL, 0, SKIP, SKIP, SKIP, SKIP );
-#endif
       break;
 
 #ifdef SIGSTAK

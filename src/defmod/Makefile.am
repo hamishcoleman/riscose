@@ -3,7 +3,7 @@ SUBDIRS = bootstrap
 noinst_PROGRAMS = defmod
 
 # FIXME:  we need these flags, but is this the right way to set them up?
-CFLAGS = -DUNIX -DEXECUTE_ON_UNIX
+CFLAGS = -DUNIX
 
 defmod_SOURCES = \
     def.c def.h defmod.y hostfs.h kernel.h lookup.c lookup.h macros.h \

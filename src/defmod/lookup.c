@@ -176,21 +176,6 @@ static os_error *Lookup
          break;
       }
 
-      /*Attempt to fix MED-4237: fall back to bytewise comparison if there
-         is no territory. J R C 23rd Feb 1995*/
-      /*Second attempt: the first stupidly still kept the erorr return from
-         xterritory_collate() in |error|.*/
-#ifndef EXECUTE_ON_UNIX
-#if 0
-      if (xterritory_collate (territory_CURRENT, s, t->entries [i].token,
-            territory_IGNORE_CASE, &collate) != NULL)
-#else
-      // Make Lookup case-sensitive, to allow otherwise identical C identifiers
-      // also to make behaviour the same as strcmp()
-      if (xterritory_collate (territory_CURRENT, s, t->entries [i].token,
-            0, &collate) != NULL)
-#endif
-#endif
          collate = strcmp (s, t->entries [i].token);
 
       if (collate == 0)

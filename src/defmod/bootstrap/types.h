@@ -42,14 +42,6 @@ typedef unsigned char byte;
 
 #define SIG_LIMIT 11 /*largest signal number + 1*/
 
-#ifndef EXECUTE_ON_UNIX
-#ifndef __swis_h
-   #define _C (1U << 29)
-   #define _Z (1U << 30)
-   #define _N (1U << 31)
-#endif
-#endif
-
 #define UNKNOWN 1
    /*may be used to declare arrays of unknown size*/
 

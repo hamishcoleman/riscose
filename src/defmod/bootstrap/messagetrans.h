@@ -32,79 +32,7 @@
 
 typedef struct {int cb [4];} messagetrans_control_block;
 
-#ifdef EXECUTE_ON_UNIX
-
 extern void messagetrans_error_lookup(_kernel_oserror *, void *, _kernel_oserror *,
   int, char *, char *, char *, char *);
-
-#else /* EXECUTE_ON_UNIX */
-
-#define xmessagetrans_file_info(file_name, flags, size) \
-  _swix (MessageTrans_FileInfo, _IN (1) | _OUT (0) | _OUT (2), \
-      (char *) (file_name), (int *) (flags), (int *) (size))
-
-#define xmessagetrans_open_file(cb, file_name, buffer) \
-  _swix (MessageTrans_OpenFile, _IN (0) | _IN (1) | _IN (2), \
-      (messagetrans_control_block *) (cb), (char *) (file_name), \
-      (char *) (buffer))
-
-#define xmessagetrans_lookup(cb, token, buffer, size_in, arg0, arg1, arg2, \
-      arg3, result, size_out) \
-  _swix (MessageTrans_Lookup, _IN (0) | _IN (1) | _IN (2) | _IN (3) | \
-      _IN (4) | _IN (5) | _IN (6) | _IN (7) | _OUT (2) | _OUT (3), \
-      (messagetrans_control_block *) (cb), (char *) (token), \
-      (char *) (buffer), (int) (size_in), (char *) (arg0), \
-      (char *) (arg1), (char *) (arg2), (char *) (arg3), \
-      (char **) (result), (int *) (size_out))
-
-#define xmessagetrans_make_menus(cb, menus, buffer, size_in, size_out) \
-  _swix (MessageTrans_MakeMenus, _IN (0) | _IN (1) | _IN (2) | _IN (3) | \
-      _OUT (3), \
-      (messagetrans_control_block *) (cb), (char *) (menus), \
-      (char *) (buffer), (int) (size_in), (int *) (size_out))
-
-#define xmessagetrans_close_file(cb) \
-  _swix (MessageTrans_CloseFile, _IN (0), \
-      (messagetrans_control_block *) (cb))
-
-#define xmessagetrans_enumerate_tokens(cb, token, buffer, size, index, \
-      cont, size_out, index_out) \
-   _swix (MessageTrans_EnumerateTokens, \
-         _IN (0) | _IN (1) | _IN (2) | _IN (3) | _IN (4) | \
-         _OUT (2) | _OUT (3) | _OUT (4), \
-         (messagetrans_control_block *) (cb), (char *) (token), \
-         (char *) (buffer), (int) (size), (int) (index), \
-         (osbool *) (cont), (int *) (size_out), (int *) (index_out))
-
-#define xmessagetrans_error_lookup(error, cb, buffer, size_in, arg0, arg1, \
-      arg2, arg3) \
-  _swix (MessageTrans_ErrorLookup, _IN (0) | _IN (1) | _IN (2) | _IN (3) | \
-      _IN (4) | _IN (5) | _IN (6) | _IN (7), \
-      (_kernel_oserror *) (error), (messagetrans_control_block *) (cb), \
-      (char *) (buffer), (int) (size_in), (char *) (arg0), \
-      (char *) (arg1), (char *) (arg2), (char *) (arg3))
-
-#define messagetrans_error_lookup(error, cb, buffer, size_in, arg0, arg1, \
-      arg2, arg3) \
-  _swi (MessageTrans_ErrorLookup, _IN (0) | _IN (1) | _IN (2) | _IN (3) | \
-      _IN (4) | _IN (5) | _IN (6) | _IN (7), \
-      (_kernel_oserror *) (error), (messagetrans_control_block *) (cb), \
-      (char *) (buffer), (int) (size_in), (char *) (arg0), \
-      (char *) (arg1), (char *) (arg2), (char *) (arg3))
-
-#define xmessagetrans_gs_lookup(cb, token, buffer, size_in, arg0, arg1, \
-      arg2, arg3, result, size_out) \
-  _swix (MessageTrans_GSLookup, _IN (0) | _IN (1) | _IN (2) | _IN (3) | \
-      _IN (4) | _IN (5) | _IN (6) | _IN (7) | _OUT (2)  | _OUT (3), \
-      (messagetrans_control_block *) (cb), (char *) (token), \
-      (char *) (buffer), (int) (size_in), (char *) (arg0), \
-      (char *) (arg1), (char *) (arg2), (char *) (arg3), \
-      (char **) (result), (int *) (size_out))
-
-#define xmessagetrans_copy_error(error, copy) \
-   _swix (MessageTrans_CopyError, _IN (0) | _OUT (0), \
-      (os_error *) (error), (os_error **) (copy))
-
-#endif /* EXECUTE_ON_UNIX */
 
 #endif

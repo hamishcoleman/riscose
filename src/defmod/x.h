@@ -19,19 +19,7 @@
 #define x_MAXDEPTH 256
 //#define TRACE 0
 
-#ifdef EXECUTE_ON_UNIX
 #  define SIGOSERROR (SIGUSR1)
-#else
-/* the following signals are defined in CLib, but not in UNIXLib */
-/* Stack overflow.  */
-#  if !defined SIGSTAK
-#    define SIGSTAK 7
-#  endif
-/* Operating system error.  */
-#  if !defined SIGOSERROR
-#    define SIGOSERROR 10
-#  endif
-#endif
 
 typedef struct x_exception
 {

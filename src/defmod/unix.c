@@ -34,7 +34,6 @@
 /*From Support*/
 #include "m.h"
 #include "trace.h"
-#include "x.h"
 
 /*------------------------------------------------------------------------*/
 
@@ -57,6 +56,7 @@ _kernel_oserror *_kernel_last_oserror(void)
 
 void os_generate_error(_kernel_oserror *e)
 {
-  last_error = e;
-  raise(SIGOSERROR);
+    fprintf(stderr, "defmod: %s (%d)\n", e->errmess, e->errnum);
+
+    exit(!!e->errnum);
 }

@@ -55,12 +55,25 @@ TV    20000503    |bool| replaced by |osbool|
    #include "riscosetpl.h"
    #include "riscosehdr.h"
 
-#ifdef PACE_BUILD
-   #include "VersionNum"
-   #define VERSION_INFO Module_FullVersion " [" Module_Date "]"
-#else
-#  define VERSION_INFO ", " __DATE__
-#endif
+#define Module_MajorVersion_CMHG        6.22
+#define Module_MinorVersion_CMHG        
+#define Module_Date_CMHG                07 Jun 2001
+
+#define Module_MajorVersion             "6.22"
+#define Module_Version                  622
+#define Module_MinorVersion             ""
+#define Module_Date                     "07 Jun 2001"
+
+#define Module_ApplicationDate2         "07-Jun-01"
+#define Module_ApplicationDate4         "07-Jun-2001"
+
+#define Module_ComponentName            "defmod"
+#define Module_ComponentPath            "RiscOS/Tools/Sources/GNU/defmod"
+
+#define Module_FullVersion              "6.22"
+#define Module_HelpVersion              "6.22 (07 Jun 2001)"
+
+#define VERSION_INFO Module_FullVersion " [" Module_Date "]"
 
 /* Set this to 1 to make APCS 3/32 the default */
 #define DEFAULT_TO_APCS_32 0

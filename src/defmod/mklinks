@@ -16,12 +16,6 @@ wantlink()
     fi
 }
 
-if [ ! -L VersionNum ];
-then
-    echo ln -s ../../Build_GNU/VersionNum VersionNum
-    ln -s ../../Build_GNU/VersionNum VersionNum
-fi
-
 if [ ! -L oslib ];
 then
     echo ln -s . oslib

@@ -1,3 +1,5 @@
 Makefile
 Makefile.in
 tmp
+tmp.1
+tmp.2

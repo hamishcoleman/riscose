@@ -1,7 +1,7 @@
 /* MB: comment this out if you don't want to see on-the-fly disassembly */
 /*#define ARMUL_SHOW_INSTRUCTIONS*/
-/*#define ARMUL_SHOW_BRANCHES*/
-/*#define ARMUL_SHOW_SWIS*/
+#define ARMUL_SHOW_BRANCHES
+#define ARMUL_SHOW_SWIS
 
 /*  armemu.c -- Main instruction emulation:  ARM6 Instruction Emulator.
    Copyright (C) 1994 Advanced RISC Machines Ltd.

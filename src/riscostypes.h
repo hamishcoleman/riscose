@@ -13,6 +13,7 @@
 #ifndef _RISCOSE_TYPES_H
 #define _RISCOSE_TYPES_H
 
+typedef signed long int WORD_signed;
 typedef unsigned long int WORD;
 typedef unsigned char BYTE;
 

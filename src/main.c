@@ -24,7 +24,6 @@
 #include "mem.h"
 #include "map.h"
 #include "util.h"
-#include "place.h"
 
 WORD wimpslot;
 char *progname;

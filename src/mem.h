@@ -43,12 +43,9 @@ mem_wimp_task;
 
 typedef struct {
   WORD            task_current;
-  BYTE           *scratch;
   mem_wimp_task  *tasks;
-  BYTE		 *svc_stack;
   BYTE           *rma;
   WORD            rma_size;
-/*  WORD		  rma_ptr;*/
   BYTE		 *rom;
 }
 mem_state;
@@ -65,17 +62,22 @@ WORD	mem_get_wimpslot(void);
 WORD	mem_rma_alloc(WORD size);
 WORD	mem_rma_resize(WORD addr, WORD newsize);
 
-/*WORD	mem_read_word(WORD arm_addr);
-BYTE	mem_read_byte(WORD arm_addr);
-void	mem_write_word(WORD arm_addr, WORD val);
-void	mem_write_byte(WORD arm_addr, BYTE val);*/
-
-BYTE*   mem_f_tohost(WORD arm_addr);
-WORD    mem_f_toarm(void *ptr);
 int 	mem_load_file_at(const char * file, WORD arm_addr);
 
-#define MEM_TOHOST(a) (mem_f_tohost(a))
-#define MEM_TOARM(a) (mem_f_toarm(a))
+#ifdef CONFIG_MEM_ONE2ONE
+
+  #define MEM_TOHOST(a) ((BYTE*)(a))
+  #define MEM_TOARM(a) ((WORD)(a))
+
+#else
+
+  BYTE*   mem_f_tohost(WORD arm_addr);
+  WORD    mem_f_toarm(void *ptr);
+  #define MEM_TOHOST(a) (mem_f_tohost(a))
+  #define MEM_TOARM(a) (mem_f_toarm(a))
+
+#endif
+
 #define MEM_READ_WORD(a) (*((WORD*)MEM_TOHOST((a))))
 #define MEM_READ_BYTE(a) (*((BYTE*)MEM_TOHOST((a))))
 #define MEM_WRITE_WORD(a,v) ((*((WORD*)MEM_TOHOST((a)))) = (v))

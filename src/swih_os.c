@@ -18,7 +18,6 @@
 #include "arm.h"
 #include "swi.h"
 #include "rom.h"
-#include "place.h"
 
 WORD
 swih_os(WORD num)

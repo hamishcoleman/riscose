@@ -7,9 +7,9 @@ OBJS = main.o mem.o swi.o arm.o heap.o util.o $(ARMUL_OBJS) $(HANDLERS)
 BIN = riscose
 
 CC      = gcc
-CFLAGS  = -Wall
+CFLAGS  = -Wall -DCONFIG_MEM_ONE2ONE
 # -O3 -funroll-loops
-LDFLAGS =
+LDFLAGS = 
 # -lefence
 
 all:	$(BIN) ROMimage
@@ -20,7 +20,7 @@ ROMimage:	*.list
 $(BIN):	$(OBJS)
 	$(CC) -o $@ $(LDFLAGS) $(OBJS)
 
-%.o:	%.c
+%.o:	%.c mem.h arm.h
 	$(CC) $(CFLAGS) -g -c -o $@ $<
 
 clean:

@@ -43,7 +43,7 @@ void fill_statics(WORD addr) /* 4-252 */
 */
 static char* arm_va_list[32];
 static
-void prepare_arm_va_list(char *str, WORD apcs_arg)
+void prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf)
 {
   int l=0;
   
@@ -56,7 +56,7 @@ void prepare_arm_va_list(char *str, WORD apcs_arg)
         if (*str == '-')                   str++;
         while (strchr("0123456789", *str)) str++;
         while (strchr("hlLqjzt", *str))    str++;
-        if (*str++ == 's')
+        if (*str++ == 's' || is_scanf)
           arm_va_list[l++] = MEM_TOHOST(ARM_APCS_ARG(apcs_arg));
         else
           arm_va_list[l++] = (char*) ARM_APCS_ARG(apcs_arg);
@@ -143,9 +143,7 @@ swih_sharedclibrary_entry(WORD num)
          {
           if (language_description[c+4] != 0)
             {
-             /*printf("*** running routine at %08x\n", language_description[c+4]);*/
              arm_run_routine(language_description[c+4]);
-             /*printf("*** finished running routine\n");*/
              arm_set_pc(ARM_R0);
              return SWIH_EXIT_HANDLED; /* BODGE! */
             }
@@ -168,6 +166,7 @@ swih_sharedclibrary_entry(WORD num)
       }
     
     case CLIB_CLIB_SIGNAL: /* 4-302 */
+      printf("signal %d = %d\n", ARM_R0, ARM_R1);
       return 0;
 
     case CLIB_CLIB_EXIT: /* 4-322 */ 
@@ -252,6 +251,10 @@ swih_sharedclibrary_entry(WORD num)
       ARM_SET_R0(0);
       return 0;
     
+    case CLIB_CLIB_REMOVE: /* 4-304 */
+      ARM_SET_R0(remove(MEM_TOHOST(ARM_R0)));
+      return 0;
+    
     /* FIXME: These functions will only work on 32-bit machines! */
     
     case CLIB_CLIB_FFLUSH: /* 4-306 */
@@ -259,13 +262,11 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
     
     case CLIB_CLIB_FOPEN: /* 4-306 */
-      printf("opening `%s' mode `%s'\n", MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
       {
         WORD fp = mem_rma_alloc(sizeof(FILE*));
         FILE **bury = (FILE**) MEM_TOHOST(fp);
         
-        *bury = fopen(MEM_TOHOST(ARM_R0),
-                      MEM_TOHOST(ARM_R1));
+        *bury = fopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
         ARM_SET_R0(*bury == NULL ? 0 : fp);
         /* FIXME: memory leak */
         return fp;
@@ -276,22 +277,18 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
     
     case CLIB_CLIB_FCLOSE:
-      printf("closing FILE* @ %08x", (unsigned) ARM_R0);
       {
         FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
-        fclose(*bury);
+        ARM_SET_R0(fclose(*bury));
         /*mem_rma_free(ARM_R0);*/
       }
       /*ARM_SET_R0((WORD) fclose((FILE*)ARM_R0));*/
       return 0;
     
     case CLIB_CLIB_FREOPEN:
-      printf("reopening %s mode %s (old %08x)\n", MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), (unsigned)ARM_R2);
       {
         FILE **bury = (FILE**) MEM_TOHOST(ARM_R2);
-        *bury = freopen(MEM_TOHOST(ARM_R0),
-                              MEM_TOHOST(ARM_R1),
-                              *bury);
+        *bury = freopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), *bury);
         ARM_SET_R0(*bury == NULL ? 0 : ARM_R2);
         /* FIXME: memory leak :-) */
       }
@@ -306,17 +303,19 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB__SPRINTF:
     case CLIB_CLIB_SPRINTF:
-      prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2);
-      vsprintf(MEM_TOHOST(ARM_R0),
-               MEM_TOHOST(ARM_R1),
-               arm_va_list);
+      prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
+      ARM_SET_R0(vsprintf(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), arm_va_list));
+      return 0;
+    
+    case CLIB_CLIB_SCANF:
+      prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 1);
+      ARM_SET_R0(scanf(MEM_TOHOST(ARM_R0), arm_va_list));
       return 0;
     
     case CLIB_CLIB__PRINTF:
     case CLIB_CLIB_PRINTF:
-      prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1);
-      vprintf(MEM_TOHOST(ARM_R0),
-              arm_va_list);
+      prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 0);
+      ARM_SET_R0(vprintf(MEM_TOHOST(ARM_R0), arm_va_list));
       return 0;
       
     case CLIB_CLIB__FPRINTF:
@@ -324,17 +323,16 @@ swih_sharedclibrary_entry(WORD num)
       {
        FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
        
-       prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2);
-       vfprintf(*bury,
-                MEM_TOHOST(ARM_R1),
-                arm_va_list);
+       prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
+       ARM_SET_R0(vfprintf(*bury, MEM_TOHOST(ARM_R1), arm_va_list));
       }
       return 0;
 
     case CLIB_CLIB_VFPRINTF: /* 4-312 */
+      prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
       ARM_SET_R0(vfprintf( *((FILE**) MEM_TOHOST(ARM_R0)),
                      MEM_TOHOST(ARM_R1),
-                     MEM_TOHOST(ARM_R2))
+                     arm_va_list)
                  );
       return 0;
 
@@ -361,7 +359,7 @@ swih_sharedclibrary_entry(WORD num)
       }
       return 0;
     
-    case CLIB_CLIB___FILBUF: /* 4-318 */
+    case CLIB_CLIB___FILBUF: /* very nasty! 4-318 */
       ARM_SET_R0(getc( *((FILE**) MEM_TOHOST(ARM_R0)) ));
       return 0;
 
@@ -385,14 +383,12 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
     
     case CLIB_CLIB_GETENV: /* 4-323 */
-      printf("getenv called for %s\n", MEM_TOHOST(ARM_R0));
+      /*printf("getenv called for %s\n", MEM_TOHOST(ARM_R0));*/
       ARM_SET_R0(0);
       return 0;
       
     case CLIB_CLIB_STRNCPY: /* 4-328 */
-      strncpy(MEM_TOHOST(ARM_R0),
-              MEM_TOHOST(ARM_R1),
-              ARM_R2);
+      strncpy(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), ARM_R2);
       return 0;
     
     case CLIB_CLIB_MEMCPY: /* 4-328 */
@@ -412,6 +408,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
     
     case CLIB_CLIB_STRCMP: /* 4-329 */
+      /*printf("comparing `%s' with `%s'\n", MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));*/
       ARM_SET_R0(strcmp(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1)));
       return 0;
     
@@ -463,7 +460,12 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
     
     case CLIB_CLIB_STRLEN: /* 4-332 */
-      ARM_SET_R0(strlen(MEM_TOHOST(ARM_R0)));
+      {
+        WORD armr0 = ARM_R0;
+        BYTE *str = MEM_TOHOST(armr0);
+        WORD x = strlen(str);
+        ARM_SET_R0(x);
+      }
       return 0;
     
     case CLIB_CLIB_CLOCK: /* 4-333 */

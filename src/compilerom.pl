@@ -43,10 +43,18 @@ $l=0; while (<ERRORS>)
   $l++;
   next if /^(\n|\#)/;
   die "Bad format in error.list at line $l"
-    if ! /^(\S*)\s+([0-9a-fA-F]*)\s+(.*)\n/;
-    
-  print ROMHDR sprintf("#define ERR_%s 0x%08x\n", uc $1, &rom_current);
-  print ROM pack("L", hex $2).$3."\0";
+    if ! /^(ERROR)\t(\S*)\s+([0-9a-fA-F]*)\s+(.*)\n/ &&
+       ! /^(WORD)\t(\S*)\s+([0-9a-fA-F]*)\n/;
+  
+  if ($1 eq "ERROR") {
+    print ROMHDR sprintf("#define ERR_%s 0x%08x\n", uc $2, &rom_current);
+    print ROM pack("L", hex $3).$4."\0";
+  } elsif ($1 eq "WORD") {
+    print ROMHDR sprintf("#define WORD_%s 0x%08x\n", uc $2, &rom_current);
+    print ROM pack("L", hex $3);
+  } else {
+    die "Bad data type $1 at line $l\n";
+  }
   &rom_align;
 }
 close ERRORS;

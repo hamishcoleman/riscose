@@ -19,6 +19,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#ifdef CONFIG_MEM_ONE2ONE
+  #include <sys/mman.h>
+#endif
 
 #include "arm.h"
 #include "map.h"
@@ -34,23 +37,18 @@ static
 void
 arm_backtrace(void);
 
+#ifndef CONFIG_MEM_ONE2ONE
 inline
 BYTE*
 mem_f_tohost(WORD arm_addr)
 {
   switch(arm_addr)
     {
-    case MMAP_SCRATCH_BASE ... MMAP_SCRATCH_BASE + MMAP_SCRATCH_SIZE - 1:
-      return mem->scratch + (arm_addr - MMAP_SCRATCH_BASE);
-
     case MMAP_APP_BASE ... MMAP_APP_BASE + MMAP_APP_SIZE - 1:
       return mem->tasks[mem->task_current].app + (arm_addr - MMAP_APP_BASE);
 
     case MMAP_RMA_BASE ... MMAP_RMA_BASE + MMAP_RMA_SIZE - 1:
       return mem->rma + (arm_addr - MMAP_RMA_BASE);
-
-    case MMAP_SVCSTACK_BASE ... MMAP_SVCSTACK_BASE + MMAP_SVCSTACK_SIZE - 1:
-      return mem->svc_stack + (arm_addr - MMAP_SVCSTACK_BASE);
       
     case MMAP_USRSTACK_BASE ... MMAP_USRSTACK_BASE + MMAP_USRSTACK_SIZE - 1:
       return mem->tasks[mem->task_current].stack + (arm_addr - MMAP_USRSTACK_BASE);
@@ -71,10 +69,11 @@ mem_f_toarm(void *ptr)
 {
   return 0;
 }
+#endif
 
 static
 BYTE*
-load_rom(char *file)
+load_rom(char *file, BYTE *address)
 {
   int f;
   struct stat s;
@@ -85,7 +84,10 @@ load_rom(char *file)
     fprintf(stderr, "Couldn't find ROMimage file\n");
     exit(1);
   }
-  rom = xmalloc(s.st_size);
+  if (address == NULL)
+    rom = xmalloc(s.st_size);
+  else
+    rom = address;
   f = open(file, O_RDONLY);
   read(f, rom, s.st_size);
   close(f);
@@ -93,28 +95,45 @@ load_rom(char *file)
   return rom;
 }
 
+#ifdef CONFIG_MEM_ONE2ONE
+#define MMAP_INIT_ERR(x) { printf("mmap_init: %s", (x)); exit(1); }
+static
+void
+map_it(char *desc, WORD base, WORD size)
+{
+  if (mmap((void*) base, size,
+           PROT_EXEC | PROT_READ | PROT_WRITE,
+           MAP_FIXED | MAP_PRIVATE | MAP_ANON,
+           0, 0) != MAP_FAILED)
+    return;
+    
+  printf("map_it: %s failed @ %08x, %d bytes\n", desc, base, size);
+  exit(1);
+}
+#endif
+
 void
 mem_init(void)
 {
   mem = xmalloc(sizeof(mem_state));
-  
-  mem->scratch  = xmalloc(32*1024);
-  mem->svc_stack= xmalloc(MMAP_SVCSTACK_SIZE);
-  mem->rma      = xmalloc(RMA_START_SIZE);
-  mem->rma_size = RMA_START_SIZE;
-  /*mem->rma_ptr  = 0;*/
-  mem->rom      = load_rom("ROMimage");
   mem->tasks    = xmalloc(MAX_TASKS * sizeof(mem_wimp_task));
   mem->task_current = 0;
   
-  heap_init((heap_t*) mem->rma, RMA_START_SIZE);
+#ifdef CONFIG_MEM_ONE2ONE
+  map_it("application", MMAP_APP_BASE, 1<<20);
+  map_it("usr stack", MMAP_USRSTACK_BASE, MMAP_USRSTACK_SIZE);
+  map_it("rma", MMAP_RMA_BASE, 1<<20); /* FIXME: arbitrary numbers :-) */
+  map_it("rom", MMAP_ROM_BASE, MMAP_ROM_SIZE);
+  load_rom("ROMimage", MEM_TOHOST(MMAP_ROM_BASE));
+  mem->rma      = MEM_TOHOST(MMAP_RMA_BASE);
+  mem->rom      = MEM_TOHOST(MMAP_ROM_BASE);
+#else
+  mem->rma      = xmalloc(RMA_START_SIZE);
+  mem->rma_size = RMA_START_SIZE;
+  mem->rom      = load_rom("ROMimage", 0);
+#endif
   
-  /* magic SWI which causes ARM to cease emulation; we slip the address 0x30
-  ** into R14 when branching to a subroutine from within our emulated code
-  ** where RISC OS would issue a BL from within SVC code.  Ought to be in ROM
-  ** really.
-  */
-  *((WORD*)(mem->scratch+0x30)) = 0xef000000 | SWI_MAGIC_RETURN;
+  heap_init((heap_t*) MEM_TOHOST(MMAP_RMA_BASE), RMA_START_SIZE);
 }
 
 void
@@ -131,7 +150,11 @@ mem_get_wimpslot(void)
 void*
 mem_get_private(void)
 {
+#ifdef CONFIG_MEM_ONE2ONE
+  return MMAP_USRSTACK_BASE;
+#else
   return(mem->tasks[mem->task_current].stack);
+#endif
 }
 
 WORD inline
@@ -188,6 +211,12 @@ mem_rma_alloc(WORD size)
   
   m = heap_block_alloc((heap_t*) mem->rma, size);
   if (m == NULL)
+#ifdef CONFIG_MEM_ONE2ONE
+    {
+     fprintf(stderr, "FIXME: extend RMA with mremap()\n");
+     exit(1);
+    }
+#else
     {
      WORD s = mem->rma_size*2;
      mem->rma = realloc(mem->rma, s);
@@ -199,6 +228,7 @@ mem_rma_alloc(WORD size)
         exit(1);
        }
     }
+#endif
 
   return MMAP_RMA_BASE + (m - mem->rma);
 }

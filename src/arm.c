@@ -52,7 +52,7 @@ arm_run_routine(WORD addr)
 {
   WORD old_pc = ARM_R15, old_r14 = ARM_R14;
   
-  ARM_SET_R14(0x30);
+  ARM_SET_R14(WORD_MAGIC_RETURN_ADDRESS);
   ARMul_SetPC(arm, addr);
   arm_run_depth++;
   ARMul_DoProg(arm);

@@ -38,14 +38,14 @@ static void utility_run(char *file, mem_private *priv);
 int
 main(int argc, char **argv)
 {
-  static const struct option long_options[] = {
-    { "help", no_argument, NULL, 'h' },
-    { "version", no_argument, NULL, 'v' },
-    { "module", no_argument, NULL, 'm' },
-    { "utility", no_argument, NULL, 'u' },
-    { "wimpslot", required_argument, NULL, 'w' }
-  };
-  
+    static struct option long_options[] = {
+        "help", no_argument, NULL, 'h',
+        "version", no_argument, NULL, 'v',
+        "module", no_argument, NULL, 'm',
+        "utility", no_argument, NULL, 'u',
+        "wimpslot", required_argument, NULL, 'w',
+        0
+    };
   int module=0, c;
   int utility=0;
   char *file = NULL;

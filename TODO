@@ -54,8 +54,7 @@ he end or finds a suitable gap.
 
 * Documentation
 
-Create riscose and riscosehack man pages.  Spell out the `aclocal &&
-autoheader && automake && autoconf' required on check-out from CVS.
+Create riscosehack man page.
 
 * Build
 

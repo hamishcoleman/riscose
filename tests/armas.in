@@ -1,7 +1,15 @@
 #! @BINAWK@ -f
 
+BEGIN {
+    for (i = 0; i < 0x10; i++) {
+        t[sprintf("%x", i)] = i
+    }
+}
+
 {
     for (o = 7; o >= 1; o -= 2) {
-        printf "%c", strtonum("0x" substr($2, o, 2))
+        h = substr($2, o, 1)
+        l = substr($2, o + 1, 1)
+        printf "%c", t[h] * 16 + t[l];
     }
 }

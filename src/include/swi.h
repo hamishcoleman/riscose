@@ -57,20 +57,23 @@ void osbyte(void);
 void swi_init(void);
 void swi_trap(WORD num);
 
-struct swi_chunk
+typedef struct swi_chunk
 {
-  int base;
+  WORD base;
   const char *prefix;
   const char **names;
   WORD (*fn)(WORD);
-};
+} swi_chunk;
 
-extern struct swi_chunk *chunks;
+extern swi_chunk *chunks[];
 
-/* nr must be exactly eight hexadecimal characters long using only
+/* base must be exactly eight hexadecimal characters long using only
  * lower case a-f as it is used for sorting swi chunks. */
 
-#define DECLARE_SWI_CHUNK(nr, prefix, names, fn)		\
-	struct swi_chunk __chunk_##nr				\
-		__attribute__ (( section ("swi." #nr))) =	\
-	{ 0x##nr, prefix, names, fn };				\
+#define DECLARE_SWI_CHUNK(base, prefix, names, fn) \
+    struct swi_chunk chunk_ ## base = { \
+        0x ## base, \
+        prefix, \
+        names, \
+        fn \
+    }

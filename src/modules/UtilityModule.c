@@ -24,7 +24,7 @@
 
 char *prompt = "*\0";
 
-GDBM_FILE *cmds;
+GDBM_FILE cmds;
 
 void
 cli_init(void)

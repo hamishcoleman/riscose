@@ -46,8 +46,7 @@ void check_integrity(heap_t *h)
   
   while (off != h->size)
     {
-#define HEAP_DEBUG 1
-#if HEAP_DEBUG
+#ifdef CONFIG_TRACE_HEAP
      printf("Heap dump: offset %ld size %ld next %ld gap %ld\n", off, BLOCK_AT(off)->size, BLOCK_AT(off)->next, space_between(h, off, BLOCK_AT(off)->size));
 #endif
      assert(BLOCK_AT(off)->magic == MAGIC_BLOCK_VALUE);
@@ -56,7 +55,7 @@ void check_integrity(heap_t *h)
      assert(space_between(h, off, BLOCK_AT(off)->size) >=0 );
      off = BLOCK_AT(off)->next;
     }
-#if HEAP_DEBUG
+#ifdef CONFIG_TRACE_HEAP
   printf("Heap dump: --- Done\n");
 #endif
 }
@@ -174,7 +173,9 @@ heap_block_free(heap_t* h, BYTE *d)
   heap_block_t *block = (heap_block_t*) (d-sizeof(heap_block_t));
 
   check_integrity(h);  
+#ifdef CONFIG_TRACE_HEAP
   printf("freeing a block at %p (off %d), magic = %08x, size %d\n", d, (BYTE*)d-(BYTE*)h, block->magic, h->size);
+#endif
 
   // assert(((BYTE*)d - (BYTE*)h)  < (sizeof(heap_t)+h->size));
   assert(block->magic == MAGIC_BLOCK_VALUE);

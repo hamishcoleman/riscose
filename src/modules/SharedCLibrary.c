@@ -230,6 +230,10 @@ swih_sharedclibrary_entry(WORD num)
       printf("signal %d = %d\n", (unsigned)ARM_R0, (unsigned)ARM_R1);
       return 0;
 
+    case CLIB_CLIB_ATEXIT:
+      printf("atexit(%#lx) called, nothing will be done.\n", ARM_R0);
+      break;
+
     case CLIB_CLIB_EXIT: /* 4-322 */ 
     case CLIB_CLIB__EXIT:
       printf("*** finished!\n");
@@ -545,7 +549,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
 
     default:
-      fprintf(stderr, "Unhandled CLib SWI %08x\n", (unsigned) num);
+      fprintf(stderr, "Unhandled CLib SWI %08lx\n", num);
       exit(1);
       return ERR_EM_UNHANDLEDSWI;
     }

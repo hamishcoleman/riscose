@@ -154,7 +154,7 @@ load_rom(char *file, BYTE *address)
    
   if (stat(file, &s) != 0)
   {
-    fprintf(stderr, "Couldn't find ROMimage file\n");
+    fprintf(stderr, "Couldn't find rom file `%s'\n", file);
     abort();
   }
   if (address == NULL)
@@ -213,10 +213,10 @@ mem_init(void)
   map_it(MMAP_ROM_BASE, MMAP_ROM_SIZE);
   mem->rma      = MEM_TOHOST(MMAP_RMA_BASE);
   mem->rom      = MEM_TOHOST(MMAP_ROM_BASE);
-  load_rom("ROMimage", MEM_TOHOST(MMAP_ROM_BASE));
+  load_rom("rom/ROMimage", MEM_TOHOST(MMAP_ROM_BASE));
 #else
   mem->rma      = xmalloc(RMA_START_SIZE);
-  mem->rom      = load_rom("ROMimage", 0);
+  mem->rom      = load_rom("rom/ROMimage", 0);
 #endif
   mem->rma_size = RMA_START_SIZE;
   
@@ -311,7 +311,11 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
          {
           WORD t = mem_task_which();
           mem_task_switch(c);
-          mem_load_file_at(image_filename, 0x8000);
+          if (mem_load_file_at(image_filename, 0x8000)) {
+            fprintf(stderr, "couldn't load file `%s'\n",
+              image_filename);
+            exit(1);
+          }
           mem_task_switch(t);
          }
        return c;

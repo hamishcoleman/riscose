@@ -52,13 +52,6 @@ version(void)
   exit(0);
 }
 
-static void
-error(char *msg)
-{
-  fprintf(stderr, "*** %s\n", msg);
-  exit(1);
-}
-
 void go(WORD wimpslot, char *file);
 
 int
@@ -92,6 +85,12 @@ main(int argc, char **argv)
   
   if (optind < argc)
     file = argv[optind++];
+
+    if (!file) {
+        /* FIXME: test against optind above looks broken.  what should
+         * happen when called with argc == 1. */
+        file = "null";
+    }
   
   mem_init();
   module_init();

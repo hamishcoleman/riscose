@@ -21,51 +21,55 @@
 #include "rom.h"
 #include "swi.h"
 
-static swi_handler * handler;
-extern struct swi_chunk __chunk_00000000;
+/* FIXME: should be in a header file. */
+WORD swih_sharedclibrary_entry(WORD num);
 
 void
 swi_init(void)
 {
-  handler = xmalloc(sizeof(swi_handler*)*0xffc0);
+    return;
 }
 
-void
-swi_number_to_name(WORD num, char *buf)
+void swi_number_to_name(WORD num, char *buf)
 {
-  WORD chunk = SWI_CHUNK(num);
-  struct swi_chunk *c;
+    WORD base;
+    swi_chunk **cp;
+    swi_chunk *c;
+    WORD bottom8;
   
-  if (SWI_OS(num) == SWI_OS_TRAP)
-    chunk = num & 0x3dff00;
+    /* FIXME: if 0x3dff00 is OK why #define the other constants. */
+    base = SWI_OS(num) == SWI_OS_TRAP ? num & 0x3dff00 : SWI_CHUNK(num);
+
+    for (cp = chunks; (*cp)->base < base; cp++);
   
-  for (c = &__chunk_00000000; chunk > c->base; c++)
-    ;
-  
-  if (chunk == c->base)
-    {
-      WORD nr = num & 0xff;
-      if (c->names && c->names[nr])
-	sprintf(buf, "%s_%s", c->prefix, c->names[nr]);
-      else
-	sprintf(buf, "%s_&%x", c->prefix, (unsigned)num);
+    c = *cp;
+    if (c->base == base) {
+        bottom8 = num & 0xff;
+        if (c->names && c->names[bottom8]) {
+            sprintf(buf, "%s_%s", c->prefix, c->names[bottom8]);
+        } else {
+            sprintf(buf, "%s_&%lx", c->prefix, num);
+        }
+    } else {
+        sprintf(buf, "&%lx", num);
     }
-  else
-    sprintf(buf, "&%x", (unsigned)num);
+
+    return;
 }
 
 void
 swi_trap(WORD num)
 {
   WORD e;
-  struct swi_chunk *c;
-  WORD chunk = SWI_CHUNK(num);
+  swi_chunk **cp;
+  swi_chunk *c;
+  WORD base = SWI_CHUNK(num);
 
 #ifdef CONFIG_TRACE_SWIS
   {
     char b[256];
     swi_number_to_name(num, b);
-    fprintf(stderr, "SWI %s (%08x) called ", b, num);
+    fprintf(stderr, "SWI %s (%08lx) called ", b, num);
     fprintf(stderr, "(%08lx %08lx %08lx %08lx)", ARM_R0, ARM_R1, ARM_R2, ARM_R3);
     fprintf(stderr, "\n");
   }
@@ -85,19 +89,16 @@ swi_trap(WORD num)
        arm_set_pc(ARM_R14);
      r &= !3;
 #ifdef CONFIG_TRACE_SWIS
-  fprintf(stderr, "return R0 = %x\n", ARM_R0);
+  fprintf(stderr, "return R0 = %lx\n", ARM_R0);
 #endif
      return;
     }
 
-  for (c = &__chunk_00000000; chunk > c->base; c++)
-    ;
+    for (cp = chunks; (*cp)->base < base; cp++);
 
-  if (chunk == c->base)
-    e = c->fn(num);
-  else
-    e = ERR_EM_UNHANDLEDSWI;
-  
+    c = *cp;
+    e = c->base == base ? c->fn(num) : ERR_EM_UNHANDLEDSWI;
+
   arm_clear_v();
   if (e)
     {
@@ -115,6 +116,3 @@ swi_trap(WORD num)
        }
     }
 }
-
-struct swi_chunk __lastchunk __attribute__ (( section ("swi.last"))) =
-	{ 0xffffffff, NULL, NULL };

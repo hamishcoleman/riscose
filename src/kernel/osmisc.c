@@ -8,7 +8,7 @@
 **   Emulation of the kernel provided OS_ SWIs; most of the `biggies' like
 **   OS_File or OS_Word ought to be farmed out to separate files to avoid
 **   clutter.
-**
+**1
 **   $Revision$
 **   $Date$
 */
@@ -23,6 +23,8 @@
 #include "map.h"
 
 #include <readline/readline.h>
+
+void osmodule(void);
 
 WORD
 swih_os_writei(WORD num)
@@ -47,6 +49,7 @@ swih_os(WORD num)
       {
 	WORD pc = ARM_R15 & 0x02fffffc, psr = ARM_R15 & 0xfc000003;
 	char *p = (char *)MEM_TOHOST(pc);
+        psr=psr; /* FIXME: Do we need this?  */
 	while (*p)
 	  {
 	    vdu(*(p++));
@@ -139,7 +142,7 @@ swih_os(WORD num)
       swi_trap(ARM_R10);
       return 0;
     case 0x71: /* OS_CallASWIR12 */
-      printf("OS_CallASWI %x\n", ARM_R12);
+      printf("OS_CallASWI %x\n", (signed int) ARM_R12);
       swi_trap(ARM_R12);
       return 0;
     }

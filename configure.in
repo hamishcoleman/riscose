@@ -1,4 +1,5 @@
 AC_INIT(src/mkswichunk.sh)
+AC_CONFIG_AUX_DIR(util)
 AM_INIT_AUTOMAKE(riscose,0.01)
 AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
@@ -20,6 +21,7 @@ AC_OUTPUT([ \
         src/monty/Makefile \
         src/rom/Makefile \
         src/rom/compilerom \
+        util/Makefile \
     ], \
     [chmod +x src/rom/compilerom]
     )

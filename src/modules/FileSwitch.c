@@ -263,6 +263,9 @@ parseFilename(char *src)
 	  /* We've got both drive and filesystem specified */
 	  char *endDriveSpec = strchr(scan+2, '.');
 	  
+	  /* FIXME: the parsing seems ad hoc.  e.g. this second BADPATH
+	   * can't be true because otherwise we wouldn't have got past
+	   * the first.  */
 	  BADPATH(!endDriveSpec);
 	  BADPATH(scan[2] == 0);
 	  

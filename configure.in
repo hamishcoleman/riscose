@@ -14,10 +14,12 @@ AC_ARG_ENABLE(arm,
                           armul, sleeve, or native [armul]],
     ARM=$enableval)
 case "$ARM" in
-armul) ;;
-*) AC_MSG_ERROR([only --enable-arm=armul handled at the moment])
+armul|sleeve) ;;
+*) AC_MSG_ERROR([only ARM=armul or ARM=sleeve handled at the moment])
 esac
 AC_SUBST(ARM)
+AM_CONDITIONAL(ARM_ARMUL, test x$ARM = xarmul)
+AM_CONDITIONAL(ARM_SLEEVE, test x$ARM = xsleeve)
 
 # FIXME: we should only use readline if --with-readline is used, or at
 # least allow it to be disabled with --without-readline.
@@ -34,8 +36,10 @@ AC_OUTPUT([ \
         src/include/Makefile \
         src/modules/Makefile \
         src/monty/Makefile \
+        src/native/Makefile \
         src/rom/Makefile \
         src/rom/compilerom \
+        src/sleeve/Makefile \
         util/Makefile \
     ], \
     [chmod +x src/rom/compilerom]

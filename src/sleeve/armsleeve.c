@@ -17,7 +17,7 @@
 #include "mem.h"
 #include "swi.h"
 #include "arm.h"
-#include "rom.h"
+#include <rom/rom.h>
 // #include "sleeve/arm.h"
 
 static arm_context arm;

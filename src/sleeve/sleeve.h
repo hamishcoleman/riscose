@@ -16,6 +16,8 @@
 
 #include <stdio.h>
 
+#include "sleeveconfig.h"
+
 /* --- @sleeve_init@ --- *
  *
  * This should be called once before the emulator is used.

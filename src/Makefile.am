@@ -1,6 +1,13 @@
 INCLUDES = -I$(srcdir)/include
 
-SUBDIRS = include monty rom @ARM@ kernel modules
+if ARM_ARMUL
+arm = armul
+endif
+if ARM_SLEEVE
+arm = sleeve
+endif
+SUBDIRS = include monty rom $(arm) kernel modules
+DIST_SUBDIRS = include monty rom armul native sleeve kernel modules
 
 bin_PROGRAMS = riscose
 noinst_PROGRAMS = heaptest

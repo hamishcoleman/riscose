@@ -38,9 +38,7 @@ CORE = heap.o mem.o swi.o swichunk.o util.o
 OBJS = $(CORE) kernel/libkernel.a modules/libmodules.a \
     $(ARM_SELECT)/lib$(ARM_SELECT).a monty/libmonty.a
 
-BIN = riscose
-
-all:	subs $(BIN) heaptest
+all: subs riscose heaptest
 
 %.o:    %.c mem.h arm.h
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -54,11 +52,11 @@ subs:
 	$(MAKE) -C modules
 	cd monty && $(MAKE)
 
-$(BIN):	main.o $(OBJS)
+riscose: main.o $(OBJS)
 	$(CC) -o $@ main.o $(OBJS) $(LDFLAGS) $(EXTRA_LDFLAGS)
 
 clean::
-	rm -f $(BIN)
+	rm -f riscose
 
 # FIXME:  produce a new swichunk.c only if it would be different to the
 # existing one.  this stops swichunk.o being rebuilt and riscose being

@@ -1,4 +1,4 @@
-#! /bin/awk -f
+#! @BINAWK@ -f
 
 {
     for (o = 7; o >= 1; o -= 2) {

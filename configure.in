@@ -6,6 +6,9 @@ AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
 AC_PROG_YACC
 AC_PROG_RANLIB
+AC_PROG_AWK
+AC_PATH_PROG(BINAWK, $AWK)
+test -z "$BINAWK" && AC_MSG_ERROR([no acceptable $AWK found in \$PATH])
 AC_PATH_PROG(PERL, perl)
 test -z "$PERL" && AC_MSG_ERROR([no acceptable $ac_word found in \$PATH])
 
@@ -45,7 +48,8 @@ AC_OUTPUT([ \
         src/rom/compilerom \
         src/sleeve/Makefile \
         tests/Makefile \
+        tests/armas \
         util/Makefile \
     ], \
-    [chmod +x src/rom/compilerom]
+    [chmod +x src/rom/compilerom tests/armas]
     )

@@ -1,4 +1,4 @@
-OBJS = mremap2.o run.o
+OBJS = mremap2.o run.o native-arm.o
 
 all:	libnative.a
 

@@ -23,17 +23,19 @@
 #include <fcntl.h>
 
 #include <stdlib.h>
+#include <stdarg.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
 
 #include "riscostypes.h"
+#include "module.h"
 #include "swi.h"
+#include "arm.h"
+#include "mem.h"
 #include "map.h"
 #include "util.h"
-#include "mem.h"
-#include "heap.h"
 
 #define CC_V_BIT	(1 << 28)
 #define CC_C_BIT	(1 << 29)
@@ -52,7 +54,7 @@ union context
 };
 
 WORD wimpslot;
-char *progname;
+
 union context *context;
 
 struct sigcontext * where;
@@ -65,36 +67,6 @@ struct sigcontext * where;
 int user_size = 16*1024*1024;
 
 extern int personality(int);
-
-static void
-help(void)
-{
-  printf("Usage: %s [options] <RISC OS binary> [RISC OS cmd line argument]...\n\
-\n\
-Execute RISC OS code under emulation\n\
-\n\
-  -w, --wimpslot=SIZE    allocates SIZE kilobytes for execution\n\
-  -m, --module
-\n\
-  -h, --help             displays this help text\n\
-  -v, --version          displays the version information\n\
-", progname);
-  exit(0);
-}
-
-static void
-version(void)
-{
-  fprintf(stderr, "riscose version 0.01\n");
-  exit(0);
-}
-
-static void
-error(char *msg)
-{
-  fprintf(stderr, "*** %s\n", msg);
-  exit(1);
-}
 
 void dump_context(struct sigcontext *ctx)
 {
@@ -225,7 +197,8 @@ arm_clear_c(void)
   context->r.regs[15] &= ~CC_C_BIT;
 }
 
-void arm_cacheflush(unsigned long _beg, unsigned long _end)
+void 
+arm_cacheflush(unsigned long _beg, unsigned long _end)
 {
   register unsigned long _flg __asm ("a3") = 0;
   __asm __volatile ("swi 0x9f0002		@ sys_cacheflush"	\
@@ -233,78 +206,15 @@ void arm_cacheflush(unsigned long _beg, unsigned long _end)
 		    : "0" (_beg), "r" (_end), "r" (_flg));
 }
 
-int
-main(int argc, char **argv)
+void
+arm_init(void)
 {
-  static const struct option long_options[] = {
-    { "help", no_argument, NULL, 'h' },
-    { "version", no_argument, NULL, 'v' },
-    { "wimpslot", required_argument, NULL, 'w' }
-  };
-  
-  int c;
-  char *file;
-  mem_private *priv;
-  WORD  count = 0, o;
-  
-  progname = argv[0];
-  wimpslot = 640*1024;
-  
-  while ((c = getopt_long(argc, argv, "hvw:", long_options, NULL)) != EOF)
-    {
-     switch (c)
-       {
-       case 'h' : help();
-       case 'v' : version();
-       case 'w' : wimpslot = atoi(optarg); break;
-       }
-    }
-  
-  if (optind < argc)
-    file = argv[optind++];
-  else
-    error("No RISC OS filename supplied");
-
-  mem_init();
-  swi_init();
-
-  mem_task_switch(mem_task_new(wimpslot, file, NULL));
-  arm_cacheflush(0x8000, 0x8000 + wimpslot);
-
-  /* Set up unprocessed + processed command line storage thingies */
-  o = optind;
-  
-  priv = (mem_private*) mem_get_private();
-  priv->argc = argc-o+1;
-  
-  sprintf(priv->cli, "%s ", file);
-  strcpy(priv->cli_split, file);
-  priv->argv[count++] = MMAP_USRSTACK_BASE+268;
-  while (o != argc)
-    {
-      priv->argv[count++] = MMAP_USRSTACK_BASE+268+strlen(priv->cli);
-      strcpy(priv->cli_split + strlen(priv->cli), argv[o]);
-      strcat(priv->cli, argv[o]);
-      strcat(priv->cli, " ");
-      o++;
-    }
-  priv->cli[strlen(priv->cli)-1] = 0;
-  
   /* Install the signal handler */
   install_signal();
 
+  /* Establish an initial context. */
+  context = malloc(sizeof(*context));
+
   /* Tell it how it is. */
   personality(PER_RISCOS);
-
-  /* Go for it */
-  {
-    __asm__ volatile (
-	"swi	0x9f0003		@ sys_usr26
-	adr	lr, 1f
-	mov	pc, %0
-1:	swi	0x9f0004		@ sys_usr32" : : "r" (0x8000) 
-		      : "r0", "r1", "r2", "r3", "ip", "lr");
-  }
-
-  return 0;
 }

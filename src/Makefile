@@ -54,8 +54,8 @@ subs:
 	$(MAKE) -C modules
 	cd monty && $(MAKE)
 
-$(BIN):	$(MAIN) $(OBJS)
-	$(CC) -o $@ $(MAIN) $(OBJS) $(LDFLAGS)
+$(BIN):	main.o $(OBJS)
+	$(CC) -o $@ main.o $(OBJS) $(LDFLAGS)
 
 clean::
 	rm -f $(BIN)

@@ -8,7 +8,7 @@ SEARCH_DIR(/lib); SEARCH_DIR(/usr/lib); SEARCH_DIR(/usr/local/lib); SEARCH_DIR(/
 SECTIONS
 {
   /* Read-only sections, merged into text segment: */
-  . = 0x04000000 + SIZEOF_HEADERS;
+  . = 0x03f00000 + SIZEOF_HEADERS;
   .interp     : { *(.interp) 	}
   .hash          : { *(.hash)		}
   .dynsym        : { *(.dynsym)		}

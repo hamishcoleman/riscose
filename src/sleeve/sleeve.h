@@ -14,7 +14,6 @@
 
 /* --- Header files --- */
 
-#include "config.h"
 #include <stdio.h>
 
 /* --- @sleeve_init@ --- *

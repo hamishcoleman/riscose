@@ -57,6 +57,9 @@ $(BIN):	$(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a modules/libm
 clean::
 	rm -f $(BIN)
 
+# FIXME:  produce a new swichunk.c only if it would be different to the
+# existing one.  this stops swichunk.o being rebuilt and riscose being
+# re-linked.  a `make' following a `make' shouldn't really do anything.
 swichunk.c::
 	./mkswichunk.sh
 

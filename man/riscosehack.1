@@ -42,6 +42,46 @@ described in this man page.
 .
 For the moment, there are just a series of notes in random order.
 .
+.SS A Tour de Source
+.
+util contains support files for the
+.BR autoconf / automake
+programs.
+.
+.P
+tests' contents are used during a `make check'.
+If a problem with
+.BR arcem 's
+disc image accessing is solved, the checks will be run under
+.B arcem
+too.
+.
+.P
+src/monty is a library of general purpose routines,
+.RB non- riscose
+specific.
+.
+.P
+src/include/arm.h defines the interface to which all three ARM processor
+implementations, src/armul, src/sleeve, and src/native, conform.
+armul is based on ARM's
+.B ARMulator
+with the ARM 6 support removed.
+sleeve was intended to be a fast emulation by the late Chris Rutter.
+native, by Phil Blundell, is of use on Linux/ARM systems where the host
+ARM processor can be used.
+.
+.P
+src/include contains miscellaneous C include files.
+I'd like to see them moved to the same directory as the C source they
+accompany and the include directory removed.
+.
+.P
+src/defmod is taken from
+.BR OSLib .
+It builds defmod which produces a variety of C source from an OSLib
+definition file.
+These have the suffix `.osl' and are found in src/osapi.
 .
 .SH BUGS
 .

@@ -1,17 +1,15 @@
-#!/bin/sh
+#! /bin/sh
 #
-# mkswichunk.sh
-#
-# (c) Ralph Corderoy 2001
+# Copyright Ralph Corderoy, 2001.
 #
 # See http://riscose.sourceforce.net/ for terms of distribution, and to
-# pick up a later versino of the software.
+# pick up a later version of the software.
 #
 #   Generates swichunk.c which maps SWI chunks to handlers
 #
 #   $Revision$
 #   $Id$
-#
+
 set -e
 
 f=swichunk.c

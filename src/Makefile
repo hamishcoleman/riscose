@@ -1,3 +1,5 @@
+#! /bin/make -f
+
 			   ############################
 			######## Riscose Makefile ########
 			   ############################
@@ -36,13 +38,10 @@ OBJS = $(CORE) kernel/libkernel.a modules/libmodules.a $(ARM_SELECT)/lib$(ARM_SE
 
 BIN = riscose
 
-all:	subs $(BIN) rom/ROMimage
+all:	subs $(BIN)
 
 %.o:    %.c mem.h arm.h
 	$(CC) $(CFLAGS) -c -o $@ $<
-
-swichunk.c:	kernel/*.c modules/*.c
-	./mkswichunk.sh
 
 $(ARM_SELECT)/lib$(ARM_SELECT).a: $(ARM_SELECT)/*.c $(ARM_SELECT)/*.h
 	$(MAKE) -C $(ARM_SELECT) 
@@ -55,12 +54,22 @@ subs:
 $(BIN):	$(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a modules/libmodules.a
 	$(CC) -o $@ $(OBJS) $(LIBRARIES) $(LDFLAGS)
 
+clean::
+	rm -f $(BIN)
+
+swichunk.c::
+	./mkswichunk.sh
+
+clean::
+	rm -f swichunk.c
+
 ######## Utility targets
 
-clean:
-	rm -f $(BIN) core rom/ROMimage swichunk.c
+clean::
 	find . -name '*.[ao]' -o -name '*~' | xargs rm -f
+	$(MAKE) -C rom $@
 
 # So you can run RISC OS binaries as if they're native
+
 binfmt:
 	echo ':riscos_aif:M:16:\x11\x00\x00\xEF::/home/mattbee/Projects/riscose/riscose/src/riscose:' >/proc/sys/fs/binfmt_misc/register

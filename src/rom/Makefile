@@ -1,4 +1,7 @@
-# ROM Makefile
+#! /bin/make -f
 
-ROMImage: *.list
+ROMimage: error.list
 	./compilerom.pl
+
+clean::
+	rm -f ROMimage

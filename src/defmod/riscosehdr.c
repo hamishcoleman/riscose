@@ -17,7 +17,6 @@
 #include <errno.h>
 
 #include "types.h"
-#include "macros.h"
 
 #include "lookup.h"
 #include "def.h"
@@ -253,7 +252,7 @@ static int Print_Decl
 
       case def_TYPE_ROW:
       {
-         char v1 [def_ID_LIMIT + 1], v2a[DEC_WIDTH + 1];
+         char v1 [def_ID_LIMIT + 1], v2a[20];
          char *v2;
 
          if (t->data AS row.count == 1)

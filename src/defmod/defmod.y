@@ -44,7 +44,6 @@ TV    20000503    |bool| replaced by |osbool|
 
    /*From OSLib*/
    #include "types.h"
-   #include "macros.h"
 
    /*From Support*/
    #include "lookup.h"

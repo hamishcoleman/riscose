@@ -95,7 +95,6 @@ main(int argc, char **argv)
   mem_init();
   swi_init();
   arm_init();
-  arm_set_mode(0);
   
   mem_task_switch(mem_task_new(wimpslot, file, NULL));
 

@@ -12,6 +12,10 @@
 **   $Date$
 */
 #include "riscostypes.h"
+#include "armdefs.h"
+#include "arminit.h"
+#include "armsupp.h"
+#include "armemu.h"
 #include "mem.h"
 #include "swi.h"
 #include "arm.h"
@@ -38,6 +42,8 @@ arm_init(void)
   ARMul_SelectProcessor(arm, ARM2);
   ARMul_Reset(arm);
   ARMul_SwitchMode(arm, SVC26MODE, USER26MODE);
+  ARMul_SetR15(arm, (arm->Reg[15] & 0xfffffffc));
+  ARMul_R15Altered(arm);
   arm_run_depth=0;
 }
 
@@ -61,13 +67,6 @@ arm_run_routine(WORD addr)
   arm_set_pc(old_pc+4);
   if (arm_run_depth)
     arm->Emulate = RUN;
-}
-
-void
-arm_set_mode(WORD svc_not_usr)
-{
-  ARMul_SetR15(arm, (arm->Reg[15] & 0xfffffffc) ^ (svc_not_usr ? 3:0) );
-  ARMul_R15Altered(arm);
 }
 
 void

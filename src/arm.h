@@ -12,16 +12,10 @@
 **   $Date$
 */
 #include "riscostypes.h"
-#include "armdefs.h"
-#include "arminit.h"
-#include "armsupp.h"
-#include "armemu.h"
 
 void	arm_init(void);
 void	arm_set_pc(WORD addr);
 void	arm_run_routine(WORD addr);
-
-void	arm_set_mode(WORD svc_not_user);
 void	arm_return(void);
 
 WORD	arm_get_reg(WORD num);

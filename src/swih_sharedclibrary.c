@@ -24,18 +24,26 @@
 #include "mem.h"
 #include "map.h"
 
+#include "clib_file.h"
 #include "clib_routines.h"
 
 static
 void fill_statics(WORD addr) /* 4-252 */
 {
-  FILE **riscos_stdin  = (FILE**) MEM_TOHOST(addr+CLIB_SHARED_STDIN);
-  FILE **riscos_stdout = (FILE**) MEM_TOHOST(addr+CLIB_SHARED_STDOUT);
-  FILE **riscos_stderr = (FILE**) MEM_TOHOST(addr+CLIB_SHARED_STDERR);
+  WORD riscos_stdin  = clib_file_new(stdin);
+  WORD riscos_stdout = clib_file_new(stdout);
+  WORD riscos_stderr = clib_file_new(stderr);
   
-  *riscos_stdin  = stdin;
-  *riscos_stdout = stdout;
-  *riscos_stderr = stderr;
+  memcpy(MEM_TOHOST(addr+CLIB_SHARED_STDIN), MEM_TOHOST(riscos_stdin),
+         sizeof(riscos_FILE));
+  memcpy(MEM_TOHOST(addr+CLIB_SHARED_STDOUT), MEM_TOHOST(riscos_stdout),
+         sizeof(riscos_FILE));
+  memcpy(MEM_TOHOST(addr+CLIB_SHARED_STDERR), MEM_TOHOST(riscos_stderr),
+         sizeof(riscos_FILE));
+  
+  mem_rma_free(riscos_stdin);
+  mem_rma_free(riscos_stdout);
+  mem_rma_free(riscos_stderr);
 }
 
 /* FIXME: this function is probably quite dependent on how a particular
@@ -258,48 +266,26 @@ swih_sharedclibrary_entry(WORD num)
     /* FIXME: These functions will only work on 32-bit machines! */
     
     case CLIB_CLIB_FFLUSH: /* 4-306 */
-      ARM_SET_R0((WORD) fflush( *((FILE**)MEM_TOHOST(ARM_R0)) ));
+      ARM_SET_R0((WORD) fflush(clib_file_real(ARM_R0)));
       return 0;
-    
+
+    case CLIB_CLIB_FREOPEN:
+      fclose(clib_file_real(ARM_R2)); /* still works, I think */
     case CLIB_CLIB_FOPEN: /* 4-306 */
       {
-        WORD fp = mem_rma_alloc(sizeof(FILE*));
-        FILE **bury = (FILE**) MEM_TOHOST(fp);
-        
-        *bury = fopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
-        ARM_SET_R0(*bury == NULL ? 0 : fp);
-        /* FIXME: memory leak */
-        return fp;
+        FILE *fh = fopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));        
+        ARM_SET_R0(fh == NULL ? 0 : clib_file_new(fh));
+        return 0;
       }
-      /*ARM_SET_R0((WORD) fopen(MEM_TOHOST(ARM_R0),
-                                  MEM_TOHOST(ARM_R1))
-                 );*/
-      return 0;
     
     case CLIB_CLIB_FCLOSE:
-      {
-        FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
-        ARM_SET_R0(fclose(*bury));
-        /*mem_rma_free(ARM_R0);*/
-      }
-      /*ARM_SET_R0((WORD) fclose((FILE*)ARM_R0));*/
-      return 0;
-    
-    case CLIB_CLIB_FREOPEN:
-      {
-        FILE **bury = (FILE**) MEM_TOHOST(ARM_R2);
-        *bury = freopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), *bury);
-        ARM_SET_R0(*bury == NULL ? 0 : ARM_R2);
-        /* FIXME: memory leak :-) */
-      }
+      ARM_SET_R0(fclose(clib_file_real(ARM_R0)));
       return 0;
     
     case CLIB_CLIB_FREAD:
-      {
-        FILE **bury = (FILE**) MEM_TOHOST(ARM_R3);
-        ARM_SET_R0(fread(MEM_TOHOST(ARM_R0), ARM_R1, ARM_R2, *bury));
-        return 0;
-      }
+      ARM_SET_R0(fread(MEM_TOHOST(ARM_R0), ARM_R1, ARM_R2,
+                 clib_file_real(ARM_R3)));
+      return 0;
 
     case CLIB_CLIB__SPRINTF:
     case CLIB_CLIB_SPRINTF:
@@ -320,47 +306,34 @@ swih_sharedclibrary_entry(WORD num)
       
     case CLIB_CLIB__FPRINTF:
     case CLIB_CLIB_FPRINTF:
-      {
-       FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
-       
-       prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
-       ARM_SET_R0(vfprintf(*bury, MEM_TOHOST(ARM_R1), arm_va_list));
-      }
+      prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
+      ARM_SET_R0(vfprintf(clib_file_real(ARM_R0),
+                          MEM_TOHOST(ARM_R1),
+                          arm_va_list));
       return 0;
 
     case CLIB_CLIB_VFPRINTF: /* 4-312 */
       prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
-      ARM_SET_R0(vfprintf( *((FILE**) MEM_TOHOST(ARM_R0)),
+      ARM_SET_R0(vfprintf(clib_file_real(ARM_R0),
                      MEM_TOHOST(ARM_R1),
-                     arm_va_list)
-                 );
+                     arm_va_list));
       return 0;
 
     case CLIB_CLIB_FWRITE: /* 4-316 */
-      {
-        FILE **bury = (FILE**) MEM_TOHOST(ARM_R3);
-        BYTE *data = MEM_TOHOST(ARM_R0);
-        WORD size = ARM_R1, nmemb = ARM_R2;
-        ARM_SET_R0(fwrite(data, size, nmemb, *bury));
-      }
+      ARM_SET_R0(fwrite(MEM_TOHOST(ARM_R0), ARM_R1, ARM_R2, clib_file_real(ARM_R3)));
       return 0;
     
     case CLIB_CLIB_FSEEK: /* 4-316 */
-      {
-        FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
-        ARM_SET_R0(fseek(*bury, ARM_R1, ARM_R2));
-      }
+      ARM_SET_R0(fseek(clib_file_real(ARM_R0), ARM_R1, ARM_R2));
       return 0;
     
     case CLIB_CLIB_FTELL: /* 4-317 */
-      {
-        FILE **bury = (FILE**) MEM_TOHOST(ARM_R0);
-        ARM_SET_R0(ftell(*bury));
-      }
+      ARM_SET_R0(ftell(clib_file_real(ARM_R0)));
       return 0;
     
     case CLIB_CLIB___FILBUF: /* very nasty! 4-318 */
-      ARM_SET_R0(getc( *((FILE**) MEM_TOHOST(ARM_R0)) ));
+      ARM_SET_R0(getc(clib_file_real(ARM_R0)));
+      printf("got character %02x\n", ARM_R0);
       return 0;
 
     case CLIB_CLIB_MALLOC: /* 4-320 */
@@ -419,7 +392,10 @@ swih_sharedclibrary_entry(WORD num)
     case CLIB_CLIB_MEMCHR: /* 4-330 */
       {
         BYTE *found = memchr(MEM_TOHOST(ARM_R0), ARM_R1, ARM_R2);
-        ARM_SET_R0(found == NULL ? NULL : ARM_R0 + (found - (BYTE*) MEM_TOHOST(ARM_R0)));
+        if (found == NULL)
+          ARM_SET_R0(0);
+        else
+          ARM_SET_R0(ARM_R0 + (found - (BYTE*) MEM_TOHOST(ARM_R0)));
       }
       return 0;
     

@@ -60,6 +60,7 @@ void*	mem_get_private(void);
 WORD	mem_get_wimpslot(void);
 
 WORD	mem_rma_alloc(WORD size);
+void    mem_rma_free(WORD arm_addr);
 WORD	mem_rma_resize(WORD addr, WORD newsize);
 
 int 	mem_load_file_at(const char * file, WORD arm_addr);

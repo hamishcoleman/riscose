@@ -1,27 +1,28 @@
 # Riscose Makefile
 
-ARMUL_OBJS = armemu.o armsupp.o arminit.o instr.o
-HANDLERS = swih_os.o swih_sharedclibrary.o osfile.o
-OBJS = main.o mem.o swi.o arm.o heap.o util.o $(ARMUL_OBJS) $(HANDLERS)
+include Makefile.common
+
+ARM = armul/armemu.o armul/arminit.o armul/armsupp.o armul/instr.o armul/arm.o
+#ARM = sleeve/sleeve_lib.o
+
+HANDLERS = swih_os.o swih_sharedclibrary.o osfile.o clib_file.o
+OBJS = main.o mem.o swi.o heap.o util.o $(ARM) $(HANDLERS)
 
 BIN = riscose
 
-CC      = gcc
-CFLAGS  = -Wall -DCONFIG_MEM_ONE2ONE
-# -O3 -funroll-loops
-LDFLAGS = 
-# -lefence
-
 all:	$(BIN) ROMimage
+
+sleeve/sleeve_lib.o: sleeve/*.c sleeve/*.h
+	cd sleeve; make
+
+armul/armul_lib.o: armul/*.c armul/*.h
+	cd armul; make
 
 ROMimage:	*.list
 	./compilerom.pl
 
 $(BIN):	$(OBJS)
 	$(CC) -o $@ $(LDFLAGS) $(OBJS)
-
-%.o:	%.c mem.h arm.h
-	$(CC) $(CFLAGS) -g -c -o $@ $<
 
 clean:
 	rm core *.o *~ $(BIN) ROMimage 2>/dev/null

@@ -23,7 +23,6 @@
   #include <sys/mman.h>
 #endif
 
-#include "arm.h"
 #include "map.h"
 #include "mem.h"
 #include "util.h"
@@ -233,6 +232,10 @@ mem_rma_alloc(WORD size)
   return MMAP_RMA_BASE + (m - mem->rma);
 }
 
+void mem_rma_free(WORD addr)
+{
+}
+
 WORD
 mem_rma_resize(WORD addr, WORD newsize)
 {
@@ -264,6 +267,8 @@ mem_load_file_at(const char * file, WORD arm_addr)
   
   return 0;
 }
+
+extern WORD arm_get_reg(WORD r);
 
 static
 void

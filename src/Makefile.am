@@ -8,9 +8,9 @@ noinst_SCRIPTS = mkswichunk.sh
 
 EXTRA_DIST = mkswichunk.sh
 
-riscose_SOURCES = main.c heap.c mem.c swi.c util.c
+riscose_SOURCES = main.c heap.c mem.c swi.c util.c swiregister.c
 EXTRA_riscose_SOURCES = heap2.c
-riscose_LDADD = swichunk.o \
+riscose_LDADD = \
     modules/libmodules.a kernel/libkernel.a \
     @ARM@/lib@ARM@.a monty/libmonty.a \
     -lncurses -lreadline

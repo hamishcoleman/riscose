@@ -16,6 +16,17 @@
 #define SWI_NUM(x)    ((x) & 0xdffff) /* as given in PRMs */
 #define SWI_CHUNK(x)  ((x) & 0xdffc0) /* as above, minus bottom few bits */
 
+
+/* We keep registered SWIs in "buckets" to speed look-up.  Each bucket
+** is itself a linked list, but any given bucket will only ever contain
+** a limited range of SWI numbers.  SWI_QUANTITY is the next power of 2
+** above the largest SWI number.  SWI_BUCKETS is the number of buckets
+** we divide this quantity into.  Hence there are SWI_QUANTITY / SWI_BUCKETS
+** possible SWIs in each bucket.  This result must be an integer.
+*/
+#define SWI_QUANTITY       0x100000
+#define SWI_BUCKETS        64
+
 #define SWI_WHERE_OS       0
 #define SWI_WHERE_OSEXT    1
 #define SWI_WHERE_3RDPARTY 2
@@ -62,23 +73,10 @@ void osbyte(void);
 void swi_init(void);
 void swi_trap(WORD num);
 
-typedef struct swi_chunk
+typedef struct swi_routine
 {
-  WORD base;
-  const char *prefix;
-  const char **names;
-  WORD (*fn)(WORD);
-} swi_chunk;
-
-extern swi_chunk *chunks[];
-
-/* base must be exactly eight hexadecimal characters long using only
- * lower case a-f as it is used for sorting swi chunks. */
-
-#define DECLARE_SWI_CHUNK(base, prefix, names, fn) \
-    struct swi_chunk chunk_ ## base = { \
-        0x ## base, \
-        prefix, \
-        names, \
-        fn \
-    }
+  WORD number;
+  const char* name;
+  swi_handler handler;
+  struct swi_routine* next;
+} swi_routine;

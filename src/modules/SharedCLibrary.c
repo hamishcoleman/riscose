@@ -221,6 +221,12 @@ swih_sharedclibrary(WORD num)
   switch (SWI_NUM(num))
     {
     case 0x80681: /* SharedCLibrary_LibInitAPCS_R (4-249) */
+    /*case 0x80683: SharedCLibrary_LibInitAPCS_32 --- FIXME; is this ok? 
+    **
+    ** MB: Not until we have some definitive documentation on what the 
+    ** differences are :-)  I don't want it screwing up tests further down
+    ** the line just because it 'looked like it worked'!
+    */
 #if defined(NATIVE) && defined(NATIVE_FASTCALL)
       {
 	static int stubs_built;
@@ -736,6 +742,24 @@ swih_sharedclibrary_entry(WORD num)
   return 0;
 }
 
-DECLARE_SWI_CHUNK(00080680, "SharedCLibrary", sharedclibrary_names, swih_sharedclibrary);
-DECLARE_SWI_CHUNK(00301000, "clib", clib_kern_names, swih_sharedclibrary_entry);
-DECLARE_SWI_CHUNK(00301100, "clib", clib_clib_names, swih_sharedclibrary_entry);
+void sharedclibrary_swi_register(void)
+{
+  char name[64];
+  int i;
+
+  swi_register(0x80680, "SharedCLibrary_LibInitAPCS_A", swih_sharedclibrary);
+  swi_register(0x80681, "SharedCLibrary_LibInitAPCS_R", swih_sharedclibrary);
+  swi_register(0x80682, "SharedCLibrary_LibInitModule", swih_sharedclibrary);
+  swi_register(0x80683, "SharedCLibrary_LibInitAPCS_32", swih_sharedclibrary);
+
+  for (i = 0; i < 183; i++) {
+    sprintf(name, "clib_%s", clib_clib_names[i]);
+    swi_register(0x301000 + i, name, swih_sharedclibrary_entry);
+  }
+
+  for (i = 0; i < 48; i++) {
+    sprintf(name, "clib_%s", clib_kern_names[i]);
+    swi_register(0x301100 + i, name, swih_sharedclibrary_entry);
+  }
+
+}

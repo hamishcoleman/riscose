@@ -25,57 +25,88 @@
 /* FIXME: should be in a header file. */
 WORD swih_sharedclibrary_entry(WORD num);
 
-void
-swi_init(void)
+/* Array of pointers to the SWI lists */
+swi_routine* swi_list[SWI_BUCKETS];
+
+
+/* Register a SWI with riscose. */
+void swi_register(WORD num, char* name, swi_handler handler)
 {
-    return;
+  WORD bucket;
+
+  swi_routine* r = emalloc(sizeof(swi_routine));
+
+  r->number = num;
+  r->name = estrdup(name);
+  r->handler = handler;
+
+  bucket = num / (SWI_QUANTITY / SWI_BUCKETS);
+  r->next = swi_list[bucket];
+  swi_list[bucket] = r;
 }
+
+
+void swi_init(void)
+{
+  int i;
+
+  for (i = 0; i < SWI_BUCKETS; i++)
+    swi_list[i] = NULL;
+
+  /* This function gets each module to register its SWIs. */
+  swi_register_all();
+}
+
+
+/* Look up a SWI number and return a pointer to its swi_routine
+** struct, or NULL if it is not found.
+*/
+swi_routine* swi_lookup(WORD num)
+{
+  swi_routine* p;
+  WORD bucket = SWI_NUM(num) / (SWI_QUANTITY / SWI_BUCKETS);
+
+  p = swi_list[bucket];
+  while (p && p->number != SWI_NUM(num))
+    p = p->next;
+
+  return p;
+}
+
 
 void swi_number_to_name(WORD num, char *buf)
 {
-    WORD base;
-    swi_chunk **cp;
-    swi_chunk *c;
-    WORD bottom8;
-  
-    /* FIXME: if 0x3dff00 is OK why #define the other constants. */
-    base = SWI_OS(num) == SWI_OS_TRAP ? num & 0x3dff00 : SWI_CHUNK(num);
+  swi_routine* p;
 
-    for (cp = chunks; (*cp)->base < base; cp++);
-  
-    c = *cp;
-    if (c->base == base) {
-        bottom8 = num & 0xff;
-        if (c->names && c->names[bottom8]) {
-            sprintf(buf, "%s_%s", c->prefix, c->names[bottom8]);
-        } else {
-            sprintf(buf, "%s_&%lx", c->prefix, num);
-        }
-    } else {
+  p = swi_lookup(num);
+
+  if (p) {
+    if (SWI_X(num))
+      sprintf(buf, "X%s", p->name);
+    else
+      strcpy(buf, p->name);
+  } else
         sprintf(buf, "&%lx", num);
-    }
 
     return;
 }
+
 
 void
 swi_trap(WORD num)
 {
   WORD e;
-  swi_chunk **cp;
-  swi_chunk *c;
-  WORD base = SWI_CHUNK(num);
+  swi_routine* p;
 
 #ifdef CONFIG_TRACE_SWIS
   {
     char b[256];
     swi_number_to_name(num, b);
-    fprintf(stderr, "SWI %s (%08lx) called ", b, num);
+    fprintf(stderr, "%08x: SWI %s (%08lx) called ", ARM_R14, b, num);
     fprintf(stderr, "(%08lx %08lx %08lx %08lx)", ARM_R0, ARM_R1, ARM_R2, ARM_R3);
     fprintf(stderr, "\n");
   }
 #endif
-  
   
   if (SWI_OS(num) == SWI_OS_TRAP)
     {
@@ -95,11 +126,16 @@ swi_trap(WORD num)
      return;
     }
 
-    for (cp = chunks; (*cp)->base < base; cp++);
 
-    c = *cp;
-    e = c->base == base ? c->fn(num) : ERR_EM_UNHANDLEDSWI;
+  /* Look up the SWI's details and call it if found */
+  p = swi_lookup(num);
 
+  if (p)
+    e = p->handler(num);
+  else
+    e = ERR_EM_UNHANDLEDSWI;
+
+  /* Handle errors */
   arm_clear_v();
   if (e)
     {

@@ -12,14 +12,7 @@
 **   $Date$
 */
 
-static const char *sharedclibrary_names[256] =
-{
-  "LibInitAPCS_A",
-  "LibInitAPCS_R",
-  "LibInitModule"
-};
-
-static const char *clib_clib_names[] =
+static const char *clib_clib_names[183] =
 {
   "CLIB_TRAPHANDLER",
   "CLIB_UNCAUGHTTRAPHANDLER",
@@ -205,7 +198,7 @@ static const char *clib_clib_names[] =
   "CLIB_FINALISE",
   "CLIB_TMPNAM"
 };
-static const char *clib_kern_names[] =
+static const char *clib_kern_names[48] =
 {
   "KERN_INIT",
   "KERN_EXIT",

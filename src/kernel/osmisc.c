@@ -120,7 +120,6 @@ swih_os(WORD num)
       return 0;
     
     case 0x11: /* OS_Exit */
-      printf("*** finished!\n");
       exit(arm_get_reg(0));
       return 0;
     
@@ -128,7 +127,6 @@ swih_os(WORD num)
       return 0;
     
     case 0x2b: /* OS_GenerateError */ 
-      
       if (!SWI_X(num)) {
         fprintf(stderr, "*** Error from RISC OS (%08x): %s\n",
 	   (unsigned) *((WORD*)MEM_TOHOST(ARM_R0)),
@@ -138,11 +136,9 @@ swih_os(WORD num)
       return ARM_R0;
       
     case 0x6f: /* OS_CallASWI */
-      printf("OS_CallASWI %x\n", (unsigned int)ARM_R10);
       swi_trap(ARM_R10);
       return 0;
     case 0x71: /* OS_CallASWIR12 */
-      printf("OS_CallASWIR12 %x\n", (unsigned int)ARM_R12);
       swi_trap(ARM_R12);
       return 0;
     }
@@ -194,10 +190,22 @@ static const char *os_names_c0[64] =
   NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
 };
 
-DECLARE_SWI_CHUNK(00000000, "OS", os_names, swih_os);
-DECLARE_SWI_CHUNK(00000040, "OS", os_names_40, swih_os);
-DECLARE_SWI_CHUNK(000000c0, "OS", os_names_c0, swih_os);
-DECLARE_SWI_CHUNK(00000100, "OS_WriteI", NULL, swih_os_writei);
-DECLARE_SWI_CHUNK(00000140, "OS_WriteI", NULL, swih_os_writei);
-DECLARE_SWI_CHUNK(00000180, "OS_WriteI", NULL, swih_os_writei);
-DECLARE_SWI_CHUNK(000001c0, "OS_WriteI", NULL, swih_os_writei);
+
+void osmisc_swi_register()
+{
+  int i;
+  char name[0x40];
+
+  for (i = 0; i < 0x40; i++) {
+
+    sprintf(name, "OS_%s", os_names[i]);
+    swi_register(i, name, swih_os);
+    sprintf(name, "OS_%s", os_names_40[i]);
+    swi_register(i + 0x40, name, swih_os);
+    sprintf(name, "OS_%s", os_names_c0[i]);
+    swi_register(i + 0xc0, name, swih_os);
+  }
+
+  for (i = 0x100; i < 0x1c0 + 0x40; i++)
+    swi_register(i, "OS_WriteI", swih_os_writei);
+}

@@ -26,7 +26,7 @@ SRCDIR  = $(CURDIR)
 CC      = gcc
 CFLAGS = -O2 -g3 -Wall \
     -I$(SRCDIR) -I$(SRCDIR)/include -I$(SRCDIR)/$(ARM_SELECT) $(DEFS)
-LDFLAGS = -lncurses -lreadline $(EXTRA_LDFLAGS)
+LDFLAGS = -lncurses -lreadline
 PREFIX  = /usr/local
 
 ######## Everything else
@@ -55,7 +55,7 @@ subs:
 	cd monty && $(MAKE)
 
 $(BIN):	main.o $(OBJS)
-	$(CC) -o $@ main.o $(OBJS) $(LDFLAGS)
+	$(CC) -o $@ main.o $(OBJS) $(LDFLAGS) $(EXTRA_LDFLAGS)
 
 clean::
 	rm -f $(BIN)

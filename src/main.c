@@ -14,6 +14,8 @@
 */
 #include <stdlib.h>
 #include <stdarg.h>
+/* FIXME: can't rely on getopt.h being a GNU one accepting long
+ * options. */
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
@@ -39,8 +41,6 @@ version(void)
     fprintf(stderr, "%s: version 0.01\n", progname);
     exit(0);
 }
-
-void go(WORD wimpslot, char *file);
 
 int
 main(int argc, char **argv)
@@ -70,11 +70,14 @@ main(int argc, char **argv)
        {
        case 'h' : usage("help requested\n");
        case 'v' : version();
-       case 'w' : wimpslot = atoi(optarg); break;
        case 'm' : module = 1; break;
        case 'u' : utility = 1; break;
+       case 'w' : wimpslot = atoi(optarg); break;
        }
     }
+
+    /* FIXME: should error if -m and -u given. */
+    /* FIXME: what meaning does wimpslot have if -m or -u given? */
   
     if (optind == argc) {
         usage("no risc os executable specified\n");
@@ -87,12 +90,8 @@ main(int argc, char **argv)
   swi_init();
   arm_init();
 
-  /* Load the code */
-
-  if (module || utility)
-    mem_task_switch(mem_task_new(wimpslot, NULL, NULL));
-  else
-    mem_task_switch(mem_task_new(wimpslot, file, NULL));
+    mem_task_switch(mem_task_new(wimpslot,
+        module || utility ? NULL : file, NULL));
 
   /* Set up unprocessed + processed command line storage thingies */
     
@@ -142,10 +141,10 @@ static void usage(char *fmt, ...)
 "usage: %s [options] binary args...\n"
 "where options are:\n"
 "    -h, --help          request this help text.\n"
-"    -u, --utility       program is a utility.\n"
 "    -v, --version       display version and exit.\n"
+"    -m, --module        binary is a module.\n"
+"    -u, --utility       binary is a utility.\n"
 "    -w, --wimpslot=K    allocates K kilobytes for execution.\n"
-"    -m, --module        FIXME: what does this so.\n"
 "binary is the risc os executable to run.  args are its arguments.\n",
         progname);
 

@@ -42,7 +42,8 @@ think this is just par for the course given that we're constantly
 translating between ARM + native address spaces, but I ought to write some
 macros to make the code more readable.  Or is there a better way...?
 
-Also, autoconf sounds like a good idea, and I ought to split off stolen code like the ARMulator and Gareth's instruction disassembler into separate directories.
+Also, I ought to split off stolen code like the ARMulator and Gareth's
+instruction disassembler into separate directories.
 
 * The heap manager algorithm
 

@@ -10,12 +10,11 @@
 
 #include <stdio.h>
 #include <monty/monty.h>
+#include <monty/mem.h>
 #include "types.h"
 #include "basictrans.h"
 
-/* Error messages for BASICTrans_Error */
-#define BASICTRANS_ERRORS 113
-static const char* basictrans_errors[] = {
+static char *basictrans_errors[] = {
   "Unknown setting of exception control",
   "Silly!",
   "No room do do this renumber",
@@ -161,8 +160,11 @@ os_error *xbasictrans_help (char const *help_text,
   fprintf(stderr, "  In: help_text = %x\n", (int) help_text);
   fprintf(stderr, "  In: prog_name = %x\n", (int) prog_name);
   fprintf(stderr, "  In: lexical_table = %x\n", (int) lexical_table);
-  error("*** SWI unimplemented\n");
+
+    *unclaimed = TRUE;
+
   fprintf(stderr, "  Out: unclaimed = %x\n", (int) *unclaimed);
+
   return 0;
 }
 
@@ -177,19 +179,24 @@ os_error *xbasictrans_help (char const *help_text,
  * Other notes:   Emulation of SWI 0x42C81.
  */
 
-os_error *xbasictrans_error (int error_no,
-      os_error *error_buffer)
+os_error *xbasictrans_error(int error_no, char *error_buffer)
 {
+    static os_error standin = {
+        0, "FIXME: what does the real thing do?"
+    };
+
   fprintf(stderr, "basictrans_error\n");
   fprintf(stderr, "  In: error_no = %x\n", (int) error_no);
   fprintf(stderr, "  In: error_buffer = %x\n", (int) error_buffer);
 
-  /* FIXME --- we should probably get these from a messages file */
-  if (error_no >= BASICTRANS_ERRORS)
-    return 1;
+    /* FIXME: we should probably get these from a messages file. */
+    if (error_no < 0 || error_no >= DIM(basictrans_errors)) {
+        return &standin;
+    }
 
-  strcpy(error_buffer, basictrans_errors[error_no]);
-  return 0;
+    strcpy(error_buffer, basictrans_errors[error_no]);
+
+    return NULL;
 }
 
 /* ------------------------------------------------------------------------
@@ -210,15 +217,15 @@ os_error *xbasictrans_message (int message_no,
       int arg1,
       int arg2)
 {
+    static os_error unknown = {
+        0x1e6, "Unknown BASICTrans operation"
+    };
+
   fprintf(stderr, "basictrans_message\n");
   fprintf(stderr, "  In: message_no = %x\n", (int) message_no);
   fprintf(stderr, "  In: arg0 = %x\n", (int) arg0);
   fprintf(stderr, "  In: arg1 = %x\n", (int) arg1);
   fprintf(stderr, "  In: arg2 = %x\n", (int) arg2);
 
-  /* FIXME --- not complete; just returning an error to stimulate
-  ** BASIC into doing it itself.
-  */
-  return 1;
+    return &unknown;
 }
-

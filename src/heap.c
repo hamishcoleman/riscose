@@ -188,7 +188,8 @@ heap_block_free(heap_t* h, BYTE *d)
 
   check_integrity(h);  
 #ifdef CONFIG_TRACE_HEAP
-  printf("freeing a block at %p (off %d), magic = %08x, size %d\n", d, (BYTE*)d-(BYTE*)h, block->magic, h->size);
+  printf("freeing a block at %p (off %d), magic = %08lx, size %ld\n", d,
+    (BYTE*)d - (BYTE*)h, block->magic, h->size);
 #endif
 
   // assert(((BYTE*)d - (BYTE*)h)  < (sizeof(heap_t)+h->size));

@@ -137,11 +137,9 @@ void swi_trap(WORD num)
       error("Unregistered SWI %s called at %08x\n", buf, (unsigned) ARM_R15);
     }
       
-    /* e = r ? r->handler(num) : ERR_EM_UNHANDLEDSWI; */
+    DEBUG(SWI, ("swi %s\n", r->name));
     e = r->handler(num);
 
-    /* Handle errors */
-    DEBUG(SWI, ("swi %s\n", r->name));
     arm_clear_v();
     if (e) {
         if (SWI_X(num)) {

@@ -46,12 +46,12 @@ struct _heap_t {
   BYTE*   addr;    /**< Address that this heap_t was last at */
   ULONG   size;    /**< Size of data[] area */
   BYTE*   limit;   /**< Highest address we can expand to */
-  heap_t* next     /**< Next block in heap, or NULL */
+  heap_t* next;    /**< Next block in heap, or NULL */
   BYTE    data[0]; /**< Data pointer */
 };
 
 /* Rounds size up to nearest multiple of four */
-#define ALIGN(size) ((size + ((size&3) ? 4-((size)&3) : 0)))
+#define ALIGN(size) (((size) + (((size)&3) ? 4-((size)&3) : 0)))
 
 /* Rounds size up to nearest multiple of four and adds on space for header */
 #define TOTAL(size) ALIGN((size) + sizeof(heap_t))
@@ -60,28 +60,29 @@ struct _heap_t {
 #define GAP_ADDR(h) ((h)->data + ALIGN((h)->size))
 
 /* Returns size of `gap' area in block `h' */
-#define GAP_SIZE(h) ((((h)->next ? (h)->next : (h)->limit)) - GAP_ADDR((h)))
+#define GAP_SIZE(h) ((((h)->next ? (BYTE*)(h)->next : (BYTE*)(h)->limit)) - GAP_ADDR((h)))
 
 /* Returns heap_t* associated with a data block passed by user */
 #define BLOCKFROMPOINTER(p) ((heap_t*)((p)-sizeof(heap_t)))
 
 /* Checks that `addr' pointers in h are still valid and adjusts if not */
-#define RESHUFFLE(h) if (h->addr != h) do_reshuffle(h)
+#define RESHUFFLE(h) if ((h)->addr != ((BYTE*)(h))) do_reshuffle((h))
 
 static void
 do_reshuffle(heap_t* h)
 {
+  BYTE *actualaddr = ((BYTE*)h);
   /* Inefficient but simple implementation of a very uncommon operation */
   
   if (h->next) {
     do_reshuffle(h->next);
-    if (h < h->addr)
-      ((BYTE*)h->next) -= (h->addr - h);
+    if (actualaddr < h->addr)
+      ((BYTE*)h->next) -= (h->addr - actualaddr);
     else
-      ((BYTE*)h->next) += (h - h->addr);
+      ((BYTE*)h->next) += (actualaddr - h->addr);
   }
   
-  h->addr = (BYTE*) h;
+  h->addr = actualaddr;
 }
 
 static void
@@ -97,7 +98,7 @@ heap_init(heap_t* h, ULONG size)
   
   h->magic = MAGIC_BLOCK_VALUE;
   h->size  = 0;
-  h->addr  = h;
+  h->addr  = (BYTE*) h;
   h->limit = ((BYTE*)h)+size;
   h->next  = NULL;
 
@@ -131,11 +132,11 @@ fill_gap(heap_t* h, ULONG size)
 {
   heap_t *allocated = (heap_t*) h->data + ALIGN(h->size);
   
-  assert(GAP_SIZE(h) <= TOTAL(size));
-  assert(h->magic == MAGIC_BLOCK_VALUE;
+  assert(GAP_SIZE(h) >= TOTAL(size));
+  assert(h->magic == MAGIC_BLOCK_VALUE);
   allocated->magic = MAGIC_BLOCK_VALUE;
   allocated->size  = size;
-  allocated->addr  = allocated;
+  allocated->addr  = (BYTE*) allocated;
   allocated->limit = h->limit;
   allocated->next  = h;
   h->next = allocated;
@@ -148,7 +149,7 @@ coalesce_empty(heap_t* h)
 {
   heap_t *nonempty = h->next;
 
-  if (!nonempty)
+  if (!nonempty || nonempty->size)
     return;
 
   while (nonempty->next && !nonempty->size)
@@ -167,8 +168,8 @@ compact_blocks(heap_t* h)
     /* Shuffle following block up to end of this block */
     
     memmove(GAP_ADDR(h), h->next, TOTAL(h->next->size));
-    h->next = GAP_ADDR(h);
-    h->next->addr = h->next;
+    h->next       = (heap_t*) GAP_ADDR(h);
+    h->next->addr = (BYTE*) h->next;
     h = h->next;
   }
   return h;
@@ -182,37 +183,42 @@ heap_block_alloc(heap_t* h, ULONG size)
   
   RESHUFFLE(h);
   
-  for (cur = h; cur && GAP_SIZE(cur) < TOTAL_SIZE(size); cur = cur->next) {
-    assert(h->magic == MAGIC_BLOCK_NUMBER);
+  for (cur = h; cur && GAP_SIZE(cur) < TOTAL(size); cur = cur->next) {
+    assert(h->magic == MAGIC_BLOCK_VALUE);
+#ifdef CONFIG_TRACE_HEAP
+    fprintf(stderr, "block @ %p addr %p size %d limit %p next %p\n", cur, cur->addr, cur->size, cur->limit, cur->next);
+#endif
+    coalesce_empty(cur);
     total_space += GAP_SIZE(cur);
   }
   
   if (cur)
     return fill_gap(h, size);
   
-  if (!cur && total_space < TOTAL_SIZE(size))
+  return NULL;
+  
+  /* Uh, Matthew, compacting the heap is nice but stupid :-) */
+  
+  /*if (!cur && total_space < TOTAL(size))
     return NULL;
   
-  return fill_gap(compact_blocks(h), size);
+  return fill_gap(compact_blocks(h), size);*/
 }
 
 void
 heap_block_free(heap_t* h, BYTE *data)
 {
-  heap_t* block = BLOCKFROMPTR(data);
+  heap_t* block = BLOCKFROMPOINTER(data);
 
-  /* No need to reshuffle, let's just keep it quick */
-  
   assert(block->magic == MAGIC_BLOCK_VALUE);
   
   h->size = 0;
-  coalesce_empty(h);
 }
 
 BYTE*
 heap_block_resize(heap_t* h, BYTE *data, ULONG size)
 {
-  heap_t* block = BLOCKFROMPTR(data);
+  heap_t *newblock, *block = BLOCKFROMPOINTER(data);
   ULONG diff = (size - h->size); /* invalid but not used if (h->size > size) */
 
   RESHUFFLE(h);
@@ -231,8 +237,15 @@ heap_block_resize(heap_t* h, BYTE *data, ULONG size)
   if (!h)
     return NULL;
   
-  memcpy(GAP_ADDR(h), block, TOTAL(size));
-  /* FIXME: finish */
+  newblock = (heap_t*) GAP_ADDR(h);
+  memcpy(newblock, block, TOTAL(block->size));
+  newblock->addr = (BYTE*) newblock;
+  newblock->next = h->next;
+  h->next        = newblock;
+  newblock->size = size;
+  block->size    = 0;
+  
+  return newblock->data;
 }
 
 ULONG
@@ -250,10 +263,11 @@ heap_resize(heap_t* h, ULONG size)
     h->limit = newlimit;
     h = h->next;
   }
+  return 0;
 }
 
 ULONG
 heap_block_size(heap_t* h, BYTE *data)
 {
-  return BLOCKFROMPTR(data)->size;
+  return BLOCKFROMPOINTER(data)->size;
 }

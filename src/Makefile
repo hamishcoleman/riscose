@@ -50,6 +50,7 @@ $(ARM_SELECT)/lib$(ARM_SELECT).a: $(ARM_SELECT)/*.c $(ARM_SELECT)/*.h
 subs:
 	$(MAKE) -C kernel
 	$(MAKE) -C modules
+	cd monty && $(MAKE)
 	$(MAKE) -C rom
 
 $(BIN):	$(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a modules/libmodules.a
@@ -72,6 +73,7 @@ clean::
 clean::
 	find . -name '*.[ao]' -o -name '*~' | xargs rm -f
 	$(MAKE) -C rom $@
+	cd monty && $(MAKE) $@
 
 # So you can run RISC OS binaries as if they're native
 

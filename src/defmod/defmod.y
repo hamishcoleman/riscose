@@ -951,7 +951,6 @@ int main (int argc, char *argv [])
    int i;
    enum {None, Riscose_OSAPI, Riscose_Template, Riscose_Header} option = None;
    enum {APCS26, APCS32} mode = DEFAULT_TO_APCS_32 ? APCS32 : APCS26;
-   char *output = NULL;
 
     lookup_new(&needses, 16);
     lookup_new(&needsatends, 16);
@@ -974,8 +973,6 @@ int main (int argc, char *argv [])
          Verbose = TRUE;
       else if (strcmp (argv [i], "-q") == 0)
          Quiet = TRUE;
-      else if (strcmp (argv [i], "-o") == 0)
-         output = argv [++i];
       else if (strcmp (argv [i], "-help") == 0)
       {  fputs("DefMod " VERSION_INFO
                ". Copyright © Jonathan Coxhead, 1994.\n"
@@ -983,15 +980,11 @@ int main (int argc, char *argv [])
                "This is free software, and you are welcome to redistribute it "
                "under certain conditions. See the file Copying for details.\n"
                "Usage: DefMod <type> [-v] [-help] "
-                     "[-o <output-dir> | > <output-file>] "
                      "[-26bit | -32bit] "
                      "< <module-interface-file>\n"
                "Purpose: generate output from a module interface file\n"
                "-v\t\t"             "verbose\n"
                "-q\t\t"             "quiet\n"
-               "-o\t\t"             "is required when generating a "
-                                    "directory\n"
-               "<output-dir>\t"     "directory to create\n"
                "-26bit\t\t"         "generate 26 bit code" HELP_STRING_26 "\n"
                "-32bit\t\t"         "generate 32 bit code" HELP_STRING_32 "\n"
 

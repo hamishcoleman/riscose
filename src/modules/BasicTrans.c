@@ -16,7 +16,6 @@ swih_basictrans(WORD num)
   return 0;
 }
 
-char *basictrans_names[] = { "HELP", "Error", "Message" };
+const char *basictrans_names[] = { "HELP", "Error", "Message" };
 
 DECLARE_SWI_CHUNK(00042c80, "BASICTrans", basictrans_names, swih_basictrans);
-

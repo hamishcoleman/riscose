@@ -40,6 +40,7 @@ TV    20000503    |bool| replaced by |osbool|
 #include <sys/stat.h>
 
 #include "monty/monty.h"
+#include "monty/mem.h"
 #include "monty/file.h"
 
    /*From OSLib*/
@@ -83,10 +84,6 @@ TV    20000503    |bool| replaced by |osbool|
 
 #define VERSION_INFO Module_FullVersion " [" Module_Date "]"
 
-extern lookup_t main_byte_wide;
-
-extern int Quiet;
-
 /* Set this to 1 to make APCS 3/32 the default */
 #define DEFAULT_TO_APCS_32 0
 #if DEFAULT_TO_APCS_32
@@ -97,8 +94,7 @@ extern int Quiet;
 #  define HELP_STRING_32 ""
 #endif
 
-   static char *strstrc (char *, char *, char);
-   static char *strcatw (char *, char *, char *);
+int yydebug;
 
    static lookup_t needses, needsatends, consts, types, swis;
    static char Title [256],
@@ -117,11 +113,8 @@ extern int Quiet;
 
    static int yyparse(void);    /* TV 990128 */
 
-   extern int yydebug;
 
    static int Line_No = 1;
-
-   static void *qalloc (size_t);
 
    static struct def_s Union (struct def_s, struct def_s), Empty;
 
@@ -208,13 +201,13 @@ const_decl: CONST const_defn_LIST;
 const_defn:
    ID EQUALS type COLON const DESCRIPTION_OPTION
    {
-      def_c c = qalloc (sizeof *c);
-      def_t t = qalloc (def_sizeof_TYPE ($3.tag));
+      def_c c = emalloc(sizeof *c);
+      def_t t = emalloc(def_sizeof_TYPE ($3.tag));
 
       memcpy (t, &$3, def_sizeof_TYPE ($3.tag));
       c->type  = t;
       c->value = $5;
-      c->description = *$6 ? NULL: qstrdup ($6);
+      c->description = *$6 ? NULL: estrdup($6);
 
       lookup_insert(consts, $1, c);
    };
@@ -246,21 +239,21 @@ type_decl: TYPE type_defn_LIST;
 type_defn:
    ID DESCRIPTION_OPTION
    {
-      def_t t = qalloc (def_sizeof_TYPE (def_TYPE_ABSTRACT));
+      def_t t = emalloc(def_sizeof_TYPE (def_TYPE_ABSTRACT));
 
       t->tag = def_TYPE_ABSTRACT;
       t->name = NULL;
       t->value = def_VALUE_REGISTER;
-      t->description = *$2 ? NULL: qstrdup ($2);
+      t->description = *$2 ? NULL: estrdup($2);
 
       lookup_insert(types, $1, t);
    } |
    ID EQUALS type DESCRIPTION_OPTION
    {
-      def_t t = qalloc (def_sizeof_TYPE ($3.tag));
+      def_t t = emalloc(def_sizeof_TYPE ($3.tag));
 
       memcpy (t, &$3, def_sizeof_TYPE ($3.tag));
-      t->description = *$4 ? NULL: qstrdup ($4);
+      t->description = *$4 ? NULL: estrdup($4);
 
       lookup_insert(types, $1, t);
    };
@@ -312,7 +305,7 @@ type:
    {$$.tag = def_TYPE_BOOL;  $$.name = NULL;
          $$.value = def_VALUE_REGISTER; $$.description = NULL;} |
    REF type
-   {  def_t t = qalloc (def_sizeof_TYPE ($2.tag));
+   {  def_t t = emalloc(def_sizeof_TYPE ($2.tag));
 
       memcpy (t, &$2, def_sizeof_TYPE ($2.tag));
       $$.tag = def_TYPE_REF;
@@ -339,7 +332,7 @@ type:
          $$.value = def_VALUE_FIXED;
       $$.description = NULL;
       if ($2.tag != def_TYPE_VOID)
-      {  $$.data AS list.base = qalloc (def_sizeof_TYPE ($2.tag));
+      {  $$.data AS list.base = emalloc(def_sizeof_TYPE ($2.tag));
          memcpy ($$.data AS list.base, &$2, def_sizeof_TYPE ($2.tag));
       }
       else
@@ -352,7 +345,7 @@ type:
       $$.description = NULL;
    } |
    SUB const BUS type
-   {  def_t t = qalloc (def_sizeof_TYPE ($4.tag));
+   {  def_t t = emalloc(def_sizeof_TYPE ($4.tag));
 
       if ($4.value == def_VALUE_VARIABLE)
       {  yyerror ("type cannot occur in an array");
@@ -395,14 +388,14 @@ toid: type | VOID {$$.tag = def_TYPE_VOID; $$.name = NULL;
 
 typed_var: type COLON ID DESCRIPTION_OPTION
    {  $$ = $1;
-      $$.name = qstrdup ($3);
-      $$.description = *$4 ? NULL: qstrdup ($4);
+      $$.name = estrdup($3);
+      $$.description = *$4 ? NULL: estrdup($4);
    };
 
 toided_var: toid COLON ID DESCRIPTION_OPTION
    {  $$ = $1;
-      $$.name = qstrdup ($3);
-      $$.description = *$4 ? NULL: qstrdup ($4);
+      $$.name = estrdup($3);
+      $$.description = *$4 ? NULL: estrdup($4);
    };
 
 swi_decl: SWI swi_defn_LIST;
@@ -410,7 +403,7 @@ swi_decl: SWI swi_defn_LIST;
 swi_defn:
    ID EQUALS swi
    {
-      def_s s = qalloc (sizeof *s);
+      def_s s = emalloc(sizeof *s);
 
       *s = $3;
 
@@ -440,14 +433,14 @@ entry_condition:
          }
          $$ = Empty;
          $$.i |= 1 << $1;
-         $$.inputs [$1] = qalloc (def_sizeof_TYPE ($3.tag));
+         $$.inputs [$1] = emalloc(def_sizeof_TYPE ($3.tag));
          memcpy ($$.inputs [$1], &$3, def_sizeof_TYPE ($3.tag));
       } |
    REG REFERENCES typed_var
       {  $$ = Empty;
          $$.i |= 1 << $1;
          $$.ri |= 1 << $1;
-         $$.inputs [$1] = qalloc (def_sizeof_TYPE ($3.tag));
+         $$.inputs [$1] = emalloc(def_sizeof_TYPE ($3.tag));
          memcpy ($$.inputs [$1], &$3, def_sizeof_TYPE ($3.tag));
       } |
 /*   REG CONSTANT NUM description_OPTION  */    /* TV 990418 */
@@ -466,7 +459,7 @@ entry_condition:
          }
          $$ = Empty;
          $$.i |= 1 << $1;
-         $$.inputs [$1] = qalloc (def_sizeof_TYPE ($3.tag));
+         $$.inputs [$1] = emalloc(def_sizeof_TYPE ($3.tag));
          memcpy ($$.inputs [$1], &$3, def_sizeof_TYPE ($3.tag));
          $$.op [$1] = def_OP_DISJOINS;
       } |
@@ -481,7 +474,7 @@ entry_condition:
          }
          $$ = Empty;
          $$.i |= 1 << $1;
-         $$.inputs [$1] = qalloc (def_sizeof_TYPE ($3.tag));
+         $$.inputs [$1] = emalloc(def_sizeof_TYPE ($3.tag));
          memcpy ($$.inputs [$1], &$3, def_sizeof_TYPE ($3.tag));
          $$.op [$1] = def_OP_ADDS;
       } |
@@ -492,7 +485,7 @@ entry_condition:
          }
          $$ = Empty;
          $$.i |= 1 << $1;
-         $$.inputs [$1] = qalloc (def_sizeof_TYPE ($3.tag));
+         $$.inputs [$1] = emalloc(def_sizeof_TYPE ($3.tag));
          memcpy ($$.inputs [$1], &$3, def_sizeof_TYPE ($3.tag));
          $$.op [$1] = def_OP_EXCLUSIVELY_DISJOINS;
       } |
@@ -510,7 +503,7 @@ exit_condition:
          $$ = Empty;
          if ($2) $$.value = 1 << $1;
          $$.o |= 1 << $1;
-         $$.outputs [$1] = qalloc (def_sizeof_TYPE ($4.tag));
+         $$.outputs [$1] = emalloc(def_sizeof_TYPE ($4.tag));
          memcpy ($$.outputs [$1], &$4, def_sizeof_TYPE ($4.tag));
       } |
    REG pling_OPTION REFERENCES typed_var
@@ -518,7 +511,7 @@ exit_condition:
          if ($2) $$.value = 1 << $1;
          $$.o |= 1 << $1;
          $$.ro |= 1 << $1;
-         $$.outputs [$1] = qalloc (def_sizeof_TYPE ($4.tag));
+         $$.outputs [$1] = emalloc(def_sizeof_TYPE ($4.tag));
          memcpy ($$.outputs [$1], &$4, def_sizeof_TYPE ($4.tag));
       } |
    REG CORRUPTED /*a corrupted register can't be returned*/
@@ -535,7 +528,7 @@ description:
    DESCRIPTION
       {  tracef ("DESCRIPTION \"%s\"\n" _ $1);
          $$ = Empty;
-         $$.description = *$1 ? NULL: qstrdup ($1);
+         $$.description = *$1 ? NULL: estrdup($1);
          $$.starred_swi = TRUE;
       } |
    STAR
@@ -614,7 +607,7 @@ NUM: num ws;
 REG: r digit ws {$$ = $2 - '0';};
 
 DESCRIPTION: '"' wordchar_SEQUENCE word_SEQUENCE_OPTION '"' ws
-      {strcatw ($$, $2, $3);};
+      {sprintf($$, "%s %s", $2, $3);};
 word: space_SEQUENCE wordchar_SEQUENCE {strcpy ($$, $2);};
 wordchar: simplechar | '\\' {$$ = '\\';}| '\'' {$$ = '\'';};
 
@@ -846,12 +839,12 @@ digit_SEQUENCE: digit {$$ = $1 - '0';} |
 hexit_SEQUENCE: hexit {$$ = XDIGIT ($1);} |
       hexit_SEQUENCE hexit {$$ = 16*$1 + XDIGIT ($2);};
 id_cont_SEQUENCE: id_cont {$$ [0] = $1; $$ [1] = '\0';} |
-      id_cont_SEQUENCE id_cont {strstrc ($$, $1, $2);};
+      id_cont_SEQUENCE id_cont {sprintf($$, "%s%c", $1, $2);};
 space_SEQUENCE: space {} | space space_SEQUENCE {};
 word_SEQUENCE: word {strcpy ($$, $1);} |
-      word word_SEQUENCE {strcatw ($$, $1, $2);};
+      word word_SEQUENCE {sprintf($$, "%s %s", $1, $2);};
 wordchar_SEQUENCE: wordchar {$$ [0] = $1; $$ [1] = '\0';} |
-      wordchar_SEQUENCE wordchar {strstrc ($$, $1, $2);};
+      wordchar_SEQUENCE wordchar {sprintf($$, "%s%c", $1, $2);};
 ws_item_SEQUENCE: ws_item {} | ws_item_SEQUENCE ws_item {};
 
 /*list*/
@@ -865,7 +858,7 @@ needs_LIST: needs {} | needs_LIST COMMA needs;
 needsatend_LIST: needsatend {} | needsatend_LIST COMMA needsatend;
 typed_var_LIST:
    typed_var
-      {  def_t t = qalloc (def_sizeof_TYPE ($1.tag));
+      {  def_t t = emalloc(def_sizeof_TYPE ($1.tag));
 
          memcpy (t, &$1, def_sizeof_TYPE ($1.tag));
          $$.tag = def_TYPE_LIST;
@@ -876,7 +869,7 @@ typed_var_LIST:
          $$.data AS list.count = 1;
       } |
    typed_var_LIST COMMA typed_var
-      {  def_t t = qalloc (def_sizeof_TYPE ($3.tag));
+      {  def_t t = emalloc(def_sizeof_TYPE ($3.tag));
 
          $$ = $1;
          memcpy (t, &$3, def_sizeof_TYPE ($3.tag));
@@ -887,7 +880,7 @@ typed_var_LIST:
       };
 toided_var_LIST:
    toided_var
-      {  def_t t = qalloc (def_sizeof_TYPE ($1.tag));
+      {  def_t t = emalloc(def_sizeof_TYPE ($1.tag));
 
          memcpy (t, &$1, def_sizeof_TYPE ($1.tag));
          $$.tag = def_TYPE_LIST;
@@ -898,7 +891,7 @@ toided_var_LIST:
          $$.data AS list.count = 1;
       } |
    toided_var_LIST COMMA toided_var
-      {  def_t t = qalloc (def_sizeof_TYPE ($3.tag));
+      {  def_t t = emalloc(def_sizeof_TYPE ($3.tag));
 
          $$ = $1;
          memcpy (t, &$3, def_sizeof_TYPE ($3.tag));
@@ -916,57 +909,6 @@ type_defn_LIST: type_defn {} |
 decl_SERIES: decl {} | decl_SERIES SEMICOLON decl {};
 /*------------------------------------------------------------------------*/
 %%
-/*More C code*/
-
-/* copy s1 into s, appending c */
-/* s = s1 + c; */
-char *strstrc (char *s, char *s1, char c)
-{  int len = strlen (s1);
-
-   strcpy (s, s1);
-   s [len] = c;
-   s [len + 1] = '\0';
-
-   return s;
-}
-
-
-/* copy s1 and s2 into s with a space separator */
-/* s = s1 + ' ' + s2; */
-char *strcatw (char *s, char *s1, char *s2)
-{  int len = strlen (s1);
-
-   strcpy (s, s1);
-   s [len] = ' ';
-   strcpy (&s [len + 1], s2);
-
-   return s;
-}
-
-
-/* perform a malloc with error checking */
-void *qalloc (size_t t)
-{  void *p;
-
-   if ((p = malloc (t)) == NULL)
-   {  yyerror ("not enough memory for |qalloc()|");
-      exit (1);
-   }
-
-   return p;
-}
-
-
-/* create a copy of string s on the heap
-**  return a pointer to the heap block
-*/
-char *qstrdup (const char *s)
-{  char *dup = qalloc (strlen (s) + 1);
-
-   strcpy (dup, s);
-   return dup;
-}
-
 
 struct def_s Union (struct def_s a, struct def_s b)
 {  struct def_s u;
@@ -1164,14 +1106,6 @@ finish:
    exit(!!Parse_Error);
 }
 
-
-/* lexical analyser
-**  read one char from stdin
-**  if EoF, then return 0
-**  else  if Verbose == true then if char is printable, copy it to stderr
-**                                else output c escape sequence to stderror
-**        return char
-*/
 int yylex(void)
 {
     int c;
@@ -1191,9 +1125,5 @@ int yylex(void)
 
 void yyerror(char *s)
 {
-    fprintf(stderr, "%s at line %d\n", s, Line_No);
-
-    exit(1);
+    error("%s at line %d\n", s, Line_No);
 }
-
-int yydebug = 0;

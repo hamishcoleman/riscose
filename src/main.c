@@ -19,6 +19,7 @@
 #include <assert.h>
 
 #include "riscostypes.h"
+#include "module.h"
 #include "swi.h"
 #include "arm.h"
 #include "mem.h"
@@ -69,7 +70,7 @@ main(int argc, char **argv)
     { "wimpslot", required_argument, NULL, 'w' }
   };
   
-  int c;
+  int module=0, c;
   char *file;
   mem_private *priv;
   WORD  count = 0, o;
@@ -84,6 +85,7 @@ main(int argc, char **argv)
        case 'h' : help();
        case 'v' : version();
        case 'w' : wimpslot = atoi(optarg); break;
+       case 'm' : module = 1;
        }
     }
   
@@ -93,32 +95,38 @@ main(int argc, char **argv)
     error("No RISC OS filename supplied");
   
   mem_init();
+  module_init();
   swi_init();
   arm_init();
   
-  mem_task_switch(mem_task_new(wimpslot, file, NULL));
+  mem_task_switch(mem_task_new(wimpslot, module ? NULL : file, NULL));
+  if (module)
+    module = module_load(file);
 
-    /* Set up unprocessed + processed command line storage thingies */
+  /* Set up unprocessed + processed command line storage thingies */
     
-    o = optind;
+  o = optind;
     
-    priv = (mem_private*) mem_get_private();
-    priv->argc = argc-o+1;
+  priv = (mem_private*) mem_get_private();
+  priv->argc = argc-o+1;
     
-    sprintf(priv->cli, "%s ", file);
-    strcpy(priv->cli_split, file);
-    priv->argv[count++] = MMAP_USRSTACK_BASE+268;
-    while (o != argc)
-      {
-       priv->argv[count++] = MMAP_USRSTACK_BASE+268+strlen(priv->cli);
-       strcpy(priv->cli_split + strlen(priv->cli), argv[o]);
-       strcat(priv->cli, argv[o]);
-       strcat(priv->cli, " ");
-       o++;
-      }
-    priv->cli[strlen(priv->cli)-1] = 0;
+  sprintf(priv->cli, "%s ", file);
+  strcpy(priv->cli_split, file);
+  priv->argv[count++] = MMAP_USRSTACK_BASE+268;
+  while (o != argc)
+    {
+     priv->argv[count++] = MMAP_USRSTACK_BASE+268+strlen(priv->cli);
+     strcpy(priv->cli_split + strlen(priv->cli), argv[o]);
+     strcat(priv->cli, argv[o]);
+     strcat(priv->cli, " ");
+     o++;
+    }
+  priv->cli[strlen(priv->cli)-1] = 0;
   
-  arm_run_routine(0x8000);
+  if (!module)
+    arm_run_routine(0x8000);
+  else
+    arm_run_routine(module);
    
   return 0;
 }

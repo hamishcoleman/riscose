@@ -5,8 +5,8 @@
 ** See http://riscose.sourceforge.net/ for terms of distribution, and to
 ** pick up a later version of the software.
 **
-**   The ARM emulation as riscose would like to see it; this is currently
-**   just a thin layer around the ARMulator.
+**   The ARM emulation as riscose would like to see it; this one assumes
+**   that you're linking to the ARMulator.
 **
 **   $Revision$
 **   $Date$

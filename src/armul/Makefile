@@ -2,5 +2,8 @@
 
 OBJS = armemu.o armsupp.o arminit.o instr.o arm.o
 
-armul_lib.o: $(OBJS)
-	ld -shared -o $@ $(OBJS)
+all:	libarmul.a
+
+libarmul.a:	$(OBJS)
+	ar cr $@ $(OBJS)
+	ranlib $@

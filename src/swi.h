@@ -51,6 +51,7 @@
 typedef WORD (*swi_handler)(WORD);
 
 void osfile(void);
+void osbyte(void);
 
 void swi_init(void);
 void swi_trap(WORD num);

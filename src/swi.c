@@ -44,10 +44,10 @@ swi_number_to_name(WORD num, char *buf)
       if (c->names && c->names[nr])
 	sprintf(buf, "%s_%s", c->prefix, c->names[nr]);
       else
-	sprintf(buf, "%s_&%x", c->prefix, num);
+	sprintf(buf, "%s_&%x", c->prefix, (unsigned)num);
     }
   else
-    sprintf(buf, "&%x", num);
+    sprintf(buf, "&%x", (unsigned)num);
 }
 
 void
@@ -91,7 +91,7 @@ swi_trap(WORD num)
        {
 	char buf[64];
 	swi_number_to_name(SWI_NUM(num), buf);
-        printf("Untrapped SWI %s at %08x\n", buf, ARM_R15);
+        printf("Untrapped SWI %s at %08x\n", buf, (unsigned)ARM_R15);
         exit(1);
        }
     }

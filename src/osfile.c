@@ -19,6 +19,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <stdio.h>
 
 #define OBJECT_NOTFOUND	0
 #define OBJECT_FILE	1
@@ -68,7 +69,7 @@ void osfile(void)
       read(file, MEM_TOHOST(ARM_R2), file_size(MEM_TOHOST(ARM_R1)) );
       ARM_SET_R4(file_size(MEM_TOHOST(ARM_R1)));
       ARM_SET_R0(file_objecttype(MEM_TOHOST(ARM_R1)));
-      printf("loaded object size %d\n", ARM_R4);
+      printf("loaded object size %d\n", (unsigned)ARM_R4);
       /* FIXME: access bits */
       close(file);
       return;
@@ -80,7 +81,7 @@ void osfile(void)
       ARM_SET_R0(file_objecttype(MEM_TOHOST(ARM_R1)));
       if (ARM_R0 != OBJECT_NOTFOUND)
         ARM_SET_R4(file_size(MEM_TOHOST(ARM_R1)));
-      printf("info object size %d\n", ARM_R4);
+      printf("info object size %d\n", (unsigned)ARM_R4);
       return;
       
     default:

@@ -67,7 +67,7 @@ swih_os(WORD num)
       return 0;
     
     case 0x7:
-      fprintf(stderr, "[OS_Word %d]", ARM_R0);
+      fprintf(stderr, "[OS_Word %ld]", ARM_R0);
       return 0;
 
     case 0x8: /* OS_File */

@@ -106,7 +106,7 @@ map_it(char *desc, WORD base, WORD size)
            0, 0) != MAP_FAILED)
     return;
     
-  printf("map_it: %s failed @ %08x, %d bytes\n", desc, base, size);
+  printf("map_it: %s failed @ %08x, %ld bytes\n", desc, (unsigned)base, size);
   exit(1);
 }
 #endif
@@ -116,10 +116,12 @@ mem_init(void)
 {
   mem = xmalloc(sizeof(mem_state));
   mem->tasks    = xmalloc(MAX_TASKS * sizeof(mem_wimp_task));
-  mem->task_current = 0;
+  mem->task_current = -1;
   
 #ifdef CONFIG_MEM_ONE2ONE
+#ifndef NATIVE
   map_it("application", MMAP_APP_BASE, 1<<20);
+#endif
   map_it("usr stack", MMAP_USRSTACK_BASE, MMAP_USRSTACK_SIZE);
   map_it("rma", MMAP_RMA_BASE, 1<<20); /* FIXME: arbitrary numbers :-) */
   map_it("rom", MMAP_ROM_BASE, MMAP_ROM_SIZE);
@@ -150,7 +152,7 @@ void*
 mem_get_private(void)
 {
 #ifdef CONFIG_MEM_ONE2ONE
-  return MMAP_USRSTACK_BASE;
+  return (void*) MMAP_USRSTACK_BASE;
 #else
   return(mem->tasks[mem->task_current].stack);
 #endif
@@ -160,9 +162,44 @@ WORD inline
 mem_task_which()
   { return mem->task_current; }
 
+#ifdef NATIVE
+
+#define MREMAP_MAYMOVE 1
+#define MREMAP_FIXED 2
+
+extern int mremap2(void *, size_t, size_t, int, void *);
+
+void
+mem_task_switch(WORD n)
+{
+  if (mem->task_current != -1)
+    {
+      if (mremap2((void *)MMAP_APP_BASE, mem->tasks[mem->task_current].wimpslot,
+		  mem->tasks[mem->task_current].wimpslot, 
+		  MREMAP_FIXED | MREMAP_MAYMOVE,
+		  mem->tasks[mem->task_current].app) < 0)
+	{
+	  perror("mremap");
+	  exit(1);
+	}
+    }
+  if (n != -1)
+    {
+      if (mremap2(mem->tasks[n].app, mem->tasks[n].wimpslot,
+		  mem->tasks[n].wimpslot, MREMAP_FIXED | MREMAP_MAYMOVE,
+		  MMAP_APP_BASE) < 0)
+	{
+	  perror("mremap");
+	  exit(1);
+	}
+    }
+  mem->task_current = n;
+}
+#else
 void inline
 mem_task_switch(WORD n)
   { mem->task_current = n; }
+#endif
 
 WORD
 mem_task_new(WORD wimpslot, char *image_filename, void *info)
@@ -176,7 +213,12 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
        mem->tasks[c].info     = info;
        mem->tasks[c].stack    = xmalloc(MMAP_USRSTACK_SIZE);
        mem->tasks[c].env      = xmalloc(256);
+#ifdef NATIVE
+       mem->tasks[c].app      = MMAP_SLOT_BASE + (c * 64 * MEG);
+       map_it("application", mem->tasks[c].app, wimpslot);
+#else
        mem->tasks[c].app      = xmalloc(wimpslot);
+#endif
        if (image_filename != NULL)
          {
           WORD t = mem_task_which();
@@ -270,6 +312,7 @@ mem_load_file_at(const char * file, WORD arm_addr)
 
 extern WORD arm_get_reg(WORD r);
 
+#ifndef CONFIG_MEM_ONE2ONE
 static
 void
 arm_backtrace(void)
@@ -294,3 +337,4 @@ arm_backtrace(void)
   
   backtrace_in_progress = 0;
 }
+#endif

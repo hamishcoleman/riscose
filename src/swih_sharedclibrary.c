@@ -174,7 +174,7 @@ swih_sharedclibrary_entry(WORD num)
       }
     
     case CLIB_CLIB_SIGNAL: /* 4-302 */
-      printf("signal %d = %d\n", ARM_R0, ARM_R1);
+      printf("signal %d = %d\n", (unsigned)ARM_R0, (unsigned)ARM_R1);
       return 0;
 
     case CLIB_CLIB_EXIT: /* 4-322 */ 
@@ -324,6 +324,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
     
     case CLIB_CLIB_FSEEK: /* 4-316 */
+      printf("seeking %d from %d\n", (unsigned)ARM_R1, (unsigned)ARM_R2);
       ARM_SET_R0(fseek(clib_file_real(ARM_R0), ARM_R1, ARM_R2));
       return 0;
     
@@ -333,7 +334,7 @@ swih_sharedclibrary_entry(WORD num)
     
     case CLIB_CLIB___FILBUF: /* very nasty! 4-318 */
       ARM_SET_R0(getc(clib_file_real(ARM_R0)));
-      printf("got character %02x\n", ARM_R0);
+      printf("got character %02x\n", (unsigned)ARM_R0);
       return 0;
 
     case CLIB_CLIB_MALLOC: /* 4-320 */

@@ -44,3 +44,4 @@ Because the ARM program counter (when in USR_26 mode, as RISC OS nearly always i
 #define MMAP_RMA_SIZE (11*MEG)
 #define MMAP_ROM_BASE (56*MEG)
 #define MMAP_ROM_SIZE (64*KB) /* actually 8MB, but hey... */
+#define MMAP_SLOT_BASE	(128*MEG)

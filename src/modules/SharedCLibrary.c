@@ -826,7 +826,7 @@ swih_sharedclibrary_entry(WORD num)
         else if (r == 15)
           ARM_SET_R0(ARM_R15_ALL);
         else
-          error("invalid return value specified in call to swi[x]");
+          error("swih_sharedclibrary_entry: bad return value: %d\n", r);
 
         /* Write the PC output if required */
         if (flags & (1 << 21))

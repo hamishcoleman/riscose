@@ -15,7 +15,7 @@ test `wc -l <tmp.2` -eq 1
 grep 'no risc os executable specified' tmp.2 >/dev/null
 
 # check version number is correct and that long arguments are working.
-for a in -v --version; do
+for a in -V --version; do
     set +e
     $r $a >tmp.1 2>tmp.2
     e=$?

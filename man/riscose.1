@@ -30,6 +30,8 @@
 [
 .B -h
 |
+.B -V
+|
 .B -v
 |
 .B -m
@@ -94,7 +96,8 @@ similar to
 usage: riscose [options] binary args...
 where options are:
     -h, --help        request this help text.
-    -v, --version     display version and exit.
+    -V, --version     display version and exit.
+    -v, --verbose     verbose.
     -D, --debug=n     turn on debug flags `n', where n is a combination of
             1 o -- pool memory routines.
             2 m -- memory routines.
@@ -107,9 +110,12 @@ where options are:
 binary is the risc os executable to run.  args are its arguments.
 .Ve
 .TP
-.B -v
+.B -V
 Display version on stderr and exit.  Please supply this with any bug
 report.
+.TP
+.B -v
+Be verbose.
 .TP
 .B -m
 .I binary

@@ -43,7 +43,8 @@ main(int argc, char **argv)
 {
     static struct option long_options[] = {
         "help", no_argument, NULL, 'h',
-        "version", no_argument, NULL, 'v',
+        "version", no_argument, NULL, 'V',
+        "verbose", no_argument, NULL, 'v',
         "debug", required_argument, NULL, 'D',
         "module", no_argument, NULL, 'm',
         "utility", no_argument, NULL, 'u',
@@ -64,7 +65,7 @@ main(int argc, char **argv)
 
     wimpslot = 640*1024;
 
-    while ((c = getopt_long(argc, argv, "+hvD:muw:", long_options,
+    while ((c = getopt_long(argc, argv, "+hVvD:muw:", long_options,
         NULL)) != EOF) {
         switch (c) {
         case 'h':
@@ -72,7 +73,8 @@ main(int argc, char **argv)
 "usage: %s [options] binary args...\n"
 "where options are:\n"
 "    -h, --help        request this help text.\n"
-"    -v, --version     display version and exit.\n"
+"    -V, --version     display version and exit.\n"
+"    -v, --verbose     verbose.\n"
 "    -D, --debug=n     turn on debug flags `n', where n is a combination of\n"
 MONTY_DEBUG_HELP
 RISCOSE_DEBUG_HELP
@@ -82,9 +84,12 @@ RISCOSE_DEBUG_HELP
 "binary is the risc os executable to run.  args are its arguments.\n",
                 progname);
             return 0;
-        case 'v':
+        case 'V':
             printf("%s: " PACKAGE " version " VERSION "\n", progname);
             return 0;
+        case 'v':
+            montyopt.verbose = 1;
+            break;
         case 'D':
             if (string_to_int(optarg, &val)) {
                 montyopt.debug |= val;

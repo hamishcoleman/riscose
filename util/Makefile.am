@@ -1,1 +1,1 @@
-noinst_SCRIPTS = install-sh missing mkinstalldirs
+noinst_SCRIPTS = depcomp install-sh missing mkinstalldirs

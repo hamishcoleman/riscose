@@ -1,7 +1,7 @@
-noinst_SCRIPTS = compilerom.pl
-EXTRA_DIST = compilerom.pl error.list
+noinst_SCRIPTS = compilerom
+EXTRA_DIST = error.list
 pkgdata_DATA = romimage
 noinst_DATA = rom.h
 
 romimage rom.h: error.list
-	$(srcdir)/compilerom.pl $?
+	./compilerom $?

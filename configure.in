@@ -3,8 +3,14 @@ AM_INIT_AUTOMAKE(riscose,0.01)
 AM_CONFIG_HEADER(config.h)
 AC_PROG_CC
 AC_PROG_RANLIB
+AC_PATH_PROG(PERL, perl)
+test -z "$PERL" && AC_MSG_ERROR([no acceptable $ac_word found in \$PATH])
+case "$ARM" in
+armul) ;;
+*) AC_MSG_ERROR([only ARM=armul handled at the moment])
+esac
 AC_SUBST(ARM)
-AC_OUTPUT( \
+AC_OUTPUT([ \
         Makefile \
         src/Makefile \
         src/armul/Makefile \
@@ -13,4 +19,7 @@ AC_OUTPUT( \
         src/modules/Makefile \
         src/monty/Makefile \
         src/rom/Makefile \
+        src/rom/compilerom \
+    ], \
+    [chmod +x src/rom/compilerom]
     )

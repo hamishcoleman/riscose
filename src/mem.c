@@ -51,13 +51,12 @@ typedef struct {
 mem_dynamicarea;
 
 typedef struct {
-  WORD            task_current;
-  mem_wimp_task  *tasks;
-  BYTE           *rma;
-  WORD            rma_size;
-  BYTE		 *rom;
-}
-mem_state;
+    WORD task_current;
+    mem_wimp_task *tasks;
+    BYTE *rma;
+    WORD rma_size;
+    BYTE *rom;
+} mem_state;
 
 /* +ve IDs indicate dynamic area numbers */
 #define MEM_ID_PRIVATE     -1
@@ -68,7 +67,7 @@ mem_state;
 #define MEM_ID_ROM         -6
 #define MEM_ID_NEWDYNAMICAREA -99
 
-static mem_state* mem = NULL;
+static mem_state *mem;
 
 static int backtrace_in_progress=0;
 static
@@ -200,35 +199,36 @@ remap_it(WORD base, WORD oldsize, WORD newsize)
 }
 #endif
 
-void
-mem_init(void)
+void mem_init(void)
 {
     char *image;
 
-  mem = emalloc(sizeof(mem_state));
-  mem->tasks    = emalloc(MAX_TASKS * sizeof(mem_wimp_task));
-  mem->task_current = -1;
+    NEW(mem);
+    mem->task_current = -1;
+    mem->tasks = ecalloc(MAX_TASKS * sizeof(*mem->tasks));
 
     /* FIXME: should look for it by installation prefix. */
     image = "rom/romimage";
 
 #ifdef CONFIG_MEM_ONE2ONE
 #ifndef NATIVE
-  map_it(MMAP_APP_BASE, 1<<20);
+    map_it(MMAP_APP_BASE, 1<<20);
 #endif
-  map_it(MMAP_USRSTACK_BASE, MMAP_USRSTACK_SIZE);
-  map_it(MMAP_RMA_BASE, RMA_START_SIZE);
-  map_it(MMAP_ROM_BASE, MMAP_ROM_SIZE);
-  mem->rma      = MEM_TOHOST(MMAP_RMA_BASE);
-  mem->rom      = MEM_TOHOST(MMAP_ROM_BASE);
+    map_it(MMAP_USRSTACK_BASE, MMAP_USRSTACK_SIZE);
+    map_it(MMAP_RMA_BASE, RMA_START_SIZE);
+    map_it(MMAP_ROM_BASE, MMAP_ROM_SIZE);
+    mem->rma      = MEM_TOHOST(MMAP_RMA_BASE);
+    mem->rom      = MEM_TOHOST(MMAP_ROM_BASE);
     load_rom(image, MEM_TOHOST(MMAP_ROM_BASE));
 #else
-  mem->rma      = emalloc(RMA_START_SIZE);
+    mem->rma      = emalloc(RMA_START_SIZE);
     mem->rom      = load_rom(image, 0);
 #endif
-  mem->rma_size = RMA_START_SIZE;
-  
-  heap_init((heap_t*) MEM_TOHOST(MMAP_RMA_BASE), RMA_START_SIZE);
+    mem->rma_size = RMA_START_SIZE;
+
+    heap_init((heap_t *)MEM_TOHOST(MMAP_RMA_BASE), RMA_START_SIZE);
+
+    return;
 }
 
 void

@@ -1212,28 +1212,21 @@ finish:
 **                                else output c escape sequence to stderror
 **        return char
 */
-int yylex (void)
-{  int c;
+int yylex(void)
+{
+    int c;
+    char s[1];
 
-   return
-     (c = getchar ()) == EOF?
-        0:
-        ( Verbose?
-          (  ' ' <= c && c <= '~'?
-            fputc (c, stderr):
-              c == '\n'?
-                ( fputc ('\n', stderr),
-                  fputc ('\r', stderr)
-                ):
-                ( fputc ('\\', stderr),
-                  fputc ('x', stderr),
-                  fputc (UCHAR (c/0x10), stderr),
-                  fputc (UCHAR (c%0x10), stderr)
-                )
-          ):
-          0,
-          c
-        );
+    if ((c = getchar()) == EOF) {
+        return 0;
+    }
+
+    if (Verbose) {
+        *s = c;
+        escape_mem(stderr, s, 1);
+    }
+
+    return c;
 }
 
 

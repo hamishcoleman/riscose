@@ -108,15 +108,6 @@
 #define NCOPY(s1, s2, n) (sprintf (s1, "%.*s", n, s2), s1)
 
 /* ------------------------------------------------------------------------
- * Macro:         UCHAR()
- *
- * Description:   The character corresponding to a hexadecimal digit,
- *                preferring upper case
- */
-
-#define UCHAR(i) ("0123456789ABCDEF" [i])
-
-/* ------------------------------------------------------------------------
  * Macro:         XDIGIT()
  *
  * Description:   The hexadecimal digit corresponding to a character

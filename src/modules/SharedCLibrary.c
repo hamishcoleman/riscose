@@ -116,6 +116,7 @@ void fill_statics(WORD addr) /* 4-252 */
       int msk;
       msk  = isspace(ch) ? 1 : 0;
       msk |= ispunct(ch) ? 2 : 0;
+      msk |= isblank(ch) ? 4 : 0; /* FIXME: compilation warning */
       msk |= islower(ch) ? 8 : 0;
       msk |= isupper(ch) ? 16 : 0;
       msk |= isdigit(ch) ? 32 : 0;

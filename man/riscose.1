@@ -116,6 +116,31 @@ report.
 .B -v
 Be verbose.
 .TP
+.BI -D " n"
+If debugging was enabled at compilation time set the debug flags
+specified by
+.I n
+on.  See the output of your
+.BR riscose 's
+.B -h
+option for their values.
+.IP
+Depending on the debug flags set various text will be written to stderr
+and the actions of the program may change slightly.
+For example, temporary files normally removed by
+.B riscose
+might be left behind.
+Some of the debug flags can cause
+.B large
+amounts of output;  it is generally better to select the ones you
+require instead of just turning them all on.
+.IP
+.I n
+is either a sequence of mnemonic letters or a decimal, octal, or
+hexadecimal integer depending on the prefix of none,
+`\f(CW0\fP', or
+`\f(CW0x\fP' respectively.
+.TP
 .B -m
 .I binary
 is a module.

@@ -31,7 +31,7 @@
 struct _heap_t {
   ULONG magic;
   ULONG size; /* size of data[] area for whole heap */
-  BYTE data[0];
+  BYTE data[0]; /* data area; offsets are from here */
 };
 
 typedef struct {
@@ -41,6 +41,15 @@ typedef struct {
   BYTE data[0];
 }
 heap_block_t;
+
+
+/*
+ *    Return the number of bytes between the end of the block at
+ *    offset `off1' and the offset `off2'.  Returns 0 if `off2'
+ *    comes before the end of the block at `off1'.
+ *
+ *    These offsets must be to the block header, not its data area.
+ */
 
 static inline
 ULONG space_between(heap_t *h, ULONG off1, ULONG off2)
@@ -61,7 +70,7 @@ void check_integrity(heap_t *h)
   while (off != h->size)
     {
 #ifdef CONFIG_TRACE_HEAP
-     printf("Heap dump: offset %ld size %ld next %ld gap %ld\n", off, BLOCK_AT(off)->size, BLOCK_AT(off)->next, space_between(h, off, BLOCK_AT(off)->size));
+     printf("Heap dump: at %p offset %ld size %ld next %ld gap %ld\n", BLOCK_AT(off), off, BLOCK_AT(off)->size, BLOCK_AT(off)->next, space_between(h, off, BLOCK_AT(off)->size));
 #endif
      assert(BLOCK_AT(off)->magic == MAGIC_BLOCK_VALUE);
      assert(BLOCK_AT(off)->next > off);
@@ -73,6 +82,13 @@ void check_integrity(heap_t *h)
   printf("Heap dump: --- Done\n");
 #endif
 }
+
+
+/*
+ *    Initialise a heap at h, with a given size in bytes.
+ *    size must be at least sizeof(heap_t) + sizeof(heap_block_t)
+ *      and will be word-aligned before use.
+ */
 
 void
 heap_init(heap_t* h, ULONG size)
@@ -136,6 +152,13 @@ heap_describe(heap_t* h, ULONG *largest_ptr)
   return _heap_describe(h, largest_ptr, 0);
 }
 
+
+/*
+ *    Allocate a block from a given heap.
+ *    size will be word-aligned before use.
+ *    Will return NULL if the requested amount could not be
+ *      allocated.
+ */
 
 BYTE*
 heap_block_alloc(heap_t* h, ULONG size)
@@ -230,7 +253,7 @@ heap_block_resize(heap_t* h, BYTE *block_ptr, ULONG size)
   assert(block->magic == MAGIC_BLOCK_VALUE);
   assert(h->magic == MAGIC_HEAP_VALUE);
   
-  if ( (space_between(h, block_ptr - h->data, block->next) + block->size) >=
+  if ( (space_between(h, ((BYTE*)block) - h->data, block->next) + block->size) >=
         size )
     {
      block->size = size;

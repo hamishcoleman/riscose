@@ -816,7 +816,7 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB_SCANF:
       arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 1, 0);
-      ARM_SET_R0(scanf(MEM_TOHOST(ARM_R0), arm_va_list));
+      ARM_SET_R0(vscanf(MEM_TOHOST(ARM_R0), arm_va_list));
       free(arm_va_list);
       return 0;
 

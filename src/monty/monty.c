@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "config.h"
 #define DEFINE_MONTY_GLOBALS
 #include "monty.h"
 #define DEFINE_ENUM_GLOBALS

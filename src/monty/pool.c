@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "config.h"
 #include "monty.h"
 #include "mem.h"
 #include "pool.h"

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "config.h"
 #include "monty.h"
 #include "mem.h"
 #include "hash.h"

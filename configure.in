@@ -12,6 +12,8 @@ test -z "$BINAWK" && AC_MSG_ERROR([no acceptable $AWK found in \$PATH])
 AC_PATH_PROG(PERL, perl)
 test -z "$PERL" && AC_MSG_ERROR([no acceptable $ac_word found in \$PATH])
 
+AC_DEFINE(CONF_DEBUGGING, 1, [enable -D command line debug option.])
+
 ARM=armul
 AC_ARG_ENABLE(arm,
 [  --enable-arm=ARM        Set the ARM emulation to use.  Choose one of

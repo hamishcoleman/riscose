@@ -4,8 +4,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#define DEFINE_MEM_GLOBALS
+#include "config.h"
 #include "monty.h"
+#define DEFINE_MEM_GLOBALS
 #include "mem.h"
 
 #if !TRACK_MEM

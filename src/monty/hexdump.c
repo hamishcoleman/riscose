@@ -4,6 +4,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "config.h"
 #include "monty.h"
 #include "hexdump.h"
 

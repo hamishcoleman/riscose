@@ -5,6 +5,7 @@
 #include <string.h>
 #include <stdarg.h>
 
+#include "config.h"
 #include "monty.h"
 #include "mem.h"
 #include "pool.h"

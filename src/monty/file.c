@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
+#include "config.h"
 #include "monty.h"
 #include "mem.h"
 #include "array.h"

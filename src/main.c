@@ -13,11 +13,13 @@
 **   $Date$
 */
 #include <stdlib.h>
+#include <stdarg.h>
 #include <getopt.h>
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
 
+#include <monty/monty.h>
 #include "riscostypes.h"
 #include "module.h"
 #include "swi.h"
@@ -27,29 +29,14 @@
 #include "util.h"
 
 WORD wimpslot;
-char *progname;
 
-static void
-help(void)
-{
-  printf("Usage: %s [options] <RISC OS binary> [RISC OS cmd line argument]...\n\
-\n\
-Execute RISC OS code under emulation\n\
-\n\
-  -w, --wimpslot=SIZE    allocates SIZE kilobytes for execution\n\
-  -m, --module
-\n\
-  -h, --help             displays this help text\n\
-  -v, --version          displays the version information\n\
-", progname);
-  exit(0);
-}
+static void usage(char *fmt, ...);
 
 static void
 version(void)
 {
-  fprintf(stderr, "riscose version 0.01\n");
-  exit(0);
+    fprintf(stderr, "%s: version 0.01\n", progname);
+    exit(0);
 }
 
 void go(WORD wimpslot, char *file);
@@ -69,41 +56,36 @@ main(int argc, char **argv)
   mem_private *priv;
   WORD  count = 0, o;
   
-  progname = argv[0];
+    (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
+    debugf = verbosef = stderr;
+
   wimpslot = 640*1024;
   
   while ((c = getopt_long(argc, argv, "hvmw:", long_options, NULL)) != EOF)
     {
      switch (c)
        {
-       case 'h' : help();
+       case 'h' : usage("help requested\n");
        case 'v' : version();
        case 'w' : wimpslot = atoi(optarg); break;
        case 'm' : module = 1; break;
        }
     }
   
-  if (optind < argc)
+    if (optind == argc) {
+        usage("no risc os executable specified\n");
+    }
     file = argv[optind++];
 
-    if (!file) {
-        /* FIXME: test against optind above looks broken.  what should
-         * happen when called with argc == 1. */
-        file = "null";
-    }
-  
   mem_init();
   module_init();
   swi_init();
   arm_init();
   
   mem_task_switch(mem_task_new(wimpslot, module ? NULL : file, NULL));
-  if (module)
-    if ( (module = module_load(file)) == -1)
-      {
-        fprintf(stderr, "Module load failed\n");
-        exit(1);
-      }
+    if (module && (module = module_load(file)) == -1) {
+        error("module load of `%s' failed\n", file);
+    }
 
   /* Set up unprocessed + processed command line storage thingies */
     
@@ -131,4 +113,27 @@ main(int argc, char **argv)
     arm_run_routine(module_base(module)+MODULE_START(module_base(module)));
 
   return 0;
+}
+
+static void usage(char *fmt, ...)
+{
+    va_list args;
+
+    va_start(args, fmt);
+
+    fprintf(stderr, "%s: ", progname);
+    vfprintf(stderr, fmt, args);
+    fprintf(stderr,
+"usage: %s [options] binary args...\n"
+"where options are:\n"
+"    -h, --help          request this help text.\n"
+"    -v, --version       display version and exit.\n"
+"    -w, --wimpslot=K    allocates K kilobytes for execution.\n"
+"    -m, --module        FIXME: what does this so.\n"
+"binary is the risc os executable to run.  args are its arguments.\n",
+        progname);
+
+    va_end(args);
+
+    exit(1);
 }

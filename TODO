@@ -45,9 +45,6 @@ macros to make the code more readable.  Or is there a better way...?
 Also, I ought to split off stolen code like the ARMulator and Gareth's
 instruction disassembler into separate directories.
 
-Consider dropping RCS identifiers from the source as they just cause
-problems with patch-processing, e.g. Revision.
-
 * The heap manager algorithm
 
 Is just naff and will slow programs down that allocate and deallocate lots

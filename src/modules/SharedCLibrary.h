@@ -168,7 +168,7 @@ static char *clib_kern_names[] = {
     X(LDIV, 0x1150) \
     X(REMOVE, 0x1151) \
     X(RENAME, 0x1152) \
-    X(TMPTILE, 0x1153) \
+    X(TMPFILE, 0x1153) \
     X(_OLD_TMPNAM, 0x1154) \
     X(FCLOSE, 0x1155) \
     X(FFLUSH, 0x1156) \

@@ -224,28 +224,3 @@ os_error *x__last_error (void)
 
   return Last_Error; /*never NULL*/
 }
-
-
-/*------------------------------------------------------------------------*/
-void *x__alloc (int size)
-{
-    return emalloc(size);
-}
-
-
-/*------------------------------------------------------------------------*/
-void *x__calloc (int count, int size)
-{
-    return ecalloc(count * size);
-}
-
-
-/*------------------------------------------------------------------------*/
-void x__free (void *ptr, int size) {NOT_USED (size) free (ptr);}
-
-
-/*------------------------------------------------------------------------*/
-void *x__realloc (void *ptr, int old_size, int size)
-{
-    return erealloc(ptr, size);
-}

@@ -130,11 +130,6 @@ extern os_error *x__last_error (void);
 
 extern os_error *x_no_memory;
 
-extern void *x__alloc (int size);
-extern void *x__calloc (int count, int size);
-extern void x__free (void *ptr, int size);
-extern void *x__realloc (void *ptr, int old_size, int size);
-
 #ifdef __cplusplus
 }
 #endif

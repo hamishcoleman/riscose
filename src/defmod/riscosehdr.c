@@ -23,7 +23,6 @@
 #include "lookup.h"
 #include "def.h"
 #include "riscose.h"
-#include "riscosever.h"
 
 static int strsplen
 (
@@ -93,27 +92,15 @@ void riscose_header_output
 
    /* Emit some header stuff */
    def_as_extern (c_name, title);
-   if ((rc = fprintf(file,
-            "/* Machine generated file --- do not edit */\n\n"
-            "#ifndef %s_H\n"
-            "#define %s_H\n\n",
-            c_name,
-            c_name)) < 0)
-      goto finish;
 
-   /* Emit our banner */
-   if ((rc = fprintf(file,
-         "/* riscose OS header file for %s\n"
-         "**\n"
-         "** Written by defmod (riscose version ) on %s"
-         "**\n"
-         "** See http://riscose.sourceforge.net/ for terms of distribution, and to\n"
-         "** pick up a later version of the software.\n"
-         "**\n"
-         "*/\n"
-         "\n",
-         title, DEFMOD_RISCOSE_VERSION)) < 0)
-      goto finish;
+    PF("/* osapi/%s.h - interface of the %s module. */\n\n", c_name,
+        title);
+    print_start_of_file_comment(TRUE);
+
+    PF(
+        "#ifndef %s_H\n"
+        "#define %s_H\n"
+        "\n", c_name, c_name);
 
    /*Make sure we have "types.h".*/
    if ((rc = fprintf (file,
@@ -983,10 +970,7 @@ void riscose_header_output
          goto finish;
    }
 
-
-   /* final #endif statement */
-   if ((rc = fprintf (file, "#endif\n")) < 0)
-      goto finish;
+    P("#endif\n");
 
 finish:
     if (rc < 0) {

@@ -21,14 +21,13 @@
 #include "monty/mem.h"
 #include "monty/array.h"
 #include "monty/str.h"
+
 #include "types.h"
-
 #include "lookup.h"
-
 #include "def.h"
-#include "riscosetpl.h"
+
 #include "riscose.h"
-#include "riscosever.h"
+#include "riscosetpl.h"
 
 static void print_params(bits b, bits rb, struct def_t **puts,
     char *arg_prefix);
@@ -47,16 +46,9 @@ void riscose_template_output(char *title, char *author,
     int i;
 
     def_as_extern(c_name, title);
-    PF(
-        "/* os/%s.c\n"
-        " *\n"
-        " * See http://riscose.sf.net/ for terms of distribution, and to\n"
-        " * pick up a later version of the software.\n"
-        " *\n"
-        " * Emulation of the %s SWIs.\n"
-        " *\n"
-        " * Template written by defmod, riscose version %s. */\n"
-        "\n", c_name, title, DEFMOD_RISCOSE_VERSION);
+    PF("/* os/%s.c - implementation of the %s module. */\n\n", c_name,
+        title);
+    print_start_of_file_comment(FALSE);
 
     PF(
         "#include <stdio.h>\n"

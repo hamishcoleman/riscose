@@ -4,7 +4,7 @@ defmod_SOURCES = \
     def.c def.h defmod.y lookup.c lookup.h \
     riscoseapi.c riscoseapi.h riscose.c \
     riscose.h riscosehdr.c riscosehdr.h riscosetpl.c riscosetpl.h \
-    riscosever.h types.h
+    types.h
 INCLUDES = -I$(srcdir)/..
 defmod_LDADD = ../monty/libmonty.a
 

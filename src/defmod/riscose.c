@@ -84,6 +84,25 @@ void check_for_wide_version(lookup_t swis, char** swi, def_s* s, void** context)
   }
 }
 
+/* ---- print_start_of_file_comment  -------------------------------- */
+
+void print_start_of_file_comment(int warn)
+{
+    P(
+        "/* See http://riscose.sf.net/ for terms of distribution, and to\n"
+        " * pick up a later version of the software.\n"
+        " *\n");
+    if (warn) {
+        P(
+            " * Mechanically produced source -- DO NOT HAND-EDIT.\n"
+            " *\n");
+    }
+
+    P(" * Created by defmod, riscose version 1.01. */\n\n");
+
+    return;
+}
+
 /* ---- print_title_comment ----------------------------------------- */
 
 void print_title_comment(char *s)

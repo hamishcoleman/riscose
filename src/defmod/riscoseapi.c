@@ -26,7 +26,6 @@
 #include "def.h"
 #include "riscoseapi.h"
 #include "riscose.h"
-#include "riscosever.h"
 
 int number_of_conditions(def_s s)
 {
@@ -140,18 +139,9 @@ void riscose_osapi_output
    file = stdout;
    def_as_extern (c_name, title);
 
-   /* Banner */
-   fprintf(file, "/* Machine generated file --- do not edit */\n\n"
-                 "/* riscose OS API .c file for %s\n"
-                 "**\n"
-                 "** Written by defmod (riscose version %s)\n"
-                 "**\n"
-                 "** See http://riscose.sourceforge.net/ for terms of distribution, and to\n"
-                 "** pick up a later version of the software.\n"
-                 "*/\n"
-                 "\n",
-                 title, DEFMOD_RISCOSE_VERSION);
-
+    PF("/* osapi/%s.c - marshaller for the %s module. */\n\n", c_name,
+        title);
+    print_start_of_file_comment(TRUE);
 
     fprintf(file,
         "#include <stdio.h>\n"

@@ -1,15 +1,13 @@
-/* heap.c
+/* heap2.c
 **
-** (c) Matthew Bloch 2000
+** (c) Matthew Bloch 2001
 **
 ** See http://riscose.sourceforge.net/ for terms of distribution, and to
 ** pick up a later version of the software.
 **
-**   General-purpose heap manager designed to emulate OS_Heap under RISC OS:
-**   i.e. you allocate the memory, this'll manage it for you, keeping all its
-**   guts inside the block you've given it, and if you need to move the memory,
-**   these routines should cope.  It's just a simple first-fit algorithm which
-**   we can improve when we need to.
+**   Redesign of heap.c which was too much effort to debug :-)  Similar
+**   algorithm, but more easily debuggable data structures, based on ideas
+**   that Ralph threw out to the mailing list.
 **
 **   $Revision$
 **   $Date$
@@ -23,124 +21,124 @@
 #include <stdio.h>
 #include "heap.h"
 
-#define HEAP_ALIGN_SIZE (size += (size&3) ? 4-(size&3) : 0)
-
-#define MAGIC_HEAP_VALUE  0x70616548
-#define MAGIC_BLOCK_VALUE 0x27111979 /* don't forget to send me a card */
-
-#define BLOCK_AT(o) ( (heap_block_t*) (h->data+(o)))
+/* Very simple heap structure, where the heap is filled with blocks which have
+** a header area, a data area and a gap area.  Initially it's just a header with
+** one big gap and no data.  This empty block gets shifted to the end of heap
+** as blocks are allocated from the start; blocks allocated have no gaps in them
+** initially.  But when a block is freed, it becomes the gap area for the
+** preceeding block.  And new blocks that fit in the gaps will slot in and
+** leave some remainder gap area.
+**
+** e.g.
+**
+** |---------------------------- heap size --------------------------------|
+**
+**     BLOCK 1               BLOCK 2                BLOCK 3       BLOCK 4
+**
+** |---data---;--gap--|
+**                    |----data-----;--gap--|
+**                                          |-------gap--------|
+**                                                             |--data-|gap|
+**
+*/
 
 struct _heap_t {
-  ULONG magic;
-  ULONG size; /* size of data[] area for whole heap */
-  BYTE data[0]; /* data area; offsets are from here */
+#define MAGIC_BLOCK_VALUE 0x27111979 /* don't forget to send me a card */
+  ULONG   magic;   /**< Always set to MAGIC_BLOCK_VALUE */
+  BYTE*   addr;    /**< Address that this heap_t was last at */
+  ULONG   size;    /**< Size of data[] area */
+  BYTE*   limit;   /**< Highest address we can expand to */
+  heap_t* next;    /**< Next block in heap, or NULL */
+  BYTE    data[0]; /**< Data pointer */
 };
 
-typedef struct {
-  ULONG magic;
-  ULONG size; /* size of data[] area for this block  */
-  ULONG next; /* offset of next allocated block from base of heap */
-  BYTE data[0];
-}
-heap_block_t;
+/* Rounds size up to nearest multiple of four */
+#define ALIGN(size) (((size) + (((size)&3) ? 4-((size)&3) : 0)))
 
+/* Rounds size up to nearest multiple of four and adds on space for header */
+#define TOTAL(size) ALIGN((size) + sizeof(heap_t))
 
-/*
- *    Return the number of bytes between the end of the block at
- *    offset `off1' and the offset `off2'.  Returns 0 if `off2'
- *    comes before the end of the block at `off1'.
- *
- *    These offsets must be to the block header, not its data area.
- */
+/* Returns first byte of `gap' area in block `h' */
+#define GAP_ADDR(h) ((h)->data + ALIGN((h)->size))
 
-static inline
-ULONG space_between(heap_t *h, ULONG off1, ULONG off2)
+/* Returns size of `gap' area in block `h' */
+#define GAP_SIZE(h) ((((h)->next ? (BYTE*)(h)->next : (BYTE*)(h)->limit)) - GAP_ADDR((h)))
+
+/* Returns heap_t* associated with a data block passed by user */
+#define BLOCKFROMPOINTER(p) ((heap_t*)((p)-sizeof(heap_t)))
+
+/* Checks that `addr' pointers in h are still valid and adjusts if not */
+#define RESHUFFLE(h) if ((h)->addr != ((BYTE*)(h))) do_reshuffle((h))
+
+static void
+do_reshuffle(heap_t* h)
 {
-  off1 += (BLOCK_AT(off1)->size) + sizeof(heap_block_t);
-  if (off2 > off1)
-    return off2-off1;
-  return 0;
-}
-
-static
-void check_integrity(heap_t *h)
-{
-  ULONG off = 0;
-    
-  assert(h->magic == MAGIC_HEAP_VALUE);
+  BYTE *actualaddr = ((BYTE*)h);
+  /* Inefficient but simple implementation of a very uncommon operation */
   
-  while (off != h->size)
-    {
-#ifdef CONFIG_TRACE_HEAP
-     printf("Heap dump: at %p offset %ld size %ld next %ld gap %ld\n", BLOCK_AT(off), off, BLOCK_AT(off)->size, BLOCK_AT(off)->next, space_between(h, off, BLOCK_AT(off)->size));
-#endif
-     assert(BLOCK_AT(off)->magic == MAGIC_BLOCK_VALUE);
-     assert(BLOCK_AT(off)->next > off);
-     assert(BLOCK_AT(off)->size < h->size);
-     assert(space_between(h, off, BLOCK_AT(off)->size) >=0 );
-     off = BLOCK_AT(off)->next;
-    }
-#ifdef CONFIG_TRACE_HEAP
-  printf("Heap dump: --- Done\n");
-#endif
+  if (h->next) {
+    do_reshuffle(h->next);
+    if (actualaddr < h->addr)
+      ((BYTE*)h->next) -= (h->addr - actualaddr);
+    else
+      ((BYTE*)h->next) += (actualaddr - h->addr);
+  }
+  
+  h->addr = actualaddr;
+}
+
+static void
+check_integrity(heap_t *h)
+{
+  assert(h->magic == MAGIC_BLOCK_VALUE);  
 }
 
 
 /*
- *    Initialise a heap at h, with a given size in bytes.
- *    size must be at least sizeof(heap_t) + sizeof(heap_block_t)
- *      and will be word-aligned before use.
+ *    Dump details of a heap to stderr.
  */
+
+void
+heap_dump(heap_t *h)
+{
+  fprintf(stderr, "\nheap_t     Magic    Address    Size     Gap      Limit     Next\n");
+  while (h) {
+    fprintf(stderr, "%8p %8lu %8p %8lu %8d %8p %8p\n",
+                    h, h->magic, h->addr, h->size, GAP_SIZE(h), h->limit, h->next);
+    h = h->next;
+  }
+}
+
 
 void
 heap_init(heap_t* h, ULONG size)
 {
-  heap_block_t* anchor = (heap_block_t*) h->data;
+  size ^= (size&3); /* Round down to multiple of four */
   
-  HEAP_ALIGN_SIZE;
-  
-  h->magic = MAGIC_HEAP_VALUE;
-  h->size = size-sizeof(heap_block_t);
-  anchor->magic = MAGIC_BLOCK_VALUE;
-  anchor->size = 0;
-  anchor->next = h->size;
-  /* it just makes the implementation a little cleaner if we know we'll
-  ** always have a block at offset 0 to start from
-  */
+  h->magic = MAGIC_BLOCK_VALUE;
+  h->size  = 0;
+  h->addr  = (BYTE*) h;
+  h->limit = ((BYTE*)h)+size;
+  h->next  = NULL;
+
   check_integrity(h);
 }
 
-static
 ULONG
-_heap_describe(heap_t* h, ULONG *largest_ptr, WORD excluding)
+heap_describe(heap_t* h, ULONG *largest_ptr)
 {
-  ULONG lastoff, off, total, largest;
+  ULONG largest, total;
 
-  check_integrity(h);
+  RESHUFFLE(h);
   
-  assert(h->magic == MAGIC_HEAP_VALUE);
+  largest = total = 0;
   
-  off     = BLOCK_AT(0)->next;
-  lastoff = 0;
-  total   = largest = 0;
-  do
-    {
-     ULONG space = space_between(h, lastoff, off);
-     if (excluding == 0 || excluding != lastoff)
-       {
-        total += space;
-        if (space > largest)
-          largest = space;
-       }
-
-     lastoff = off;
-     if (off != h->size)
-       {
-        off = BLOCK_AT(off)->next;
-        assert(lastoff < off);
-       }
-    }
-  while (lastoff != h->size);
+  while (h) {
+    if (largest < GAP_SIZE(h))
+      largest = GAP_SIZE(h);
+    total += GAP_SIZE(h);
+    h = h->next;
+  }
   
   if (largest_ptr)
     *largest_ptr = largest;
@@ -148,184 +146,187 @@ _heap_describe(heap_t* h, ULONG *largest_ptr, WORD excluding)
   return total;
 }
 
-ULONG
-heap_describe(heap_t* h, ULONG *largest_ptr)
+
+
+/*
+ *    Put a new block (of data area size `size') in the gap of
+ *    an existing block `h'.  Return a pointer to the new block's data area.
+ */
+
+static BYTE*
+fill_gap(heap_t* h, ULONG size)
 {
-  return _heap_describe(h, largest_ptr, 0);
+  heap_t *allocated = (heap_t*) (h->data + ALIGN(h->size));
+  
+  assert(GAP_SIZE(h) >= TOTAL(size));
+  assert(h->magic == MAGIC_BLOCK_VALUE);
+  allocated->magic = MAGIC_BLOCK_VALUE;
+  allocated->size  = size;
+  allocated->addr  = (BYTE*) allocated;
+  allocated->limit = h->limit;
+  allocated->next  = h->next;
+  h->next = allocated;
+
+  return allocated->data;
 }
 
 
 /*
- *    Allocate a block from a given heap.
- *    size will be word-aligned before use.
- *    Will return NULL if the requested amount could not be
- *      allocated.
+ *    Look for any empty blocks after `h'.  If there are any, join
+ *    them all together.
  */
+
+static inline void
+coalesce_empty(heap_t* h)
+{
+  heap_t *nonempty = h->next;
+
+  if (!nonempty || nonempty->size)
+    return;
+
+  while (nonempty->next && !nonempty->size)
+    nonempty = nonempty->next;
+
+  h->next = nonempty;
+}
+
+
+/*
+ *    Compact the heap.
+ *    Of course we don't want to do this if we are emulating OS_Heap,
+ *    since OS_Heap's blocks do not move once allocated!
+ *
+ *    Commented out for now to stop the compiler warning about this
+ *    function being defined but not used.
+ */
+
+/* static heap_t*
+compact_blocks(heap_t* h)
+{
+  while (h->next) {
+    
+    coalesce_empty(h); */
+    
+    /* Shuffle following block up to end of this block */
+    
+/*    memmove(GAP_ADDR(h), h->next, TOTAL(h->next->size));
+    h->next       = (heap_t*) GAP_ADDR(h);
+    h->next->addr = (BYTE*) h->next;
+    h = h->next;
+  }
+  return h;
+} */
 
 BYTE*
 heap_block_alloc(heap_t* h, ULONG size)
 {
-  ULONG lastoff, off, newoff;
-  heap_block_t  *block = NULL;
+  ULONG   total_space;
+  heap_t *cur;
   
-  HEAP_ALIGN_SIZE;
-  
-  assert(h->magic == MAGIC_HEAP_VALUE);
-  
-  off     = BLOCK_AT(0)->next;
-  lastoff = 0;
+  /*
+   *    OS_Heap does not allow allocation of zero size blocks.
+   *    We disallow it too because it causes problems with our code;
+   *    allocated blocks of zero size cannot be distinguished from freed blocks
+   *    and so are liable to be coalesced and lost.
+   */
 
-  while (off != h->size &&
-         space_between(h, lastoff, off) < size+sizeof(heap_block_t))
-    {
-     block = BLOCK_AT(off);
-     assert(block->magic == MAGIC_BLOCK_VALUE);
-     
-     lastoff = off;
-     off = block->next;
-     assert(lastoff < off);
-    }
-    
-  if (off == h->size && 
-      space_between(h, lastoff, off) < size+sizeof(heap_block_size))
-    return NULL; /* no suitably-sized space left */
+  if (size == 0)
+    return NULL;
 
-  newoff = lastoff + sizeof(heap_block_t) + (BLOCK_AT(lastoff)->size);
-  block = BLOCK_AT(newoff);
-  
-  block->magic = MAGIC_BLOCK_VALUE;
-  block->size  = size;
-  block->next  = off;
-  BLOCK_AT(lastoff)->next = newoff;
-  assert(newoff > lastoff);
-  assert(off > newoff);
 
-  check_integrity(h);
+  RESHUFFLE(h);
   
-  return block->data;
+  for (cur = h; cur && GAP_SIZE(cur) < TOTAL(size); cur = cur->next) {
+    assert(h->magic == MAGIC_BLOCK_VALUE);
+#ifdef CONFIG_TRACE_HEAP
+    fprintf(stderr, "block @ %p addr %p size %d limit %p next %p\n", cur, cur->addr, cur->size, cur->limit, cur->next);
+#endif
+    coalesce_empty(cur);
+    total_space += GAP_SIZE(cur);
+  }
+  
+  if (cur)
+    return fill_gap(cur, size);
+  
+  return NULL;
+  
+  /* Uh, Matthew, compacting the heap is nice but stupid :-) */
+  
+  /*if (!cur && total_space < TOTAL(size))
+    return NULL;
+  
+  return fill_gap(compact_blocks(h), size);*/
 }
 
 void
-heap_block_free(heap_t* h, BYTE *d)
+heap_block_free(heap_t* h, BYTE *data)
 {
-  ULONG lastoff, off;
-  heap_block_t *block = (heap_block_t*) (d-sizeof(heap_block_t));
+  heap_t* block = BLOCKFROMPOINTER(data);
 
-  check_integrity(h);  
-#ifdef CONFIG_TRACE_HEAP
-  printf("freeing a block at %p (off %d), magic = %08lx, size %ld\n", d,
-    (BYTE*)d - (BYTE*)h, block->magic, h->size);
-#endif
-
-  // assert(((BYTE*)d - (BYTE*)h)  < (sizeof(heap_t)+h->size));
   assert(block->magic == MAGIC_BLOCK_VALUE);
-  assert(h->magic  == MAGIC_HEAP_VALUE);
-
-  off     = BLOCK_AT(0)->next;
-  lastoff = 0;
   
-  while (off != h->size)
-    if (BLOCK_AT(off) == (heap_block_t*) block)
-      {
-       BLOCK_AT(lastoff)->next = BLOCK_AT(off)->next;
-       BLOCK_AT(off)->magic = 666;
-       assert(BLOCK_AT(lastoff)->next > lastoff);
-       check_integrity(h);
-       return;
-      }
-    else
-      {
-       lastoff = off;
-       off = BLOCK_AT(off)->next;
-       assert(lastoff < off);
-      }
-   abort();
+  block->size = 0;
 }
 
 BYTE*
-heap_block_resize(heap_t* h, BYTE *block_ptr, ULONG size)
+heap_block_resize(heap_t* h, BYTE *data, ULONG size)
 {
-  BYTE *tmp;
-  WORD old_size;
-  WORD largest, remaining;
-  heap_block_t* block = (heap_block_t*) (block_ptr-sizeof(heap_block_t));
-  
-  HEAP_ALIGN_SIZE;
-  
+  heap_t *newblock, *block = BLOCKFROMPOINTER(data);
+  ULONG diff = (size - block->size); /* invalid but not used if (block->size > size) */
+
+  /* We don't allow zero-sized blocks; see heap_block_alloc */
+  if (size == 0)
+    return NULL;
+
   assert(block->magic == MAGIC_BLOCK_VALUE);
-  assert(h->magic == MAGIC_HEAP_VALUE);
-  
-  if ( (space_between(h, ((BYTE*)block) - h->data, block->next) + block->size) >=
-        size )
-    {
-     block->size = size;
-     check_integrity(h);
-     return block_ptr; /* either there's room to breathe and it's easy... */
-    }
-  
-  /* ...or drat, we need to relocate the block-- is there the space? */
-  
-  remaining = _heap_describe(h, &largest, (block_ptr - h->data));
-  
-  if (largest < (size + sizeof(heap_block_t)) )
-    {
-     return NULL; /* no room */
-    }
-  
-  /* deallocate old block, reserve new*/
-  
-  old_size = block->size;
-  tmp = malloc(old_size);
-  memcpy(tmp, block->data, block->size);
-  heap_block_free(h, block_ptr);
-  block_ptr = heap_block_alloc(h, size);
-  assert(block_ptr != NULL);
-  memcpy(block_ptr, tmp, old_size);
-  
-  /* FIXME: should use memmove for purity and speed but can't be bothered
-  ** to work out why it doesn't work
-  */
-  
-  /*memmove(block_ptr, block->data, block->size);*/
 
-  check_integrity(h);
+  RESHUFFLE(h);
 
-  return block_ptr;
+  if (size <= block->size || GAP_SIZE(block) >= diff) {
+    /* Easy cases where the user wants to shrink the block, or extend it where
+    ** the gap area is big enough to hold the extension.
+    */
+    block->size = size;
+    return block->data;
+  }
+  
+  while (h && GAP_SIZE(h) < TOTAL(size))
+    h = h->next;
+  
+  if (!h)
+    return NULL;
+  
+  newblock = (heap_t*) GAP_ADDR(h);
+  memcpy(newblock, block, TOTAL(block->size));
+  newblock->addr = (BYTE*) newblock;
+  newblock->next = h->next;
+  h->next        = newblock;
+  newblock->size = size;
+  block->size    = 0;
+  
+  return newblock->data;
 }
 
 ULONG
 heap_resize(heap_t* h, ULONG size)
 {
-  ULONG lastoff, off, shrink;
-  
-  HEAP_ALIGN_SIZE;
-  
-  shrink  = 0;
-  off     = BLOCK_AT(0)->next;
-  lastoff = 0;
-  while (off != h->size)
-    {
-     lastoff = off;
-     off = BLOCK_AT(off)->next;
-     assert(lastoff < off);
-    }
-  
-  if (size < h->size)
-    {
-     ULONG topgap = h->size - (lastoff + BLOCK_AT(lastoff)->size + sizeof(heap_block_t));
-     ULONG reqgap = h->size - size;
-     shrink = (reqgap <= topgap) ? topgap : reqgap;
-    }
+  BYTE *oldlimit, *newlimit;
 
-  size -= shrink;
-  BLOCK_AT(lastoff)->next = h->size = size;
-  check_integrity(h);
-  assert(BLOCK_AT(lastoff)->next > lastoff);
-  return shrink;
+  assert(h->magic == MAGIC_BLOCK_VALUE);
+
+  oldlimit = h->limit;
+  newlimit = ((BYTE*)h)+size;
+
+  while (h) {
+    assert(h->limit == oldlimit);
+    h->limit = newlimit;
+    h = h->next;
+  }
+  return 0;
 }
 
 ULONG
-heap_block_size(heap_t* h, BYTE *block)
+heap_block_size(heap_t* h, BYTE *data)
 {
-  return ( (heap_block_t*) (block - sizeof(heap_block_t)) )->size;
+  return BLOCKFROMPOINTER(data)->size;
 }

@@ -17,6 +17,7 @@
 #include <ctype.h>
 #include <time.h>
 
+#include <monty/monty.h>
 #include "riscostypes.h"
 #include "swi.h"
 #include "rom.h"
@@ -582,9 +583,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
 
     default:
-      fprintf(stderr, "Unhandled CLib SWI %08lx\n", SWI_NUM(num));
-      exit(1);
-      return ERR_EM_UNHANDLEDSWI;
+        error("unhandled clib swi %#08lx\n", SWI_NUM(num));
     }
   return 0;
 }

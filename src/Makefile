@@ -25,7 +25,7 @@ include $(ARM_SELECT)/Make-defs
 SRCDIR  = $(CURDIR)
 CC      = gcc
 CFLAGS = -O2 -g3 -Wall \
-    -I. -I$(SRCDIR)/include -I$(SRCDIR)/$(ARM_SELECT) $(DEFS)
+    -I$(SRCDIR) -I$(SRCDIR)/include -I$(SRCDIR)/$(ARM_SELECT) $(DEFS)
 LDFLAGS = -lncurses -lreadline $(EXTRA_LDFLAGS)
 PREFIX  = /usr/local
 
@@ -33,13 +33,14 @@ PREFIX  = /usr/local
 
 export CC CFLAGS SRCDIR LDFLAGS
 
-CORE   = swi.o swichunk.o util.o $(MAIN) mem.o heap.o
+CORE = heap.o mem.o swi.o swichunk.o util.o
 
-OBJS = $(CORE) kernel/libkernel.a modules/libmodules.a $(ARM_SELECT)/lib$(ARM_SELECT).a
+OBJS = $(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a \
+    modules/libmodules.a monty/libmonty.a
 
 BIN = riscose
 
-all:	subs $(BIN)
+all:	subs $(BIN) heaptest
 
 %.o:    %.c mem.h arm.h
 	$(CC) $(CFLAGS) -c -o $@ $<
@@ -53,8 +54,8 @@ subs:
 	cd monty && $(MAKE)
 	$(MAKE) -C rom
 
-$(BIN):	$(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a modules/libmodules.a
-	$(CC) -o $@ $(OBJS) $(LIBRARIES) $(LDFLAGS)
+$(BIN):	main.o $(OBJS)
+	$(CC) -o $@ main.o $(OBJS) $(LDFLAGS)
 
 clean::
 	rm -f $(BIN)
@@ -67,6 +68,12 @@ swichunk.c::
 
 clean::
 	rm -f swichunk.c
+
+heaptest: heaptest.o $(OBJS)
+	$(CC) -o $@ heaptest.o $(OBJS) $(LDFLAGS)
+
+clean::
+	rm -f heaptest
 
 ######## Utility targets
 

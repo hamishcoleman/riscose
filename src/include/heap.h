@@ -16,21 +16,7 @@
 #include "riscostypes.h"
 
 typedef unsigned long ULONG;
-
-typedef struct {
-  ULONG magic;
-  ULONG size; /* size of data[] area for whole heap */
-  BYTE data[0];
-}
-heap_t;
-
-typedef struct {
-  ULONG magic;
-  ULONG size; /* size of data[] area for this block  */
-  ULONG next; /* offset of next allocated block from base of heap */
-  BYTE data[0];
-}
-heap_block_t;
+typedef struct _heap_t heap_t;
 
 void	heap_init(heap_t* h, ULONG size);
 ULONG	heap_describe(heap_t* h, ULONG *largest);

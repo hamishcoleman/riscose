@@ -28,6 +28,20 @@
 
 #define BLOCK_AT(o) ( (heap_block_t*) (h->data+(o)))
 
+struct _heap_t {
+  ULONG magic;
+  ULONG size; /* size of data[] area for whole heap */
+  BYTE data[0];
+};
+
+typedef struct {
+  ULONG magic;
+  ULONG size; /* size of data[] area for this block  */
+  ULONG next; /* offset of next allocated block from base of heap */
+  BYTE data[0];
+}
+heap_block_t;
+
 static inline
 ULONG space_between(heap_t *h, ULONG off1, ULONG off2)
 {

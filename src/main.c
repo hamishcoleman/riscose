@@ -31,6 +31,7 @@
 WORD wimpslot;
 
 static void usage(char *fmt, ...);
+static void utility_run(char *file, mem_private *priv);
 
 static void
 version(void)
@@ -48,10 +49,12 @@ main(int argc, char **argv)
     { "help", no_argument, NULL, 'h' },
     { "version", no_argument, NULL, 'v' },
     { "module", no_argument, NULL, 'm' },
+    { "utility", no_argument, NULL, 'u' },
     { "wimpslot", required_argument, NULL, 'w' }
   };
   
   int module=0, c;
+  int utility=0;
   char *file = NULL;
   mem_private *priv;
   WORD  count = 0, o;
@@ -61,7 +64,7 @@ main(int argc, char **argv)
 
   wimpslot = 640*1024;
   
-  while ((c = getopt_long(argc, argv, "hvmw:", long_options, NULL)) != EOF)
+  while ((c = getopt_long(argc, argv, "hvumw:", long_options, NULL)) != EOF)
     {
      switch (c)
        {
@@ -69,6 +72,7 @@ main(int argc, char **argv)
        case 'v' : version();
        case 'w' : wimpslot = atoi(optarg); break;
        case 'm' : module = 1; break;
+       case 'u' : utility = 1; break;
        }
     }
   
@@ -82,11 +86,13 @@ main(int argc, char **argv)
   module_init();
   swi_init();
   arm_init();
-  
-  mem_task_switch(mem_task_new(wimpslot, module ? NULL : file, NULL));
-    if (module && (module = module_load(file)) == -1) {
-        error("module load of `%s' failed\n", file);
-    }
+
+  /* Load the code */
+
+  if (module || utility)
+    mem_task_switch(mem_task_new(wimpslot, NULL, NULL));
+  else
+    mem_task_switch(mem_task_new(wimpslot, file, NULL));
 
   /* Set up unprocessed + processed command line storage thingies */
     
@@ -108,10 +114,18 @@ main(int argc, char **argv)
     }
   priv->cli[strlen(priv->cli)-1] = 0;
   
-  if (!module)
-    arm_run_routine(0x8000);
-  else
+  /* Run the code */
+
+  if (utility) {
+    utility_run(file, priv);
+  } else if (module) {
+    module = module_load(file);
+    if (module == -1)
+      error("module load of `%s' failed\n", file);
     arm_run_routine(module_base(module)+MODULE_START(module_base(module)));
+  } else {
+    arm_run_routine(0x8000);
+  }
 
   return 0;
 }
@@ -128,6 +142,7 @@ static void usage(char *fmt, ...)
 "usage: %s [options] binary args...\n"
 "where options are:\n"
 "    -h, --help          request this help text.\n"
+"    -u, --utility       program is a utility.\n"
 "    -v, --version       display version and exit.\n"
 "    -w, --wimpslot=K    allocates K kilobytes for execution.\n"
 "    -m, --module        FIXME: what does this so.\n"
@@ -137,4 +152,42 @@ static void usage(char *fmt, ...)
     va_end(args);
 
     exit(1);
+}
+
+/* Loads 'file' into the RMA and runs it as a transient utility */
+static void utility_run(char *file, mem_private *priv)
+{
+  void *base;
+  WORD len;
+  WORD workspace;
+
+  /* A utility starts executing with (I think):
+   * => r1  -> command-line arguments
+   *    r12 -> start of 1K workspace in RMA
+   *    r13 =  top of (same?) 1K workspace
+   * <= V set on error, and r0 -> error block
+   */
+
+  if (!file_isfile(file))
+    error("utility load of `%s' failed\n", file);
+
+  base = mem_rma_alloc(file_size(file));
+  len  = file_size(file);
+  if (base == NULL)
+    error("no room in RMA for utility '%s'\n", file);
+  file_loadat(file, base);
+
+  workspace = MEM_TOARM(mem_rma_alloc(1024));
+  ARM_SET_R1(MEM_TOARM(priv->cli + strlen(file) + 1));
+  ARM_SET_R12(workspace);
+  ARM_SET_R13(workspace + 1024);
+
+  arm_run_routine(MEM_TOARM(base));
+
+  if (ARM_V_SET) {
+    char *error = (char *)MEM_TOHOST(arm_get_reg(0));
+
+    printf("Utility returned an error (%ld):\n%s\n",
+	  ((WORD *) error)[0], error + 4);
+  }
 }

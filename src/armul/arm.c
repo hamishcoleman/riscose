@@ -68,7 +68,7 @@ void
 arm_set_pc(WORD addr)
 {
   ARMul_SetPC(arm, addr);
-  ARMul_R15Altered(arm);
+  /* ARMul_R15Altered(arm); --- only when setting the flags directly! */
 }
 
 void
@@ -102,6 +102,14 @@ WORD
 arm_get_reg(WORD num)
 {
   return arm->Reg[num];
+}
+
+WORD
+arm_get_r15_all(void)
+{
+  ARMul_State *state = arm;
+
+  return ECC | ER15INT | R15PC | EMODE;
 }
 
 void

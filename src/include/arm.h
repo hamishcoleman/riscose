@@ -19,6 +19,7 @@ void	arm_run_routine(WORD addr);
 void	arm_return(void);
 
 WORD	arm_get_reg(WORD num);
+WORD	arm_get_r15_all(void);
 void	arm_set_reg(WORD num, WORD val);
 
 /* Some macros for convenience */
@@ -38,6 +39,7 @@ void	arm_set_reg(WORD num, WORD val);
 #define ARM_R13 (arm_get_reg(13))
 #define ARM_R14 (arm_get_reg(14))
 #define ARM_R15 (arm_get_reg(15))
+#define ARM_R15_ALL (arm_get_r15_all())
 
 #define ARM_SET_R0(v) (arm_set_reg(0, (v)))
 #define ARM_SET_R1(v) (arm_set_reg(1, (v)))
@@ -67,10 +69,10 @@ void	arm_set_reg(WORD num, WORD val);
 #define ARM_Z_FLAG (1<<30)
 #define ARM_N_FLAG (1<<31)
 
-#define ARM_V_SET (ARM_R15 & ARM_V_FLAG)
-#define ARM_C_SET (ARM_R15 & ARM_C_FLAG)
-#define ARM_Z_SET (ARM_R15 & ARM_Z_FLAG)
-#define ARM_N_SET (ARM_R15 & ARM_N_FLAG)
+#define ARM_V_SET ((ARM_R15_ALL & ARM_V_FLAG) != 0)
+#define ARM_C_SET ((ARM_R15_ALL & ARM_C_FLAG) != 0)
+#define ARM_Z_SET ((ARM_R15_ALL & ARM_Z_FLAG) != 0)
+#define ARM_N_SET ((ARM_R15_ALL & ARM_N_FLAG) != 0)
 
 void	arm_clear_v();
 void	arm_set_v();

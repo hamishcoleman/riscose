@@ -32,6 +32,5 @@ typedef struct {
 } os_error;
 
 #define os_GLOBAL_NO_ANY 9
-#define os_GLOBAL_NO_MEM 49
 
 #endif

@@ -15,16 +15,6 @@
 #define SWI_X(x)     (((x)>>17)&1)
 #define SWI_NUM(x)    ((x) & 0xdffff) /* as given in PRMs */
 
-/* We keep registered SWIs in "buckets" to speed look-up.  Each bucket
-** is itself a linked list, but any given bucket will only ever contain
-** a limited range of SWI numbers.  SWI_QUANTITY is the next power of 2
-** above the largest SWI number.  SWI_BUCKETS is the number of buckets
-** we divide this quantity into.  Hence there are SWI_QUANTITY / SWI_BUCKETS
-** possible SWIs in each bucket.  This result must be an integer.
-*/
-#define SWI_QUANTITY       0x100000
-#define SWI_BUCKETS        64
-
 #define SWI_WHERE_OS       0
 #define SWI_WHERE_OSEXT    1
 #define SWI_WHERE_3RDPARTY 2
@@ -70,11 +60,3 @@ void osbyte(void);
 
 void swi_init(void);
 void swi_trap(WORD num);
-
-typedef struct swi_routine
-{
-  WORD number;
-  const char* name;
-  swi_handler handler;
-  struct swi_routine* next;
-} swi_routine;

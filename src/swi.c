@@ -17,6 +17,8 @@
 
 #include <monty/monty.h>
 #include <monty/mem.h>
+#include <monty/hash.h>
+
 #include "riscostypes.h"
 #include "util.h"
 #include "arm.h"
@@ -26,99 +28,84 @@
 /* FIXME: should be in a header file. */
 WORD swih_sharedclibrary_entry(WORD num);
 
-/* Array of pointers to the SWI lists */
-static swi_routine *swi_list[SWI_BUCKETS];
+typedef struct {
+    WORD number;
+    char *name;
+    swi_handler handler;
+} swi_routine;
 
-/* Register a SWI with riscose. */
-void swi_register(WORD num, char* name, swi_handler handler)
-{
-  swi_routine *r;
-  WORD bucket;
+static void swi_number_to_name(WORD num, char *buf);
+static swi_routine *swi_lookup(WORD num);
 
-  NEW(r);
-  r->number = num;
-  r->name = estrdup(name);
-  r->handler = handler;
+static hash *registered_swi;
 
-  bucket = num / (SWI_QUANTITY / SWI_BUCKETS);
-  r->next = swi_list[bucket];
-  swi_list[bucket] = r;
-}
+/* ------------------------------------------------------------------ */
 
 void swi_init(void)
 {
-  /* This function gets each module to register its SWIs. */
-  swi_register_all();
-}
-
-/* Look up a SWI number and return a pointer to its swi_routine
-** struct, or NULL if it is not found.
-*/
-swi_routine* swi_lookup(WORD num)
-{
-  swi_routine* p;
-  WORD bucket = SWI_NUM(num) / (SWI_QUANTITY / SWI_BUCKETS);
-
-  p = swi_list[bucket];
-  while (p && p->number != SWI_NUM(num))
-    p = p->next;
-
-  return p;
-}
-
-void swi_number_to_name(WORD num, char *buf)
-{
-    swi_routine* p;
-
-    if (p = swi_lookup(num)) {
-        if (SWI_X(num)) {
-            *buf++ = 'X';
-        }
-        strcpy(buf, p->name);
-    } else {
-        sprintf(buf, "&%lx", num);
-    }
+    registered_swi = create_hash();
+    swi_register_all();
 
     return;
 }
 
-void
-swi_trap(WORD num)
+/* Register a SWI with riscose. */
+void swi_register(WORD number, char *name, swi_handler handler)
 {
-  WORD e;
-  swi_routine* p;
+    swi_routine *r;
+
+    NEW(r);
+    r->number = number;
+    r->name = estrdup(name);
+    r->handler = handler;
+    hash_addi(registered_swi, r->number, r);
+
+    return;
+}
+
+void swi_trap(WORD num)
+{
+    WORD e;
+    swi_routine *r;
 
 #ifdef CONFIG_TRACE_SWIS
-  {
-    char b[256];
+    {
+        char name[256];
 
-    swi_number_to_name(num, b);
-    fprintf(stderr, "%08x: SWI %s (%08lx) called ", ARM_R14, b, num);
-    fprintf(stderr, "(%08lx %08lx %08lx %08lx)", ARM_R0, ARM_R1, ARM_R2, ARM_R3);
-    fprintf(stderr, "\n");
-  }
+        swi_number_to_name(num, name);
+        debug("%08x: SWI %s (%08lx) called (%08lx %08lx %08lx "
+            "%08lx)\n", ARM_R14, name, num, ARM_R0, ARM_R1, ARM_R2,
+            ARM_R3);
+    }
 #endif
 
-  if (SWI_OS(num) == SWI_OS_TRAP)
-    {
-     WORD r;
+    if (SWI_OS(num) == SWI_OS_TRAP) {
+        WORD r;
 
 #ifndef NATIVE
-     if (num == SWI_MAGIC_RETURN)
-       { arm_return(); return; }
+        if (num == SWI_MAGIC_RETURN) {
+            arm_return();
+            return;
+        }
 #endif
-     if (((r = swih_sharedclibrary_entry(num)) & SWIH_EXIT_HANDLED) == 0)
-       arm_set_pc(ARM_R14);
-     r &= !3;
+
+        if (((r = swih_sharedclibrary_entry(num)) &
+            SWIH_EXIT_HANDLED) == 0) {
+            arm_set_pc(ARM_R14);
+        }
+        /* FIXME: next statement does nothing. */
+        r &= !3;
+
 #ifdef CONFIG_TRACE_SWIS
-  fprintf(stderr, "return R0 = %lx\n", ARM_R0);
+        debug("return R0 = %lx\n", ARM_R0);
 #endif
-     return;
+
+        return;
     }
 
     /* Look up the SWI's details and call it if found */
-    p = swi_lookup(num);
-    e = p ? p->handler(num) : ERR_EM_UNHANDLEDSWI;
+    r = swi_lookup(num);
+    e = r ? r->handler(num) : ERR_EM_UNHANDLEDSWI;
 
     /* Handle errors */
     arm_clear_v();
@@ -139,4 +126,36 @@ swi_trap(WORD num)
     }
 
     return;
+}
+
+/* ------------------------------------------------------------------ */
+
+/* FIXME: buf could be over-run. */
+
+static void swi_number_to_name(WORD num, char *buf)
+{
+    swi_routine *r;
+
+    if (r = swi_lookup(num)) {
+        if (SWI_X(num)) {
+            *buf++ = 'X';
+        }
+        strcpy(buf, r->name);
+    } else {
+        sprintf(buf, "&%lx", num);
+    }
+
+    return;
+}
+
+/* FIXME: it's unclear from using `WORD num' when the number has
+ * already passed through SWI_NUM and when it hasn't.  Some
+ * consistentcy is required throughout riscose to avoid recurring
+ * mistakes. */
+
+static swi_routine *swi_lookup(WORD num)
+{
+    num = SWI_NUM(num);
+
+    return hash_lookupi_get_datum(registered_swi, num);
 }

@@ -10,12 +10,20 @@
 **   $Revision$
 **   $Date$
 */
+
+#include "../../config.h"
+
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <stdio.h>
+#if defined(HAVE_READLINE_H)
+#include <readline.h>
+#elif HAVE_READLINE_READLINE_H
 #include <readline/readline.h>
+#endif
 #include <gdbm.h>
+
 #include <getopt.h>
 #include <stdlib.h>
 

@@ -12,8 +12,16 @@
 **   $Revision$
 **   $Date$
 */
+
+#include "../../config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
+#if HAVE_READLINE_H
+#include <readline.h>
+#elif HAVE_READLINE_READLINE_H
+#include <readline/readline.h>
+#endif
 
 #include "mem.h"
 #include "arm.h"
@@ -21,8 +29,6 @@
 #include <rom/rom.h>
 #include "vdu.h"
 #include "map.h"
-
-#include <readline/readline.h>
 
 /* FIXME: this should be in a header file, osmodule.h? */
 void osmodule(void);

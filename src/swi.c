@@ -15,6 +15,7 @@
 
 #include <stdio.h>
 
+#include <monty/monty.h>
 #include "riscostypes.h"
 #include "util.h"
 #include "arm.h"
@@ -107,12 +108,18 @@ swi_trap(WORD num)
         arm_set_v();
         ARM_SET_R0(e);
        }
-     else
+     else if (e == ERR_EM_UNHANDLEDSWI)
        {
 	char buf[64];
 	swi_number_to_name(SWI_NUM(num), buf);
         printf("Untrapped SWI %s at %08x\n", buf, (unsigned)ARM_R15);
         exit(1);
-       }
+        } else {
+            /* FIXME: should call OS_GenerateError. */
+            error("swi returned error: %#x %s\n", *(int *)e,
+                (char *)e + 4);
+        }
     }
+
+    return;
 }

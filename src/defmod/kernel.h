@@ -8,7 +8,5 @@ typedef struct {
   char errmess[252];
 } _kernel_oserror;
 
-#define __swi(n)
-
 # endif
 

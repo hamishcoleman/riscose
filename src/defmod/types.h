@@ -56,9 +56,4 @@ typedef unsigned char byte;
 #define NOT_USED(x) {x = x;}
 #define UNSET(x)    {(void) &x;}
 
-#ifdef  __swi
-#undef  __swi
-#define __swi(x) extern
-#endif
-
 #endif

@@ -823,7 +823,7 @@ os_error *riscose_header_output
          break;
 
          case def_TYPE_BOOL:
-            if ((rc = fprintf (file, "%s", WHETHER (c->value))) < 0)
+            if ((rc = fprintf (file, "%s", c->value ? "TRUE" : "FALSE")) < 0)
                goto finish;
          break;
 

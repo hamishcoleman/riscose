@@ -222,7 +222,7 @@ const_defn:
       memcpy (t, &$3, def_sizeof_TYPE ($3.tag));
       c->type  = t;
       c->value = $5;
-      c->description = EMPTY ($6)? NULL: qstrdup ($6);
+      c->description = *$6 ? NULL: qstrdup ($6);
 
       if ((error = lookup_insert (consts, $1, c)) != NULL)
       {  yyerror (error->errmess);
@@ -262,7 +262,7 @@ type_defn:
       t->tag = def_TYPE_ABSTRACT;
       t->name = NULL;
       t->value = def_VALUE_REGISTER;
-      t->description = EMPTY ($2)? NULL: qstrdup ($2);
+      t->description = *$2 ? NULL: qstrdup ($2);
 
       if ((error = lookup_insert (types, $1, t)) != NULL)
       {  yyerror (error->errmess);
@@ -274,7 +274,7 @@ type_defn:
       def_t t = qalloc (def_sizeof_TYPE ($3.tag));
 
       memcpy (t, &$3, def_sizeof_TYPE ($3.tag));
-      t->description = EMPTY ($4)? NULL: qstrdup ($4);
+      t->description = *$4 ? NULL: qstrdup ($4);
 
       if ((error = lookup_insert (types, $1, t)) != NULL)
       {  yyerror (error->errmess);
@@ -421,13 +421,13 @@ toid: type | VOID {$$.tag = def_TYPE_VOID; $$.name = NULL;
 typed_var: type COLON ID DESCRIPTION_OPTION
    {  $$ = $1;
       $$.name = qstrdup ($3);
-      $$.description = EMPTY ($4)? NULL: qstrdup ($4);
+      $$.description = *$4 ? NULL: qstrdup ($4);
    };
 
 toided_var: toid COLON ID DESCRIPTION_OPTION
    {  $$ = $1;
       $$.name = qstrdup ($3);
-      $$.description = EMPTY ($4)? NULL: qstrdup ($4);
+      $$.description = *$4 ? NULL: qstrdup ($4);
    };
 
 swi_decl: SWI swi_defn_LIST;
@@ -563,7 +563,7 @@ description:
    DESCRIPTION
       {  tracef ("DESCRIPTION \"%s\"\n" _ $1);
          $$ = Empty;
-         $$.description = EMPTY ($1)? NULL: qstrdup ($1);
+         $$.description = *$1 ? NULL: qstrdup ($1);
          $$.starred_swi = TRUE;
       } |
    STAR
@@ -856,13 +856,13 @@ commentchar_SEQUENCE_OPTION: commentchar_SEQUENCE {} | EMPTY {};
 condition_part_OPTION: condition_part | EMPTY {$$ = Empty;};
 decl_SERIES_OPTION: decl_SERIES | EMPTY;
 description_OPTION: description | EMPTY {$$ = Empty;};
-DESCRIPTION_OPTION: DESCRIPTION {strcpy ($$, $1);} | EMPTY {CLEAR ($$);};
+DESCRIPTION_OPTION: DESCRIPTION {strcpy ($$, $1);} | EMPTY {*$$ = '\0';};
 ellipsis_OPTION: ELLIPSIS {$$ = TRUE;} | EMPTY {$$ = FALSE;};
 id_cont_SEQUENCE_OPTION: id_cont_SEQUENCE {strcpy ($$, $1);} |
-      EMPTY {CLEAR ($$);};
+      EMPTY {*$$ = '\0';};
 pling_OPTION: PLING {$$ = TRUE;} | EMPTY {$$ = FALSE;};
 word_SEQUENCE_OPTION: word_SEQUENCE {strcpy ($$, $1);} |
-      EMPTY {CLEAR ($$);};
+      EMPTY {*$$ = '\0';};
 ws_item_SEQUENCE_OPTION: ws_item_SEQUENCE {} | EMPTY {};
 
 /*sequence*/

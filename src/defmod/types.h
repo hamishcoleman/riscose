@@ -38,8 +38,6 @@ typedef unsigned char byte;
 #define SKIP 0
    /*may be used as a "don't care" value for |int|, |... *|, |bits| etc*/
 
-#define SIG_LIMIT 11 /*largest signal number + 1*/
-
 #define UNKNOWN 1
    /*may be used to declare arrays of unknown size*/
 

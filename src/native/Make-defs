@@ -1,0 +1,3 @@
+DEFS += -DNATIVE
+MAIN = native/native-main.o
+EXTRA_LDFLAGS = -T native/riscose.lds

@@ -133,24 +133,36 @@ sigsegv_handler(int sig, int _a2, int _a3, int _a4, struct siginfo *info,
   exit(1);
 }
 
+#define SVC_STACK_SIZE 65536
+static unsigned char svc_stack[SVC_STACK_SIZE];
+
 void
 install_signal(void)
 {
-  struct sigaction sa, old;
+  struct sigaction sa;
+  struct sigaltstack ss;
   sa.sa_handler = sigswi_handler;
   sigemptyset(&sa.sa_mask);
-  sa.sa_flags = SA_SIGINFO | SA_THIRTYTWO |SA_NOMASK;
-  if (sigaction(SIGSWI, &sa, &old))
+  sa.sa_flags = SA_SIGINFO | SA_THIRTYTWO | SA_NOMASK | SA_ONSTACK;
+  if (sigaction(SIGSWI, &sa, NULL))
     {
       perror("sigaction");
       exit(1);
     }
   sa.sa_handler = sigsegv_handler;
   sigemptyset(&sa.sa_mask);
-  sa.sa_flags = SA_SIGINFO | SA_THIRTYTWO ;
-  if (sigaction(SIGSEGV, &sa, &old))
+  sa.sa_flags = SA_SIGINFO | SA_THIRTYTWO | SA_ONSTACK;
+  if (sigaction(SIGSEGV, &sa, NULL))
     {
       perror("sigaction");
+      exit(1);
+    }
+  ss.ss_sp = svc_stack;
+  ss.ss_size = SVC_STACK_SIZE;
+  ss.ss_flags = SS_ONSTACK;
+  if (sigaltstack(&ss, NULL))
+    {
+      perror("sigaltstack");
       exit(1);
     }
 }
@@ -214,6 +226,7 @@ arm_init(void)
 
   /* Establish an initial context. */
   context = malloc(sizeof(*context));
+  memset(context, 0, sizeof(*context));
 
   /* Tell it how it is. */
   personality(PER_RISCOS);

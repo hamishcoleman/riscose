@@ -15,12 +15,15 @@ arm_run_routine:
 	stmfd	sp!, {r4 - r11, lr}
 	ldr	ip, 2f
 	ldr	lr, [ip]
-	str	lr, [sp, #-4]!
 
 	swi	0x9f0003		@ sys_usr26
 	add	lr, lr, #12
 	mov	ip, r0
 	ldmia	lr, {r0 - r11}
+	str	sp, [lr, #-4]
+	ldr	sp, [lr, #52]
+	movs	sp, sp
+	strne	lr, [sp, #-4]!
 
 	adr	lr, 1f
 	mov	pc, ip
@@ -29,7 +32,7 @@ arm_run_routine:
 	swi	0x9f0004		@ sys_usr32
 
 	ldr	ip, [sp], #4
-	add	ip, ip, #12
+	ldr	sp, [ip, #-4]
 	stmia	ip, {r0 - r11}
 	sub	ip, ip, #12
 	ldr	r0, 2f

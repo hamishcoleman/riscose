@@ -95,56 +95,54 @@ mem_where(void *_ptr)
 }
 
 #ifndef CONFIG_MEM_ONE2ONE
-inline
-BYTE*
-mem_f_tohost(WORD arm_addr)
+
+inline BYTE *mem_f_tohost(WORD arm)
 {
-    /* FIXME: replace switch with if-else to remove gcc dependency on
-     * `...'. */
-
-  /*printf("converting %x\n", arm_addr);*/
-  switch(arm_addr)
-    {
-    case MMAP_APP_BASE ... MMAP_APP_BASE + MMAP_APP_SIZE - 1:
-      return mem->tasks[mem->task_current].app + (arm_addr - MMAP_APP_BASE);
-
-    case MMAP_RMA_BASE ... MMAP_RMA_BASE + MMAP_RMA_SIZE - 1:
-      return mem->rma + (arm_addr - MMAP_RMA_BASE);
-      
-    case MMAP_USRSTACK_BASE ... MMAP_USRSTACK_BASE + MMAP_USRSTACK_SIZE - 1:
-      return mem->tasks[mem->task_current].stack + (arm_addr - MMAP_USRSTACK_BASE);
-      
-    case MMAP_ROM_BASE ... MMAP_ROM_BASE + MMAP_ROM_SIZE - 1:
-      return mem->rom + (arm_addr - MMAP_ROM_BASE);
-    
-    default:
-      fprintf(stderr, "*** Bad memory access 0x%08x\n", (unsigned)arm_addr);
-      arm_backtrace();
-      abort();
+    if (arm == 0) {
+        return NULL;
     }
+    if (arm >= MMAP_APP_BASE && arm < MMAP_APP_BASE + MMAP_APP_SIZE) {
+        return mem->tasks[mem->task_current].app + (arm - MMAP_APP_BASE);
+    }
+    if (arm >= MMAP_RMA_BASE && arm < MMAP_RMA_BASE + MMAP_RMA_SIZE) {
+        return mem->rma + (arm - MMAP_RMA_BASE);
+    }
+    if (arm >= MMAP_USRSTACK_BASE &&
+        arm < MMAP_USRSTACK_BASE + MMAP_USRSTACK_SIZE) {
+        return mem->tasks[mem->task_current].stack + (arm - MMAP_USRSTACK_BASE);
+    }
+    if (arm >= MMAP_ROM_BASE && arm < MMAP_ROM_BASE + MMAP_ROM_SIZE) {
+        return mem->rom + (arm - MMAP_ROM_BASE);
+    }
+    
+    error("mem_f_tohost: %#x invalid address\n", arm);
 }
 
-inline
-WORD
-mem_f_toarm(void *_ptr)
+inline WORD mem_f_toarm(void *host)
 {
-  BYTE *ptr = (BYTE*) _ptr;
-    
-  switch (mem_where(ptr))
-    {
+    BYTE *arm;
+
+    if (host == NULL) {
+        return 0;
+    }
+
+    arm = host;
+    switch (mem_where(arm)) {
     case MEM_ID_RMA:
-      return MMAP_RMA_BASE + (ptr - mem->rma);
+        return MMAP_RMA_BASE + (arm - mem->rma);
     case MEM_ID_TASKHEAP:
-      return MMAP_APP_BASE + (ptr - mem->tasks[mem->task_current].app);
+        return MMAP_APP_BASE +
+            (arm - mem->tasks[mem->task_current].app);
     case MEM_ID_USRSTACK:
-      return MMAP_USRSTACK_BASE + (ptr - mem->tasks[mem->task_current].stack);
+        return MMAP_USRSTACK_BASE +
+            (arm - mem->tasks[mem->task_current].stack);
     case MEM_ID_ROM:
-      return MMAP_ROM_BASE + (ptr - mem->rom);
+        return MMAP_ROM_BASE + (arm - mem->rom);
     }
-  fprintf(stderr, "Unknown area for memory address %p\n", _ptr);
-  abort();
-  return 0;
+
+    error("mem_f_toarm: %p invalid address\n", host);
 }
+
 #endif
 
 static

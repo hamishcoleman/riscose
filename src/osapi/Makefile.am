@@ -15,7 +15,7 @@ SUFFIXES = .osl .c .h
 # FIXME: these end up in the `make dist' tar file and they shouldn't.
 # the .osl files should.
 
-libosapi_a_SOURCES = \
+BUILT_SOURCES = \
     os.c os.h \
     basictrans.c basictrans.h \
     fileswitch.c fileswitch.h \
@@ -29,10 +29,12 @@ libosapi_a_SOURCES = \
     osspriteop.c osspriteop.h \
     osword.c osword.h \
     wimp.c wimp.h
+libosapi_a_SOURCES = $(BUILT_SOURCES)
+$(BUILT_SOURCES): ../defmod/defmod
 
 $(filter %.c, $(libosapi_a_SOURCES)): %.c: %.h
 
-MOSTLYCLEANFILES = $(libosapi_a_SOURCES)
+MOSTLYCLEANFILES = $(BUILT_SOURCES)
 
 EXTRA_libosapi_a_SOURCES = \
     $($(filter %.c, $(libosapi_a_SOURCES)):%.c=%.osl)

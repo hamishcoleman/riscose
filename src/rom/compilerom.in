@@ -41,8 +41,8 @@ $l=0; while (<ERRORS>)
   $l++;
   next if /^(\n|\#)/;
   die "Bad format in error.list at line $l"
-    if ! /^(ERROR)\t(\S*)\s+([0-9a-fA-F]*)\s+(.*)\n/ &&
-       ! /^(WORD)\t(\S*)\s+([0-9a-fA-F]*)\n/;
+    if ! /^(ERROR)\s+(\S*)\s+([0-9a-fA-F]*)\s+(.*)\n/ &&
+       ! /^(WORD)\s+(\S*)\s+([0-9a-fA-F]*)\n/;
   
   if ($1 eq "ERROR") {
     print ROMHDR sprintf("#define ERR_%s 0x%08x\n", uc $2, &rom_current);

@@ -46,7 +46,7 @@ os_error *xosword_read_system_clock (osword_timer_block *clock)
  * Other notes:   Emulation of SWI 0x7 with R0 = 0x2.
  */
 
-os_error *xosword_write_system_clock (osword_timer_block const *clock)
+os_error *xosword_write_system_clock (osword_timer_block *clock)
 {
   fprintf(stderr, "osword_write_system_clock\n");
   fprintf(stderr, "  In: clock = %x\n", (int) clock);
@@ -82,7 +82,7 @@ os_error *xosword_read_interval_timer (osword_timer_block *timer)
  * Other notes:   Emulation of SWI 0x7 with R0 = 0x4.
  */
 
-os_error *xosword_write_interval_timer (osword_timer_block const *timer)
+os_error *xosword_write_interval_timer (osword_timer_block *timer)
 {
   fprintf(stderr, "osword_write_interval_timer\n");
   fprintf(stderr, "  In: timer = %x\n", (int) timer);
@@ -139,7 +139,7 @@ os_error *xosword_read_palette (osword_palette_block *entry)
  * Other notes:   Emulation of SWI 0x7 with R0 = 0xC.
  */
 
-os_error *xosword_write_palette (osword_palette_block const *entry)
+os_error *xosword_write_palette (osword_palette_block *entry)
 {
   fprintf(stderr, "osword_write_palette\n");
   fprintf(stderr, "  In: entry = %x\n", (int) entry);
@@ -354,7 +354,7 @@ os_error *xoswordpointer_set_bbox (oswordpointer_bbox_block *bbox)
  * Other notes:   Emulation of SWI 0x7 with R0 = 0x15.
  */
 
-os_error *xoswordpointer_step (oswordpointer_step_block const *step)
+os_error *xoswordpointer_step (oswordpointer_step_block *step)
 {
   fprintf(stderr, "oswordpointer_step\n");
   fprintf(stderr, "  In: step = %x\n", (int) step);

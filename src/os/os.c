@@ -76,7 +76,7 @@ void os_swi_register_extra(void)
  * Other notes:   Emulation of SWI 0x23 with R1 = 0x0, R2 = 0x80000000.
  */
 
-os_error *xos_read_var_val_size (char const *var,
+os_error *xos_read_var_val_size (char *var,
       int context,
       os_var_type var_type,
       int *used,
@@ -124,7 +124,7 @@ os_error *xos_writec (char c)
  * Other notes:   Emulation of SWI 0x2.
  */
 
-os_error *xos_write0 (char const *s)
+os_error *xos_write0 (char *s)
 {
   fprintf(stderr, "os_write0\n");
   fprintf(stderr, "  In: s = %x\n", (int) s);
@@ -186,7 +186,7 @@ os_error *xos_readc (char *c,
  * Other notes:   Emulation of SWI 0x5.
  */
 
-os_error *xos_cli (char const *command)
+os_error *xos_cli (char *command)
 {
   fprintf(stderr, "os_cli\n");
   fprintf(stderr, "  In: command = %x\n", (int) command);
@@ -382,10 +382,10 @@ os_error *xos_read_line_given_echo_suppress_invalid (char *buffer,
  * Other notes:   Emulation of SWI 0xF.
  */
 
-os_error *xos_control (void const *error_handler,
+os_error *xos_control (void *error_handler,
       os_error *error_buffer,
-      void const *escape_handler,
-      void const *event_handler,
+      void *escape_handler,
+      void *event_handler,
       void **old_error_handler,
       os_error **old_error_buffer,
       void **old_escape_handler,
@@ -445,7 +445,7 @@ os_error *xos_get_env (char **command,
  * Other notes:   Emulation of SWI 0x11 with R1 = 0x58454241.
  */
 
-os_error *xos_exit (os_error const *e,
+os_error *xos_exit (os_error *e,
       int abex,
       int rc)
 {
@@ -486,12 +486,12 @@ os_error *xos_exit (os_error const *e,
  * Other notes:   Emulation of SWI 0x12.
  */
 
-os_error *xos_set_env (void const *exit_handler,
+os_error *xos_set_env (void *exit_handler,
       byte *ram_limit,
-      void const *undefined_instruction_handler,
-      void const *prefetch_abort_handler,
-      void const *data_abort_handler,
-      void const *address_exception_handler,
+      void *undefined_instruction_handler,
+      void *prefetch_abort_handler,
+      void *data_abort_handler,
+      void *address_exception_handler,
       void **old_exit_handler,
       byte **old_ram_limit,
       void **old_undefined_instruction_handler,
@@ -561,8 +561,8 @@ os_error *xos_int_off (void)
  * Other notes:   Emulation of SWI 0x15.
  */
 
-os_error *xos_call_back (os_register_block const *register_block,
-      void const *call_back_handler,
+os_error *xos_call_back (os_register_block *register_block,
+      void *call_back_handler,
       os_register_block **old_register_block,
       void **old_call_back_handler)
 {
@@ -607,7 +607,7 @@ os_error *xos_break_pt (void)
  */
 
 os_error *xos_break_ctrl (os_register_block *register_block,
-      void const *break_pt_handler,
+      void *break_pt_handler,
       os_register_block **old_register_block,
       void **old_break_pt_handler)
 {
@@ -635,7 +635,7 @@ os_error *xos_break_ctrl (os_register_block *register_block,
  * Other notes:   Emulation of SWI 0x19.
  */
 
-os_error *xos_unused_swi (void const *unused_swi_handler,
+os_error *xos_unused_swi (void *unused_swi_handler,
       void **old_unused_swi_handler)
 {
   fprintf(stderr, "os_unused_swi\n");
@@ -727,7 +727,7 @@ os_error *xos_mouse (int *x,
  */
 
 os_error *xos_claim (int vector,
-      void const *routine,
+      void *routine,
       byte *handle)
 {
   fprintf(stderr, "os_claim\n");
@@ -752,7 +752,7 @@ os_error *xos_claim (int vector,
  */
 
 os_error *xos_release (int vector,
-      void const *routine,
+      void *routine,
       byte *handle)
 {
   fprintf(stderr, "os_release\n");
@@ -781,7 +781,7 @@ os_error *xos_release (int vector,
  */
 
 os_error *xos_read_unsigned (os_read_unsigned_flags flags,
-      char const *number,
+      char *number,
       bits limit,
       char **end,
       bits *value)
@@ -817,7 +817,7 @@ os_error *xos_read_unsigned (os_read_unsigned_flags flags,
  * Other notes:   Emulation of SWI 0x23.
  */
 
-os_error *xos_read_var_val (char const *var,
+os_error *xos_read_var_val (char *var,
       char *value,
       int size,
       int context,
@@ -858,8 +858,8 @@ os_error *xos_read_var_val (char const *var,
  * Other notes:   Emulation of SWI 0x24.
  */
 
-os_error *xos_set_var_val (char const *var,
-      byte const *value,
+os_error *xos_set_var_val (char *var,
+      byte *value,
       int size,
       int context,
       os_var_type var_type,
@@ -892,7 +892,7 @@ os_error *xos_set_var_val (char const *var,
  * Other notes:   Emulation of SWI 0x25.
  */
 
-os_error *xos_gs_init (char const *s,
+os_error *xos_gs_init (char *s,
       os_gs_flags flags,
       int *context1,
       int *context2)
@@ -960,7 +960,7 @@ os_error *xos_gs_read (int context1,
  * Other notes:   Emulation of SWI 0x27.
  */
 
-os_error *xos_gs_trans (char const *s,
+os_error *xos_gs_trans (char *s,
       char *buffer,
       int size,
       int *used,
@@ -1042,7 +1042,7 @@ os_error *xos_change_dynamic_area (os_dynamic_area_no area_type,
  * Other notes:   Emulation of SWI 0x2B.
  */
 
-os_error *xos_generate_error (os_error const *e)
+os_error *xos_generate_error (os_error *e)
 {
   fprintf(stderr, "os_generate_error\n");
   fprintf(stderr, "  In: e = %x\n", (int) e);
@@ -1087,7 +1087,7 @@ os_error *xos_read_escape_state (bits *psr)
  * Other notes:   Emulation of SWI 0x2D.
  */
 
-os_error *xos_evaluate_expression (char const *expr,
+os_error *xos_evaluate_expression (char *expr,
       char *buffer,
       int size,
       osbool *expr_is_str,
@@ -1142,7 +1142,7 @@ os_error *xos_read_palette (os_colour_number entry,
  * Other notes:   Emulation of SWI 0x31.
  */
 
-os_error *xos_read_vdu_variables (os_vdu_var_list const *var_list,
+os_error *xos_read_vdu_variables (os_vdu_var_list *var_list,
       int *value_list)
 {
   fprintf(stderr, "os_read_vdu_variables\n");
@@ -1288,7 +1288,7 @@ os_error *xos_swi_number_to_string (int swi,
  * Other notes:   Emulation of SWI 0x39.
  */
 
-os_error *xos_swi_number_from_string (char const *swi_name,
+os_error *xos_swi_number_from_string (char *swi_name,
       int *swi)
 {
   fprintf(stderr, "os_swi_number_from_string\n");
@@ -1337,7 +1337,7 @@ os_error *xos_validate_address (byte *min,
  */
 
 os_error *xos_call_after (int delay,
-      void const *code,
+      void *code,
       byte *handle)
 {
   fprintf(stderr, "os_call_after\n");
@@ -1361,7 +1361,7 @@ os_error *xos_call_after (int delay,
  */
 
 os_error *xos_call_every (int delay,
-      void const *code,
+      void *code,
       byte *handle)
 {
   fprintf(stderr, "os_call_every\n");
@@ -1384,7 +1384,7 @@ os_error *xos_call_every (int delay,
  * Other notes:   Emulation of SWI 0x3D.
  */
 
-os_error *xos_remove_ticker_event (void const *code,
+os_error *xos_remove_ticker_event (void *code,
       byte *handle)
 {
   fprintf(stderr, "os_remove_ticker_event\n");
@@ -1409,7 +1409,7 @@ os_error *xos_remove_ticker_event (void const *code,
  * Other notes:   Emulation of SWI 0x3E.
  */
 
-os_error *xos_install_key_handler (os_key_handler const *key_handler,
+os_error *xos_install_key_handler (os_key_handler *key_handler,
       os_key_handler **old_key_handler)
 {
   fprintf(stderr, "os_install_key_handler\n");
@@ -1468,7 +1468,7 @@ os_error *xos_check_mode_valid (os_mode mode,
  */
 
 os_error *xos_change_environment (os_handler_type handler_type,
-      void const *handler,
+      void *handler,
       byte *handle,
       byte *buffer,
       void **old_handler,
@@ -1574,10 +1574,10 @@ os_error *xos_read_monotonic_time (os_t *t)
  * Other notes:   Emulation of SWI 0x43.
  */
 
-os_error *xos_substitute_args (char const *args,
+os_error *xos_substitute_args (char *args,
       char *buffer,
       int size,
-      char const *source,
+      char *source,
       int source_size,
       int *used)
 {
@@ -1605,9 +1605,9 @@ os_error *xos_substitute_args (char const *args,
  * Other notes:   Emulation of SWI 0x44.
  */
 
-os_error *xos_pretty_print (char const *string,
-      byte const *dictionary,
-      char const *special)
+os_error *xos_pretty_print (char *string,
+      byte *dictionary,
+      char *special)
 {
   fprintf(stderr, "os_pretty_print\n");
   fprintf(stderr, "  In: string = %x\n", (int) string);
@@ -1653,7 +1653,7 @@ os_error *xos_plot (os_plot_code plot_code,
  * Other notes:   Emulation of SWI 0x46.
  */
 
-os_error *xos_writen (char const *s,
+os_error *xos_writen (char *s,
       int size)
 {
   int c;
@@ -1681,7 +1681,7 @@ os_error *xos_writen (char const *s,
  */
 
 os_error *xos_add_to_vector (int vector,
-      void const *routine,
+      void *routine,
       byte *handle)
 {
   fprintf(stderr, "os_add_to_vector\n");
@@ -1704,8 +1704,8 @@ os_error *xos_add_to_vector (int vector,
  * Other notes:   Emulation of SWI 0x48.
  */
 
-os_error *xos_write_env (char const *command,
-      os_date_and_time const *start)
+os_error *xos_write_env (char *command,
+      os_date_and_time *start)
 {
   fprintf(stderr, "os_write_env\n");
   fprintf(stderr, "  In: command = %x\n", (int) command);
@@ -1731,8 +1731,8 @@ os_error *xos_write_env (char const *command,
  * Other notes:   Emulation of SWI 0x49.
  */
 
-os_error *xos_read_args (char const *keywords,
-      char const *input,
+os_error *xos_read_args (char *keywords,
+      char *input,
       char *buffer,
       int size,
       int *spare)
@@ -1783,7 +1783,7 @@ os_error *xos_read_ram_fs_limits (byte **start,
  */
 
 os_error *xos_claim_device_vector (os_device_type device,
-      void const *driver,
+      void *driver,
       byte *handle,
       int *status,
       bits mask)
@@ -1813,7 +1813,7 @@ os_error *xos_claim_device_vector (os_device_type device,
  */
 
 os_error *xos_release_device_vector (os_device_type device,
-      void const *driver,
+      void *driver,
       byte *handle,
       int *status,
       bits mask)
@@ -1866,7 +1866,7 @@ os_error *xos_delink_application (byte *vector_details,
  * Other notes:   Emulation of SWI 0x4E.
  */
 
-os_error *xos_relink_application (byte const *vector_details)
+os_error *xos_relink_application (byte *vector_details)
 {
   fprintf(stderr, "os_relink_application\n");
   fprintf(stderr, "  In: vector_details = %x\n", (int) vector_details);
@@ -1923,9 +1923,9 @@ os_error *xos_heap_sort (int count,
  * Other notes:   Emulation of SWI 0x50 with R1 = 0x58454241.
  */
 
-os_error *xos_exit_and_die (os_error const *e,
+os_error *xos_exit_and_die (os_error *e,
       int rc,
-      char const *module_name)
+      char *module_name)
 {
   fprintf(stderr, "os_exit_and_die\n");
   fprintf(stderr, "  In: e = %x\n", (int) e);
@@ -1986,7 +1986,7 @@ os_error *xos_read_mem_map_entries (os_mem_map_request_list *request_list)
  * Other notes:   Emulation of SWI 0x53.
  */
 
-os_error *xos_set_mem_map_entries (os_mem_map_request_list const *request_list)
+os_error *xos_set_mem_map_entries (os_mem_map_request_list *request_list)
 {
   fprintf(stderr, "os_set_mem_map_entries\n");
   fprintf(stderr, "  In: request_list = %x\n", (int) request_list);
@@ -2005,7 +2005,7 @@ os_error *xos_set_mem_map_entries (os_mem_map_request_list const *request_list)
  * Other notes:   Emulation of SWI 0x54.
  */
 
-os_error *xos_add_call_back (void const *call_back,
+os_error *xos_add_call_back (void *call_back,
       byte *handle)
 {
   fprintf(stderr, "os_add_call_back\n");
@@ -2134,8 +2134,8 @@ os_error *xos_changed_box (os_changed_box_state state,
  */
 
 os_error *xos_crc (int crc_in,
-      byte const *block,
-      char const *end,
+      byte *block,
+      char *end,
       int stride,
       int *crc)
 {
@@ -2237,7 +2237,7 @@ os_error *xos_change_redirectionw (os_fw input,
  * Other notes:   Emulation of SWI 0x5F.
  */
 
-os_error *xos_remove_call_back (void const *call_back,
+os_error *xos_remove_call_back (void *call_back,
       byte *handle)
 {
   fprintf(stderr, "os_remove_call_back\n");
@@ -2522,12 +2522,12 @@ os_error *xosscreenmode_force_clean (void)
 
 os_error *xosdynamicarea_create (os_dynamic_area_no area,
       int size,
-      byte const *base_address,
+      byte *base_address,
       bits flags,
       int size_limit,
-      void const *handler,
+      void *handler,
       void *workspace,
-      char const *description,
+      char *description,
       os_dynamic_area_no *area_out,
       byte **base_address_out,
       int *size_limit_out)
@@ -2725,7 +2725,7 @@ os_error *xosdynamicarea_set_clamps (int unlimited_area_clamp,
  */
 
 os_error *xosdynamicarea_ensure_region (os_dynamic_area_no area,
-      byte const *base_address,
+      byte *base_address,
       int size)
 {
   fprintf(stderr, "osdynamicarea_ensure_region\n");
@@ -2750,7 +2750,7 @@ os_error *xosdynamicarea_ensure_region (os_dynamic_area_no area,
  */
 
 os_error *xosdynamicarea_release_region (os_dynamic_area_no area,
-      byte const *base_address,
+      byte *base_address,
       int size)
 {
   fprintf(stderr, "osdynamicarea_release_region\n");
@@ -2774,7 +2774,7 @@ os_error *xosdynamicarea_release_region (os_dynamic_area_no area,
  */
 
 os_error *xosmemory_page_op (osmemory_flags flags,
-      os_page_block const *page_block,
+      os_page_block *page_block,
       int page_count)
 {
   fprintf(stderr, "osmemory_page_op\n");
@@ -2919,7 +2919,7 @@ os_error *xosmemory_find_contiguous (int size,
  */
 
 os_error *xosclaimprocessorvector_alloc (bits vector,
-      void const *routine,
+      void *routine,
       void **old_routine)
 {
   fprintf(stderr, "osclaimprocessorvector_alloc\n");
@@ -2942,7 +2942,7 @@ os_error *xosclaimprocessorvector_alloc (bits vector,
  */
 
 os_error *xosclaimprocessorvector_free (bits vector,
-      void const *old_routine)
+      void *old_routine)
 {
   fprintf(stderr, "osclaimprocessorvector_free\n");
   fprintf(stderr, "  In: vector = %x\n", (int) vector);
@@ -3031,8 +3031,8 @@ os_error *xosplatformfeatures_get_features (os_platform_feature_flags *flags,
  */
 
 os_error *xos_synchronise_code_areas (bits flags,
-      void const *start,
-      void const *end)
+      void *start,
+      void *end)
 {
   fprintf(stderr, "os_synchronise_code_areas\n");
   fprintf(stderr, "  In: flags = %x\n", (int) flags);
@@ -3090,7 +3090,7 @@ os_error *xos_enter_usr26 (void)
  * Other notes:   Emulation of SWI 0xC0.
  */
 
-os_error *xos_convert_standard_date_and_time (os_date_and_time const *date_and_time,
+os_error *xos_convert_standard_date_and_time (os_date_and_time *date_and_time,
       char *buffer,
       int size,
       char **end)
@@ -3122,10 +3122,10 @@ os_error *xos_convert_standard_date_and_time (os_date_and_time const *date_and_t
  * Other notes:   Emulation of SWI 0xC1.
  */
 
-os_error *xos_convert_date_and_time (os_date_and_time const *date_and_time,
+os_error *xos_convert_date_and_time (os_date_and_time *date_and_time,
       char *buffer,
       int size,
-      char const *format,
+      char *format,
       char **end)
 {
   fprintf(stderr, "os_convert_date_and_time\n");
@@ -3913,7 +3913,7 @@ os_error *xos_convert_spaced_integer4 (int value,
  * Other notes:   Emulation of SWI 0xE9.
  */
 
-os_error *xos_convert_fixed_net_station (os_station_number const *station_number,
+os_error *xos_convert_fixed_net_station (os_station_number *station_number,
       char *buffer,
       int size,
       char **end)
@@ -3944,7 +3944,7 @@ os_error *xos_convert_fixed_net_station (os_station_number const *station_number
  * Other notes:   Emulation of SWI 0xEA.
  */
 
-os_error *xos_convert_net_station (os_station_number const *station_number,
+os_error *xos_convert_net_station (os_station_number *station_number,
       char *buffer,
       int size,
       char **end)

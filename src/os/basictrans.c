@@ -151,9 +151,9 @@ void basictrans_swi_register_extra(void)
  * Other notes:   Emulation of SWI 0x42C80.
  */
 
-os_error *xbasictrans_help (char const *help_text,
-      char const *prog_name,
-      byte const *lexical_table,
+os_error *xbasictrans_help (char *help_text,
+      char *prog_name,
+      byte *lexical_table,
       osbool *unclaimed)
 {
   fprintf(stderr, "basictrans_help\n");

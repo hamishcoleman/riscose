@@ -31,7 +31,7 @@ void messagetrans_swi_register_extra(void)
  * Other notes:   Emulation of SWI 0x41500.
  */
 
-os_error *xmessagetrans_file_info (char const *file_name,
+os_error *xmessagetrans_file_info (char *file_name,
       messagetrans_file_flags *flags,
       int *size)
 {
@@ -56,7 +56,7 @@ os_error *xmessagetrans_file_info (char const *file_name,
  */
 
 os_error *xmessagetrans_open_file (messagetrans_control_block *cb,
-      char const *file_name,
+      char *file_name,
       char *buffer)
 {
   fprintf(stderr, "messagetrans_open_file\n");
@@ -90,14 +90,14 @@ os_error *xmessagetrans_open_file (messagetrans_control_block *cb,
  * Other notes:   Emulation of SWI 0x41502.
  */
 
-os_error *xmessagetrans_lookup (messagetrans_control_block const *cb,
-      char const *token,
+os_error *xmessagetrans_lookup (messagetrans_control_block *cb,
+      char *token,
       char *buffer,
       int size,
-      char const *arg0,
-      char const *arg1,
-      char const *arg2,
-      char const *arg3,
+      char *arg0,
+      char *arg1,
+      char *arg2,
+      char *arg3,
       char **terminator,
       char **result,
       int *used)
@@ -137,8 +137,8 @@ os_error *xmessagetrans_lookup (messagetrans_control_block const *cb,
  * Other notes:   Emulation of SWI 0x41503.
  */
 
-os_error *xmessagetrans_make_menus (messagetrans_control_block const *cb,
-      byte const *menus,
+os_error *xmessagetrans_make_menus (messagetrans_control_block *cb,
+      byte *menus,
       char *buffer,
       int size,
       byte **end,
@@ -165,7 +165,7 @@ os_error *xmessagetrans_make_menus (messagetrans_control_block const *cb,
  * Other notes:   Emulation of SWI 0x41504.
  */
 
-os_error *xmessagetrans_close_file (messagetrans_control_block const *cb)
+os_error *xmessagetrans_close_file (messagetrans_control_block *cb)
 {
   fprintf(stderr, "messagetrans_close_file\n");
   fprintf(stderr, "  In: cb = %x\n", (int) cb);
@@ -193,8 +193,8 @@ os_error *xmessagetrans_close_file (messagetrans_control_block const *cb)
  * Other notes:   Emulation of SWI 0x41505.
  */
 
-os_error *xmessagetrans_enumerate_tokens (messagetrans_control_block const *cb,
-      char const *token,
+os_error *xmessagetrans_enumerate_tokens (messagetrans_control_block *cb,
+      char *token,
       char *buffer,
       int size,
       int context,
@@ -236,14 +236,14 @@ os_error *xmessagetrans_enumerate_tokens (messagetrans_control_block const *cb,
  * Other notes:   Emulation of SWI 0x41506.
  */
 
-os_error *xmessagetrans_error_lookup (os_error const *err,
-      messagetrans_control_block const *cb,
+os_error *xmessagetrans_error_lookup (os_error *err,
+      messagetrans_control_block *cb,
       os_error *buffer,
       int size,
-      char const *arg0,
-      char const *arg1,
-      char const *arg2,
-      char const *arg3,
+      char *arg0,
+      char *arg1,
+      char *arg2,
+      char *arg3,
       os_error **out_buffer)
 {
   fprintf(stderr, "messagetrans_error_lookup\n");
@@ -283,14 +283,14 @@ os_error *xmessagetrans_error_lookup (os_error const *err,
  * Other notes:   Emulation of SWI 0x41507.
  */
 
-os_error *xmessagetrans_gs_lookup (messagetrans_control_block const *cb,
-      char const *token,
+os_error *xmessagetrans_gs_lookup (messagetrans_control_block *cb,
+      char *token,
       char *buffer,
       int size,
-      char const *arg0,
-      char const *arg1,
-      char const *arg2,
-      char const *arg3,
+      char *arg0,
+      char *arg1,
+      char *arg2,
+      char *arg3,
       char **result,
       int *used)
 {
@@ -324,7 +324,7 @@ os_error *xmessagetrans_gs_lookup (messagetrans_control_block const *cb,
  * Other notes:   Emulation of SWI 0x41508.
  */
 
-os_error *xmessagetrans_copy_error (os_error const *err,
+os_error *xmessagetrans_copy_error (os_error *err,
       os_error **copy)
 {
   fprintf(stderr, "messagetrans_copy_error\n");

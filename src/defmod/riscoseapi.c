@@ -479,7 +479,7 @@ void riscose_osapi_output
              /* Cast */
              fprintf(file, "(");
              Print_Decl(file, s->inputs[i], "", "", FALSE, 0);
-             fprintf(file, (s->ri & (1 << i)) ? "const *) " : ") ");
+             fprintf(file, (s->ri & (1 << i)) ? "*) " : ") ");
 
              /* Convert to a host address if this is a pointer */
              to_host = (s->inputs[i]->tag == def_TYPE_REF || (s->ri & (1 << i)) );

@@ -1149,7 +1149,7 @@ void riscose_header_output
                   else
                   {
                      if ((rc = sprintf (arg_name,
-                           "const *%s" /*was *%s 2nd Mar 1994*/
+                           "*%s" /*was *%s 2nd Mar 1994*/
                            /*was (%s) 2nd Mar 1994*/,
                            s->inputs [i]->name)) < 0)
                         goto finish;

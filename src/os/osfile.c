@@ -31,10 +31,10 @@ void osfile_swi_register_extra(void)
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xA.
  */
 
-os_error *xosfile_save_stamped (char const *file_name,
+os_error *xosfile_save_stamped (char *file_name,
       bits file_type,
-      byte const *data,
-      byte const *end)
+      byte *data,
+      byte *end)
 {
   fprintf(stderr, "osfile_save_stamped\n");
   fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
@@ -59,7 +59,7 @@ os_error *xosfile_save_stamped (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x1.
  */
 
-os_error *xosfile_write (char const *file_name,
+os_error *xosfile_write (char *file_name,
       bits load_addr,
       bits exec_addr,
       fileswitch_attr attr)
@@ -84,7 +84,7 @@ os_error *xosfile_write (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x2.
  */
 
-os_error *xosfile_write_load (char const *file_name,
+os_error *xosfile_write_load (char *file_name,
       bits load_addr)
 {
   fprintf(stderr, "osfile_write_load\n");
@@ -108,7 +108,7 @@ os_error *xosfile_write_load (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x3.
  */
 
-os_error *xosfile_write_exec (char const *file_name,
+os_error *xosfile_write_exec (char *file_name,
       bits exec_addr)
 {
   fprintf(stderr, "osfile_write_exec\n");
@@ -129,7 +129,7 @@ os_error *xosfile_write_exec (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x4.
  */
 
-os_error *xosfile_write_attr (char const *file_name,
+os_error *xosfile_write_attr (char *file_name,
       fileswitch_attr attr)
 {
   fprintf(stderr, "osfile_write_attr\n");
@@ -149,7 +149,7 @@ os_error *xosfile_write_attr (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x9.
  */
 
-os_error *xosfile_stamp (char const *file_name)
+os_error *xosfile_stamp (char *file_name)
 {
   fprintf(stderr, "osfile_stamp\n");
   fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
@@ -170,7 +170,7 @@ os_error *xosfile_stamp (char const *file_name)
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x12.
  */
 
-os_error *xosfile_set_type (char const *file_name,
+os_error *xosfile_set_type (char *file_name,
       bits file_type)
 {
   fprintf(stderr, "osfile_set_type\n");
@@ -198,7 +198,7 @@ os_error *xosfile_set_type (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x6.
  */
 
-os_error *xosfile_delete (char const *file_name,
+os_error *xosfile_delete (char *file_name,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -228,7 +228,7 @@ os_error *xosfile_delete (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xB, R4 = 0x0.
  */
 
-os_error *xosfile_create_stamped (char const *file_name,
+os_error *xosfile_create_stamped (char *file_name,
       bits file_type,
       int size)
 {
@@ -251,7 +251,7 @@ os_error *xosfile_create_stamped (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x8.
  */
 
-os_error *xosfile_create_dir (char const *dir_name,
+os_error *xosfile_create_dir (char *dir_name,
       int entry_count)
 {
   fprintf(stderr, "osfile_create_dir\n");
@@ -281,7 +281,7 @@ os_error *xosfile_create_dir (char const *dir_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xFF, R3 = 0x0.
  */
 
-os_error *xosfile_load_stamped (char const *file_name,
+os_error *xosfile_load_stamped (char *file_name,
       byte *addr,
       fileswitch_object_type *obj_type,
       bits *load_addr,
@@ -322,9 +322,9 @@ os_error *xosfile_load_stamped (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xC, R3 = 0x0.
  */
 
-os_error *xosfile_load_stamped_path (char const *file_name,
+os_error *xosfile_load_stamped_path (char *file_name,
       byte *addr,
-      char const *path,
+      char *path,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -365,9 +365,9 @@ os_error *xosfile_load_stamped_path (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xE, R3 = 0x0.
  */
 
-os_error *xosfile_load_stamped_path_var (char const *file_name,
+os_error *xosfile_load_stamped_path_var (char *file_name,
       byte *addr,
-      char const *var,
+      char *var,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -406,7 +406,7 @@ os_error *xosfile_load_stamped_path_var (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x10, R3 = 0x0.
  */
 
-os_error *xosfile_load_stamped_no_path (char const *file_name,
+os_error *xosfile_load_stamped_no_path (char *file_name,
       byte *addr,
       fileswitch_object_type *obj_type,
       bits *load_addr,
@@ -437,7 +437,7 @@ os_error *xosfile_load_stamped_no_path (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x13.
  */
 
-os_error *xosfile_make_error (char const *file_name,
+os_error *xosfile_make_error (char *file_name,
       fileswitch_object_type obj_type)
 {
   fprintf(stderr, "osfile_make_error\n");
@@ -467,7 +467,7 @@ os_error *xosfile_make_error (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x14.
  */
 
-os_error *xosfile_read_stamped (char const *file_name,
+os_error *xosfile_read_stamped (char *file_name,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -508,8 +508,8 @@ os_error *xosfile_read_stamped (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x15.
  */
 
-os_error *xosfile_read_stamped_path (char const *file_name,
-      char const *path,
+os_error *xosfile_read_stamped_path (char *file_name,
+      char *path,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -552,8 +552,8 @@ os_error *xosfile_read_stamped_path (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x16.
  */
 
-os_error *xosfile_read_stamped_path_var (char const *file_name,
-      char const *var,
+os_error *xosfile_read_stamped_path_var (char *file_name,
+      char *var,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -594,7 +594,7 @@ os_error *xosfile_read_stamped_path_var (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x17.
  */
 
-os_error *xosfile_read_stamped_no_path (char const *file_name,
+os_error *xosfile_read_stamped_no_path (char *file_name,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -628,7 +628,7 @@ os_error *xosfile_read_stamped_no_path (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x18.
  */
 
-os_error *xosfile_read_block_size (char const *file_name,
+os_error *xosfile_read_block_size (char *file_name,
       int *block_size)
 {
   fprintf(stderr, "osfile_read_block_size\n");
@@ -653,11 +653,11 @@ os_error *xosfile_read_block_size (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x0.
  */
 
-os_error *xosfile_save (char const *file_name,
+os_error *xosfile_save (char *file_name,
       bits load_addr,
       bits exec_addr,
-      byte const *data,
-      byte const *end)
+      byte *data,
+      byte *end)
 {
   fprintf(stderr, "osfile_save\n");
   fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
@@ -689,7 +689,7 @@ os_error *xosfile_save (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x5.
  */
 
-os_error *xosfile_read (char const *file_name,
+os_error *xosfile_read (char *file_name,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -728,8 +728,8 @@ os_error *xosfile_read (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xD.
  */
 
-os_error *xosfile_read_path (char const *file_name,
-      char const *path,
+os_error *xosfile_read_path (char *file_name,
+      char *path,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -769,8 +769,8 @@ os_error *xosfile_read_path (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xF.
  */
 
-os_error *xosfile_read_path_var (char const *file_name,
-      char const *var,
+os_error *xosfile_read_path_var (char *file_name,
+      char *var,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -808,7 +808,7 @@ os_error *xosfile_read_path_var (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x11.
  */
 
-os_error *xosfile_read_no_path (char const *file_name,
+os_error *xosfile_read_no_path (char *file_name,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -840,7 +840,7 @@ os_error *xosfile_read_no_path (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x7, R4 = 0x0.
  */
 
-os_error *xosfile_create (char const *file_name,
+os_error *xosfile_create (char *file_name,
       bits load_addr,
       bits exec_addr,
       int size)
@@ -873,7 +873,7 @@ os_error *xosfile_create (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xFF, R3 = 0x1.
  */
 
-os_error *xosfile_load (char const *file_name,
+os_error *xosfile_load (char *file_name,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -911,8 +911,8 @@ os_error *xosfile_load (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xC, R3 = 0x1.
  */
 
-os_error *xosfile_load_path (char const *file_name,
-      char const *path,
+os_error *xosfile_load_path (char *file_name,
+      char *path,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -952,8 +952,8 @@ os_error *xosfile_load_path (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0xE, R3 = 0x1.
  */
 
-os_error *xosfile_load_path_var (char const *file_name,
-      char const *var,
+os_error *xosfile_load_path_var (char *file_name,
+      char *var,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,
@@ -991,7 +991,7 @@ os_error *xosfile_load_path_var (char const *file_name,
  * Other notes:   Emulation of SWI 0x8 with R0 = 0x10, R3 = 0x1.
  */
 
-os_error *xosfile_load_no_path (char const *file_name,
+os_error *xosfile_load_no_path (char *file_name,
       fileswitch_object_type *obj_type,
       bits *load_addr,
       bits *exec_addr,

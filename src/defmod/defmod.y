@@ -205,7 +205,7 @@ const_defn:
       memcpy (t, &$3, def_sizeof_TYPE ($3.tag));
       c->type  = t;
       c->value = $5;
-      c->description = *$6 ? NULL: estrdup($6);
+      c->description = *$6 ? estrdup($6) : NULL;
 
       lookup_insert(consts, $1, c);
    };
@@ -242,7 +242,7 @@ type_defn:
       t->tag = def_TYPE_ABSTRACT;
       t->name = NULL;
       t->value = def_VALUE_REGISTER;
-      t->description = *$2 ? NULL: estrdup($2);
+      t->description = *$2 ? estrdup($2) : NULL;
 
       lookup_insert(types, $1, t);
    } |
@@ -251,7 +251,7 @@ type_defn:
       def_t t = emalloc(def_sizeof_TYPE ($3.tag));
 
       memcpy (t, &$3, def_sizeof_TYPE ($3.tag));
-      t->description = *$4 ? NULL: estrdup($4);
+      t->description = *$4 ? estrdup($4) : NULL;
 
       lookup_insert(types, $1, t);
    };
@@ -387,13 +387,13 @@ toid: type | VOID {$$.tag = def_TYPE_VOID; $$.name = NULL;
 typed_var: type COLON ID DESCRIPTION_OPTION
    {  $$ = $1;
       $$.name = estrdup($3);
-      $$.description = *$4 ? NULL: estrdup($4);
+      $$.description = *$4 ? estrdup($4) : NULL;
    };
 
 toided_var: toid COLON ID DESCRIPTION_OPTION
    {  $$ = $1;
       $$.name = estrdup($3);
-      $$.description = *$4 ? NULL: estrdup($4);
+      $$.description = *$4 ? estrdup($4) : NULL;
    };
 
 swi_decl: SWI swi_defn_LIST;
@@ -526,7 +526,7 @@ description:
    DESCRIPTION
       {  tracef ("DESCRIPTION \"%s\"\n" _ $1);
          $$ = Empty;
-         $$.description = *$1 ? NULL: estrdup($1);
+         $$.description = *$1 ? estrdup($1) : NULL;
          $$.starred_swi = TRUE;
       } |
    STAR

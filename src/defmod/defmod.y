@@ -37,7 +37,6 @@ TV    20000503    |bool| replaced by |osbool|
 
    /*From OSLib*/
    #include "bootstrap/types.h"
-   #include "bootstrap/fileswitch.h"
    #include "bootstrap/macros.h"
    #include "bootstrap/os.h"
 

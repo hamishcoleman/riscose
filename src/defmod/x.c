@@ -41,7 +41,6 @@
 
 /*From OSLib*/
 #include "macros.h"
-#include "messagetrans.h"
 #include "os.h"
 
 /*From Support*/
@@ -97,7 +96,6 @@ x_LOCAL_ERROR( Error_Sync, 1 + (1U<<30), "Try/Catch Synchronisation Error" );
 x_LOCAL_ERROR( Error_XStack, 2 + (1U<<30), "Too many nested x_TRY blocks" );
 
 
-/* error blocks with tokens in (for use with MessageTrans).*/
 x_LOCAL_ERROR( Error_Escape, error_ESCAPE, "Escape" );
 x_LOCAL_ERROR( Error_No_Memory, os_GLOBAL_NO_MEM, "NoMem" );
 

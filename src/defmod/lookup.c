@@ -48,6 +48,15 @@ struct lookup_t
       Entry *entries;
    };
 
+static os_error nomem = {
+    os_GLOBAL_NO_MEM,
+    "NoMeM"
+};
+static os_error noany = {
+    os_GLOBAL_NO_ANY,
+    "NoAny"
+};
+
 #if 0
 /*------------------------------------------------------------------------*/
 static os_error *Trace (lookup_t t)
@@ -88,13 +97,13 @@ os_error *lookup_new
 //   tracef ("lookup_new\n");
    if ((t = m_ALLOC (sizeof *t)) == NULL)
    {
-      error = riscos_error_lookup (os_GLOBAL_NO_MEM, "NoMem");
+      error = &nomem;
       goto finish;
    }
 
    if ((t->entries = m_ALLOC (start_count*sizeof (Entry))) == NULL)
    {
-      error = riscos_error_lookup (os_GLOBAL_NO_MEM, "NoMem");
+      error = &nomem;
       goto finish;
    }
    t->count = start_count;
@@ -213,7 +222,7 @@ os_error *lookup
 
    if (e == NULL || e->token == NULL)
    {
-      error = riscos_error_lookup (os_GLOBAL_NO_ANY, "NoAny", s);
+      error = &noany;
       goto finish;
    }
 
@@ -245,7 +254,7 @@ os_error *lookup_insert (lookup_t t, char *s, void *ptr)
       if ((tmp = m_REALLOC (t->entries, t->count*sizeof (Entry),
             2*t->count*sizeof (Entry))) == NULL)
       {
-         error = riscos_error_lookup (os_GLOBAL_NO_MEM, "NoMem");
+         error = &nomem;
          goto finish;
       }
       t->entries = tmp;
@@ -264,7 +273,7 @@ os_error *lookup_insert (lookup_t t, char *s, void *ptr)
    if (e->token == NULL && (e->token = m_ALLOC (riscos_strlen (s) + 1)) ==
          NULL)
    {
-      error = riscos_error_lookup (os_GLOBAL_NO_MEM, "NoMem");
+      error = &nomem;
       goto finish;
    }
 

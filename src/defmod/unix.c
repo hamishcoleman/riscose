@@ -40,40 +40,6 @@
 static char *Decimal_Point     = ".";
 static int   Decimal_Point_Len = 1;
 
-static os_error *Error_Lookup
-(
-   int      errnum,
-   char    *token,
-   va_list  list
-)
-{
-   os_error *e = (os_error *) m_ALLOC(sizeof(*e));
-
-   e->errnum = errnum;
-   riscos_strcpy (e->errmess, token);
-
-   return e;
-}
-/*------------------------------------------------------------------------*/
-
-os_error *riscos_error_lookup
-(
-   int   errnum,
-   char *token,
-    ...
-)
-{
-   va_list   list;
-   os_error *error;
-
-   tracef ("riscos_error_lookup (%d, %s)\n" _ errnum _ token);
-
-   va_start (list, token);
-   error = Error_Lookup (errnum, token, list);
-   va_end (list);
-
-   return error;
-}
 /*------------------------------------------------------------------------*/
 
 #if TRACE
@@ -366,7 +332,9 @@ os_error *riscos_var_val_alloc
    {
       if ((val = m_ALLOC (len + 1)) == NULL)
       {
-         error = riscos_error_lookup (os_GLOBAL_NO_MEM, "NoMem");
+         error = (os_error *) m_ALLOC(sizeof(*error));
+         error->errnum = os_GLOBAL_NO_MEM;
+         riscos_strcpy(error->errmess, "NoMem");
          goto finish;
       }
 
@@ -650,6 +618,7 @@ finish:
 }
 #endif
 
+static _kernel_oserror last_error_v;
 static _kernel_oserror *last_error;
 
 _kernel_oserror *_kernel_last_oserror(void)
@@ -658,7 +627,9 @@ _kernel_oserror *_kernel_last_oserror(void)
     last_error = NULL;
   }
   else {
-    last_error = riscos_error_lookup(0, strerror(errno));
+    last_error_v.errnum = 0;
+    riscos_strcpy(last_error_v.errmess, strerror(errno));
+    last_error = &last_error_v;
   }
 
   return last_error;
@@ -673,7 +644,9 @@ void os_generate_error(_kernel_oserror *e)
 void messagetrans_error_lookup(_kernel_oserror *e, void *fd, _kernel_oserror *buf,
   int size, char *s1, char *s2, char *s3, char *s4)
 {
-  os_generate_error(riscos_error_lookup(e->errnum, e->errmess, s1, s2, s3, s4));
+  last_error_v.errnum = e->errnum;
+  riscos_strcpy(last_error_v.errmess, e->errmess);
+  os_generate_error(&last_error_v);
 }
 
 os_error *xos_pretty_print(char *string, void *arg1, void *arg2)

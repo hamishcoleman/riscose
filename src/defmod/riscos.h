@@ -37,12 +37,6 @@
 
 extern void riscos__assert (char *file, int line, char *msg);
 
- /* Function to return an |os_error *| from an error token in the global
-  * messages file.
-  */
-
-extern os_error *riscos_error_lookup (int errnum, char *token, ...);
-
  /* Trivial functions to do things "the RISC O S way" rather than "the C
   * way." This means treating strings as control-char terminated, rather
   * than 0-terminated. These can be printed using a format of

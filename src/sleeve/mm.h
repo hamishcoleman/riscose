@@ -17,6 +17,8 @@
 #include "sleeve.h"
 #include <stddef.h>
 #include <mLib/exc.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "arm.h"
 
 /* --- @mm_init@ --- *

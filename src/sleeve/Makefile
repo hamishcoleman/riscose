@@ -1,7 +1,16 @@
-sleeve: arm.o mm.o sleeve.o bdt.o dis.o
-	gcc -o sleeve arm.o mm.o sleeve.o bdt.o dis.o -lmLib
+OBJS = arm.o mm.o sleeve.o bdt.o dis.o armsleeve.o
+CFLAGS += -Dsleeve_SUPPORT_MM_DIRECT -Dsleeve_DEBUG -Dsleeve_SUPPORT_STATS
 
-clean:; rm -f *.o bdt.c genbdt sleeve
+all:	libsleeve.a
+
+libsleeve.a:	$(OBJS)
+	ar cr $@ $(OBJS)
+	ranlib $@
+
+#sleeve: arm.o mm.o sleeve.o bdt.o dis.o
+#	gcc -o sleeve arm.o mm.o sleeve.o bdt.o dis.o -lmLib
+
+clean:; rm -f *.o bdt.c genbdt sleeve libsleeve.a
 
 arm.o: arm.c arm.h sleeve.h mm.h
 mm.o: mm.c mm.h sleeve.h
@@ -17,9 +26,10 @@ genbdt: genbdt.o
 	gcc -o genbdt genbdt.o
 
 #SUPPORT = -Dsleeve_SUPPORT_MM_PAGED -Dsleeve_SUPPORT_MM_DIRECT
-SUPPORT = -Dsleeve_SUPPORT_MM_DIRECT
+#SUPPORT = -Dsleeve_SUPPORT_MM_DIRECT -Dsleeve_SUPPORT_STATS
 
-CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
+#CFLAGS = -O3 -funroll-loops -fomit-frame-pointer
 #CFLAGS = -O2 -g -Dsleeve_DEBUG
 
-.c.o:; gcc -c $(CFLAGS) $(SUPPORT) -o $@ $< -Wall -pedantic -DTEST_RIG $(DEBUG)
+
+#.c.o:; gcc -c $(CFLAGS) $(SUPPORT) -o $@ $< -Wall $(DEBUG)

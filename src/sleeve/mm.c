@@ -102,7 +102,7 @@ void mm_init (unsigned t, size_t l, unsigned p, ptrdiff_t o)
     #endif
 
     default:
-      die(EXIT_FAILURE, "mm_init: No support for translation type %u.", t);
+      die(/*EXIT_FAILURE*/ 1, "mm_init: No support for translation type %u.", t);
   }
 }
 

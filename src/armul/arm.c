@@ -51,14 +51,13 @@ arm_init(void)
   
   ARMul_EmulateInit();
   arm = ARMul_NewState();
-  for (dummyInstr = 0; dummyInstr < 16; dummyInstr++)
-  {
-      arm->LDC[dummyInstr] =
-      arm->STC[dummyInstr] =
-      arm->MRC[dummyInstr] =
-      arm->MCR[dummyInstr] =
-      arm->CDP[dummyInstr] = (void*) arm_unsupported_instruction;
-  }
+    for (dummyInstr = 0; dummyInstr < 16; dummyInstr++) {
+        arm->LDC[dummyInstr] = (ARMul_LDCs *)arm_unsupported_instruction;
+        arm->STC[dummyInstr] = (ARMul_STCs *)arm_unsupported_instruction;
+        arm->MRC[dummyInstr] = (ARMul_MRCs *)arm_unsupported_instruction;
+        arm->MCR[dummyInstr] = (ARMul_MCRs *)arm_unsupported_instruction;
+        arm->CDP[dummyInstr] = (ARMul_CDPs *)arm_unsupported_instruction;
+    }
   ARMul_SelectProcessor(arm, ARM2);
   ARMul_Reset(arm);
   ARMul_SwitchMode(arm, SVC26MODE, USER26MODE);

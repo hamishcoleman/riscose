@@ -55,17 +55,17 @@ void	mem_free(void *ptr);
 
 int 	mem_load_file_at(const char * file, WORD arm_addr);
 
+WORD    mem_get_wimpslot(void);
+
 #ifdef CONFIG_MEM_ONE2ONE
 
   #define mem_get_private()  ((void*) MMAP_USRSTACK_BASE)
-  #define mem_get_wimpslot() ((void*) MMAP_APP_BASE)
   #define MEM_TOHOST(a) ((BYTE*)(a))
   #define MEM_TOARM(a) ((WORD)(a))
 
 #else
 
   void*   mem_get_private(void);
-  WORD    mem_get_wimpslot(void);
   BYTE*   mem_f_tohost(WORD arm_addr);
   WORD    mem_f_toarm(void *ptr);
   #define MEM_TOHOST(a) (mem_f_tohost(a))

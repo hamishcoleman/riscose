@@ -228,13 +228,13 @@ mem_final(void)
 {
 }
 
-#ifndef CONFIG_MEM_ONE2ONE
 WORD
 mem_get_wimpslot(void)
 {
   return(mem->tasks[mem->task_current].wimpslot);
 }
 
+#ifndef CONFIG_MEM_ONE2ONE
 void*
 mem_get_private(void)
 {

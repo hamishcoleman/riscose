@@ -41,8 +41,7 @@ extern void riscos__assert (char *file, int line, char *msg);
   * way." This means treating strings as control-char terminated, rather
   * than 0-terminated. These can be printed using a format of
   * "%.*s" and passing in the length of the string, as calculated by
-  * |riscos_strlen|, as a argument to the printing function. Note that
-  * riscos_strncpy() is not like strncpy(): it always terminates its output.
+  * |riscos_strlen|, as a argument to the printing function.
   */
 
 extern int riscos_strlen (char *s);
@@ -50,8 +49,6 @@ extern int riscos_strlen (char *s);
 extern char *riscos_strcpy (char *s1, char *s);
 
 extern int riscos_strcmp (char *s0, char *s1);
-
-extern char *riscos_strncpy (char *s1, char *s, int n);
 
  /* Functions to read back the items above - these return the number of
   * characters successfully read, 0 for error.

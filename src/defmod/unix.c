@@ -50,18 +50,10 @@ void riscos__assert
    char *msg
 )
 {
-   os_error error;
-   int      len;
+    fprintf(stderr, "assert failed in file %s at line %d: %s\n", file,
+        line, msg);
 
-   tracef ("riscos__assert\n");
-
-   error.errnum = 1;
-   sprintf (error.errmess, "\"%.*s\", line %d: %n",
-         sizeof error.errmess - 11 - UNSIGNED_WIDTH - 1, file, line, &len);
-   riscos_strncpy (&error.errmess [len], msg, os_ERROR_LIMIT - len - 1);
-
-   (void) xwimp_report_error (&error, wimp_ERROR_BOX_SHORT_TITLE,
-         "Assertion failure", NULL);
+    return;
 }
 /*------------------------------------------------------------------------*/
 #endif
@@ -126,29 +118,6 @@ int riscos_strcmp
          else
             if (c0 != c1) return (tracef ("-> %d\n" _ c0 - c1), c0 - c1);
    }
-}
-/*------------------------------------------------------------------------*/
-
-/*Copies a RISC O S string of limited length, like
-   sprintf (s1, "%.*s", MIN (n, riscos_strlen (s)), s);*/
-
-char *riscos_strncpy
-(
-   char *s1,
-   char *s,
-   int   n
-)
-{
-   int i;
-
-   /*Copy up to |n| characters of the string*/
-   for (i = 0; s [i] >= ' ' && i < n; i++)
-      s1 [i] = s [i];
-
-   /*Append a terminator.*/
-   s1 [i] = '\0';
-
-   return s1;
 }
 /*------------------------------------------------------------------------*/
 

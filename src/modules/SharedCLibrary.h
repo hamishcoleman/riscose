@@ -72,7 +72,7 @@ enum {
 };
 
 static char *clib_kern_names[] = {
-#define X(i, n) "KERN_" #i,
+#define X(i, n) "CLIB_KERN_" #i,
     LIST
 #undef X
 };
@@ -278,7 +278,7 @@ enum {
 };
 
 static char *clib_clib_names[] = {
-#define X(i, n) "CLIB_" #i,
+#define X(i, n) "CLIB_CLIB_" #i,
     LIST
 #undef X
 };

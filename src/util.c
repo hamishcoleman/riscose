@@ -32,6 +32,20 @@ void *xmalloc(size_t size)
   exit(1);
 }
 
+char *xstrcpy(char *src)
+{
+   char *dst = xmalloc(strlen(src)+1);
+   strcpy(dst, src);
+   return dst;
+}
+
+char *xstrncpy(char *src, int n)
+{
+  char *dst = xmalloc(n+1);
+  strncpy(dst, src, n);
+  return dst;
+}
+
 int file_objecttype(char *name)
 {
   struct stat file_info;

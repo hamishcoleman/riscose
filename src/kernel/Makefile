@@ -1,10 +1,9 @@
-#! /bin/make -f
+#!/bin/make -f
 
 LIB = libkernel.a
 OBJ = \
     $(LIB)(module.o) \
     $(LIB)(osbyte.o) \
-    $(LIB)(osfileio.o) \
     $(LIB)(osmisc.o) \
     $(LIB)(osmodule.o) \
     $(LIB)(vdu.o) \

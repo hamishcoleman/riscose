@@ -3,6 +3,7 @@
 LIB = libmodules.a
 OBJ = \
     $(LIB)(BasicTrans.o) \
+    $(LIB)(FileSwitch.o) \
     $(LIB)(SharedCLibrary.o) \
     $(LIB)(UtilityModule.o) \
 

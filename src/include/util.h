@@ -16,9 +16,13 @@
 #include <stddef.h>
 
 void *xmalloc(size_t size);
+char *xstrcpy(char *src);
+char *xstrncpy(char *src, int n);
+#define xstrcpybetween(start, end) xstrncpy((start), (end)-(start))
+
 #define OBJECT_NOTFOUND	0
-#define OBJECT_FILE	1
-#define OBJECT_DIR	2
+#define OBJECT_FILE	    1
+#define OBJECT_DIR	    2
 #define OBJECT_IMAGE	3
 int file_objecttype(char *name);
 #define file_isfile(x) (file_objecttype((x)) == OBJECT_FILE)

@@ -1,4 +1,4 @@
-/* swih_os.c
+/* osmisc.c
 **
 ** (c) Matthew Bloch 2000
 **
@@ -13,6 +13,7 @@
 **   $Date$
 */
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "mem.h"
 #include "arm.h"
@@ -20,6 +21,8 @@
 #include "rom.h"
 #include "vdu.h"
 #include "map.h"
+
+#include <readline/readline.h>
 
 WORD
 swih_os_writei(WORD num)
@@ -50,7 +53,7 @@ swih_os(WORD num)
 	    pc++;
 	  }
 	pc = (pc + 3) & ~3;
-	ARM_SET_R15(pc | psr);
+	arm_set_pc(pc);
 	return 0;
       }
     
@@ -61,7 +64,12 @@ swih_os(WORD num)
 	  vdu(*(p++));
       }
       return 0;
-      
+    
+    case 0x3 : /* OS_NewLine */
+      vdu(10);
+      vdu(13);
+      return 0;
+    
     case 0x6:
       osbyte();
       return 0;
@@ -74,8 +82,28 @@ swih_os(WORD num)
       osfile();
       return 0;
     
+    case 0x9: /* OS_Find */
+      switch(ARM_R0 & 0xf0)
+      {
+      }
+      return 0;
+    
+    case 0xe: /* OS_ReadLine */
+      {
+        /* FIXME: not quite right! */
+        char *l = readline(NULL);
+        strncpy(MEM_TOHOST(ARM_R0 & 0x3fffffff), l, ARM_R1);
+        ARM_SET_R1(strlen(l));
+        free(l);
+      }
+      return 0;
+    
     case 0xf:
       fprintf(stderr, "OS_Control called");
+      return 0;
+    
+    case 0x1e:
+      osmodule();
       return 0;
     
     case 0x46 : /* OS_WriteN */
@@ -93,13 +121,27 @@ swih_os(WORD num)
       exit(arm_get_reg(0));
       return 0;
     
+    case 0x16: /* OS_EnterOS (eeek!) */
+      return 0;
+    
     case 0x2b: /* OS_GenerateError */ 
       
-      fprintf(stderr, "*** Error from RISC OS (%08x): %s\n",
-	 (unsigned) *((WORD*)MEM_TOHOST(ARM_R0)),
-	 (char*) MEM_TOHOST(ARM_R0)+4);
-      exit(1);
+      if (!SWI_X(num)) {
+        fprintf(stderr, "*** Error from RISC OS (%08x): %s\n",
+	   (unsigned) *((WORD*)MEM_TOHOST(ARM_R0)),
+	   (char*) MEM_TOHOST(ARM_R0)+4);
+        exit(1); /* FIXME: Sort the error handlers! */
+      }
+      return ARM_R0;
       
+    case 0x6f: /* OS_CallASWI */
+      printf("OS_CallASWI\n");
+      swi_trap(ARM_R10);
+      return 0;
+    case 0x71: /* OS_CallASWIR12 */
+      printf("OS_CallASWI %x\n", ARM_R12);
+      swi_trap(ARM_R12);
+      return 0;
     }
   return ERR_EM_UNHANDLEDSWI;
 }
@@ -107,13 +149,13 @@ swih_os(WORD num)
 static const char *os_names[64] =
 {
   "WriteC",  "WriteS", "Write0", "NewLine", "ReadC", "CLI", "Byte", "Word",
-  "File", "Args", "BGet", "BPut", "GBPB", "Find", "ReadLine", "Control",
+  "File", "Args", "BGet", "BPut", "GBPB", "Find", "ReadLine", "Control",  
   "GetEnv", "Exit", "SetEnv", "IntOn", "IntOff", "CallBack", "EnterOS",
-  "BreakPt", "BreakCtrl", "UnusedSWI", "UpdateMEMC", "SetCallBack", "Mouse",
+  "BreakPt", "BreakCtrl", "UnusedSWI", "UpdateMEMC", "SetCallBack", "Mouse",  
   "Heap", "Module", "Claim", "Release", "ReadUnsigned", "GenerateEvent",
   "ReadVarVal", "SetVarVal", "GSInit", "GSRead", "GSTrans", "BinaryToDecimal",
   "FSControl", "ChangeDyamicArea", "GenerateError", "ReadEscapeState",
-  "EvaluateExpression", "SpriteOp", "ReadPalette", "ServiceCall",
+  "EvaluateExpression", "SpriteOp", "ReadPalette", "ServiceCall",  
   "ReadVduVariables", "ReadPoint", "UpCall", "CallAVector", "ReadModeVariable",
   "RemoveCursors", "RestoreCursors", "SWINumberToString", "SWINumberFromString",
   "ValidateAddress", "CallAfter", "CallEvery", "RemoveTickerEvent",

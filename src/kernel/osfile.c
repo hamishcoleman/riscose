@@ -29,7 +29,8 @@ void osfile(void)
     case 3:
     case 4:
     case 9:
-    case 18: /* Various calls to write catalogue information (yawn) */
+    case 18:
+      fprintf(stderr, "FIXME: OS_File: Catalogue information NOT written\n");
       return;
     
     case 12:
@@ -48,10 +49,11 @@ void osfile(void)
     case 13:
     case 15:
     case 17: /* FIXME: implement various path options */
+      fprintf(stderr, "FIXME: OS_File: Path options unimplemented\n");
       ARM_SET_R0(file_objecttype(MEM_TOHOST(ARM_R1)));
       if (ARM_R0 != OBJECT_NOTFOUND)
         ARM_SET_R4(file_size(MEM_TOHOST(ARM_R1)));
-      printf("info object size %d\n", (unsigned)ARM_R4);
+      printf("`%s' size %d\n", MEM_TOHOST(ARM_R1), (unsigned)ARM_R4);
       return;
       
     default:

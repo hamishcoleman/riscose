@@ -13,7 +13,7 @@
 */
 
 #define MODULE_ENTRY(a,o) ( ((a) + MEM_READ_WORD((a)+(o))) == (a) ? 0 \
-                       :  ((a) + MEM_READ_WORD((a)+(o))) == (a)     )
+                       :  (  (a) + MEM_READ_WORD((a)+(o))) == (a)     )
 
 #define MODULE_START(a)			MODULE_ENTRY((a), 0)
 #define MODULE_INIT(a) 			MODULE_ENTRY((a), 4)
@@ -29,6 +29,8 @@
 #define MODULE_MESSAGES(a) 		MODULE_ENTRY((a), 44)
 
 void	module_init(void);
-WORD	module_ptr(int num);
+int	module_numberofmodules(void);
+WORD    module_base(int num);
+int	module_lookup(char *name);
 int	module_load(char *name);
-void	module_kill(int num);
+int	module_kill(int num);

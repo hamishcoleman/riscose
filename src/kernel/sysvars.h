@@ -10,9 +10,12 @@
 **   $Revision$
 **   $Date$
 */
-int    sysvars_init();
-void   sysvars_set(char *var, char *val);
-char * sysvars_get(char *var);
-char * sysvars_unset(char *var);
-char * sysvars_list_first();
-char * sysvars_list_next(char *last);
+
+#define SYSVAR_TYPE_STRING  0
+#define SYSVAR_TYPE_INTEGER 1
+#define SYSVAR_TYPE_MACRO   2
+
+void sysvars_init();
+
+WORD osreadvarval();
+WORD ossetvarval();

@@ -5,7 +5,7 @@
 ######## Feature switches
 
 # One-to-one memory mapping?
-DEFS += -DCONFIG_MEM_ONE2ONE
+#DEFS += -DCONFIG_MEM_ONE2ONE
 
 # Which ARM to use?  Either armul, sleeve or native.
 ARM_SELECT = armul
@@ -19,34 +19,45 @@ ARM_SELECT = armul
 
 SRCDIR  = $(CURDIR)
 CC      = gcc
-CFLAGS  = -Wall -I$(SRCDIR) $(DEFS) -g3
-LDFLAGS = -lmLib
+CFLAGS  = -Wall -I. -I$(SRCDIR)/include $(DEFS) -g3
+LDFLAGS = -lncurses -lreadline
+PREFIX  = /usr/local
 
 ######## Everything else
-
-LDFLAGS += -L $(ARM_SELECT) -l$(ARM_SELECT)
 
 %.o:    %.c mem.h arm.h
 	$(CC) $(CFLAGS) -c -o $@ $<
 
 export CC CFLAGS SRCDIR LDFLAGS
 
-HANDLERS = swih_os.o swih_sharedclibrary.o osfile.o osbyte.o clib_file.o
-OBJS = main.o mem.o swi.o heap.o util.o vdu.o module.o \
-       $(ARM) $(HANDLERS)
+CORE   = swi.o util.o main.o mem.o heap.o
+
+OBJS = $(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a modules/libmodules.a
 
 BIN = riscose
 
-all:	$(BIN) ROMimage
+all:	subs $(BIN) rom/ROMimage
 
 $(ARM_SELECT)/lib$(ARM_SELECT).a: $(ARM_SELECT)/*.c $(ARM_SELECT)/*.h
-	cd $(ARM_SELECT) && $(MAKE)
+	$(MAKE) -C $(ARM_SELECT) 
 
-ROMimage:	*.list
-	./compilerom.pl
+subs:
+	$(MAKE) -C kernel
+	$(MAKE) -C modules
+	$(MAKE) -C rom
 
-$(BIN):	$(OBJS) $(ARM_SELECT)/lib$(ARM_SELECT).a
-	$(CC) -o $@ swi.lds $(OBJS) -lncurses $(LDFLAGS)
+# WTF is the linkscript file for then?  See:
+#
+# http://www.gnu.org/manual/ld-2.9.1/html_chapter/ld_3.html
+
+$(BIN):	$(CORE) $(ARM_SELECT)/lib$(ARM_SELECT).a kernel/libkernel.a modules/libmodules.a
+	$(CC) -o $@ linkscript $(OBJS) $(LIBRARIES) $(LDFLAGS)
+
+######## Utility targets
 
 clean:
 	-rm `find . -name '*.o' -o -name '*.a' -o -name '*~'` $(BIN) core ROMimage
+
+# So you can run RISC OS binaries as if they're native
+binfmt:
+	echo ':riscos_aif:M:16:\x11\x00\x00\xEF::/home/mattbee/Projects/riscose/riscose/src/riscose:' >/proc/sys/fs/binfmt_misc/register

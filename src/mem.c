@@ -29,6 +29,42 @@
 #include "swi.h"
 #include "heap.h"
 
+#define MAX_TASKS 64
+#define RMA_START_SIZE 256*1024
+
+typedef struct {
+  WORD wimpslot;
+  BYTE *app;
+  BYTE *stack;
+  BYTE *env;
+  void *info; /* for our WIMP to use */
+}
+mem_wimp_task;
+
+typedef struct {
+  char name[64];
+  WORD size, maxsize;
+}
+mem_dynamicarea;
+
+typedef struct {
+  WORD            task_current;
+  mem_wimp_task  *tasks;
+  BYTE           *rma;
+  WORD            rma_size;
+  BYTE		 *rom;
+}
+mem_state;
+
+/* +ve IDs indicate dynamic area numbers */
+#define MEM_ID_PRIVATE     -1
+#define MEM_ID_RMA         -2
+#define MEM_ID_READONLY    -3
+#define MEM_ID_TASKHEAP    -4
+#define MEM_ID_USRSTACK    -5
+#define MEM_ID_ROM         -6
+#define MEM_ID_NEWDYNAMICAREA -99
+
 static mem_state* mem = NULL;
 
 static int backtrace_in_progress=0;
@@ -36,11 +72,34 @@ static
 void
 arm_backtrace(void);
 
+static
+int
+mem_where(void *_ptr)
+{
+  BYTE *ptr = (BYTE*) _ptr;
+  mem_wimp_task *ctask = &mem->tasks[mem->task_current];
+
+  /*printf("%p, %p (%p) %p %p %p\n", ptr, mem->rma, mem->rma_size, mem->tasks[mem->task_current].app, mem->tasks[mem->task_current].stack, mem->rom);*/
+  
+  if (ptr >= mem->rma && ptr < mem->rma + mem->rma_size)
+    return MEM_ID_RMA;
+  if (ptr >= ctask->app && ptr < ctask->app + ctask->wimpslot)
+    return MEM_ID_TASKHEAP;
+  if (ptr >= mem->rom && ptr < mem->rom+MMAP_ROM_SIZE)
+    return MEM_ID_ROM;
+  if (ptr >= ctask->stack && ptr < ctask->stack + MMAP_USRSTACK_SIZE)
+    return MEM_ID_USRSTACK;
+  fprintf(stderr, "*** Don't know which memory area %p belongs to\n", ptr);
+  abort();
+  return 0;
+}
+
 #ifndef CONFIG_MEM_ONE2ONE
 inline
 BYTE*
 mem_f_tohost(WORD arm_addr)
 {
+  /*printf("converting %x\n", arm_addr);*/
   switch(arm_addr)
     {
     case MMAP_APP_BASE ... MMAP_APP_BASE + MMAP_APP_SIZE - 1:
@@ -58,14 +117,29 @@ mem_f_tohost(WORD arm_addr)
     default:
       fprintf(stderr, "*** Bad memory access 0x%08x\n", (unsigned)arm_addr);
       arm_backtrace();
-      exit(1);
+      abort();
     }
 }
 
 inline
 WORD
-mem_f_toarm(void *ptr)
+mem_f_toarm(void *_ptr)
 {
+  BYTE *ptr = (BYTE*) _ptr;
+    
+  switch (mem_where(ptr))
+    {
+    case MEM_ID_RMA:
+      return MMAP_RMA_BASE + (ptr - mem->rma);
+    case MEM_ID_TASKHEAP:
+      return MMAP_APP_BASE + (ptr - mem->tasks[mem->task_current].app);
+    case MEM_ID_USRSTACK:
+      return MMAP_USRSTACK_BASE + (ptr - mem->tasks[mem->task_current].stack);
+    case MEM_ID_ROM:
+      return MMAP_ROM_BASE + (ptr - mem->rom);
+    }
+  fprintf(stderr, "Unknown area for memory address %p\n", _ptr);
+  abort();
   return 0;
 }
 #endif
@@ -81,7 +155,7 @@ load_rom(char *file, BYTE *address)
   if (stat(file, &s) != 0)
   {
     fprintf(stderr, "Couldn't find ROMimage file\n");
-    exit(1);
+    abort();
   }
   if (address == NULL)
     rom = xmalloc(s.st_size);
@@ -98,7 +172,7 @@ load_rom(char *file, BYTE *address)
 #define MMAP_INIT_ERR(x) { printf("mmap_init: %s", (x)); exit(1); }
 static
 void
-map_it(char *desc, WORD base, WORD size)
+map_it(WORD base, WORD size)
 {
   if (mmap((void*) base, size,
            PROT_EXEC | PROT_READ | PROT_WRITE,
@@ -106,7 +180,19 @@ map_it(char *desc, WORD base, WORD size)
            0, 0) != MAP_FAILED)
     return;
     
-  printf("map_it: %s failed @ %08x, %ld bytes\n", desc, (unsigned)base, size);
+  printf("map_it: failed to map %ld bytes at %08x\n", size, (unsigned)base);
+  exit(1);
+}
+
+static
+void
+remap_it(WORD base, WORD oldsize, WORD newsize)
+{
+  if (mremap((void*) base, oldsize, newsize,
+             MAP_FIXED | MAP_PRIVATE | MAP_ANON) != MAP_FAILED)
+    return;
+  
+  printf("remap_it: failed to resize %08x from %ld to %ld\n", (unsigned) base, oldsize, newsize);
   exit(1);
 }
 #endif
@@ -120,19 +206,19 @@ mem_init(void)
   
 #ifdef CONFIG_MEM_ONE2ONE
 #ifndef NATIVE
-  map_it("application", MMAP_APP_BASE, 1<<20);
+  map_it(MMAP_APP_BASE, 1<<20);
 #endif
-  map_it("usr stack", MMAP_USRSTACK_BASE, MMAP_USRSTACK_SIZE);
-  map_it("rma", MMAP_RMA_BASE, 1<<20); /* FIXME: arbitrary numbers :-) */
-  map_it("rom", MMAP_ROM_BASE, MMAP_ROM_SIZE);
-  load_rom("ROMimage", MEM_TOHOST(MMAP_ROM_BASE));
+  map_it(MMAP_USRSTACK_BASE, MMAP_USRSTACK_SIZE);
+  map_it(MMAP_RMA_BASE, RMA_START_SIZE);
+  map_it(MMAP_ROM_BASE, MMAP_ROM_SIZE);
   mem->rma      = MEM_TOHOST(MMAP_RMA_BASE);
   mem->rom      = MEM_TOHOST(MMAP_ROM_BASE);
+  load_rom("ROMimage", MEM_TOHOST(MMAP_ROM_BASE));
 #else
   mem->rma      = xmalloc(RMA_START_SIZE);
-  mem->rma_size = RMA_START_SIZE;
   mem->rom      = load_rom("ROMimage", 0);
 #endif
+  mem->rma_size = RMA_START_SIZE;
   
   heap_init((heap_t*) MEM_TOHOST(MMAP_RMA_BASE), RMA_START_SIZE);
 }
@@ -142,6 +228,7 @@ mem_final(void)
 {
 }
 
+#ifndef CONFIG_MEM_ONE2ONE
 WORD
 mem_get_wimpslot(void)
 {
@@ -151,12 +238,9 @@ mem_get_wimpslot(void)
 void*
 mem_get_private(void)
 {
-#ifdef CONFIG_MEM_ONE2ONE
-  return (void*) MMAP_USRSTACK_BASE;
-#else
   return(mem->tasks[mem->task_current].stack);
-#endif
 }
+#endif
 
 WORD inline
 mem_task_which()
@@ -215,9 +299,13 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
        mem->tasks[c].env      = xmalloc(256);
 #ifdef NATIVE
        mem->tasks[c].app      = MMAP_SLOT_BASE + (c * 64 * MEG);
-       map_it("application", mem->tasks[c].app, wimpslot);
+       map_it(mem->tasks[c].app, wimpslot);
 #else
+#  ifdef CONFIG_MEM_ONE2ONE
+       mem->tasks[c].app      = (void*) 0x8000; /* FIXME: Task switching won't work! */
+#  else
        mem->tasks[c].app      = xmalloc(wimpslot);
+#  endif
 #endif
        if (image_filename != NULL)
          {
@@ -243,48 +331,99 @@ mem_task_delete(WORD c, void *info)
   free(mem->tasks[c].env);
 }
 
-WORD
+static
+int
+mem_extend_rma(WORD size_to_accommodate)
+{
+  WORD newsize = mem->rma_size * 2;
+  
+#ifdef CONFIG_MEM_ONE2ONE
+  remap_it(MMAP_RMA_BASE, mem->rma_size, newsize);
+#else
+  assert( (mem->rma = realloc(mem->rma, newsize)) != 0);
+#endif
+  mem->rma_size = newsize;
+  return heap_resize((heap_t*) mem->rma, newsize);
+}
+
+void*
+mem_private_alloc(WORD size)
+{
+  return malloc(size);
+}
+
+void*
 mem_rma_alloc(WORD size)
 {
-  BYTE *m;
-  
-  size += 8-(size&3); /* must be word-aligned, eejut! */
-  
+  void *m;
+  size += 8-(size&3);
   m = heap_block_alloc((heap_t*) mem->rma, size);
   if (m == NULL)
-#ifdef CONFIG_MEM_ONE2ONE
     {
-     fprintf(stderr, "FIXME: extend RMA with mremap()\n");
-     exit(1);
-    }
-#else
-    {
-     WORD s = mem->rma_size*2;
-     mem->rma = realloc(mem->rma, s);
-     heap_resize((heap_t*) mem->rma, s);
+     mem_extend_rma(size);
      m = heap_block_alloc((heap_t*) mem->rma, size);
-     if (m == NULL)
-       {
-        fprintf(stderr, "Couldn't allocate %ld bytes of RMA!\n", size);
-        exit(1);
-       }
+     assert(m != NULL);
     }
-#endif
-
-  return MMAP_RMA_BASE + (m - mem->rma);
+    return m;
 }
 
-void mem_rma_free(WORD addr)
+void*
+mem_taskheap_alloc(WORD size)
 {
+  return mem_rma_alloc(size);
 }
 
-WORD
-mem_rma_resize(WORD addr, WORD newsize)
+void*
+mem_readonly_alloc(WORD size)
 {
-  BYTE *resized = heap_block_resize((heap_t*) mem->rma, mem->rma + (addr - MMAP_RMA_BASE), newsize);
+  fprintf(stderr, "FIXME: unimplemented mem_readonly_alloc\n");
+  abort();
+}
 
-  assert(resized != NULL); /* FIXME -- should extend the RMA instead */
-  return (resized - mem->rma) + MMAP_RMA_BASE;
+void*
+mem_realloc(void *ptr, WORD size, int immovable)
+{
+  void *m;
+  int id = mem_where(ptr);
+  
+  switch (id)
+    {
+      case MEM_ID_PRIVATE:
+        return realloc(ptr, size);
+		
+      case MEM_ID_TASKHEAP:
+      case MEM_ID_RMA:
+        m = heap_block_resize((heap_t*) mem->rma, ptr, size);
+	if (m == NULL)
+	  {
+	   mem_extend_rma(size);
+	   m = heap_block_resize((heap_t*) mem->rma, ptr, size);
+	   assert(m != NULL);
+	  }
+	return m;
+    }
+  fprintf(stderr, "FIXME: mem_realloc for id=%d\n", id);
+  abort();
+}
+
+void
+mem_free(void *ptr)
+{
+  int id = mem_where(ptr);
+
+  switch (id)
+    {
+      case MEM_ID_PRIVATE:
+        free(ptr);
+	return;
+	
+      case MEM_ID_TASKHEAP:
+      case MEM_ID_RMA:
+        heap_block_free((heap_t*) mem->rma, ptr);
+	return;
+    }
+  fprintf(stderr, "FIXME: mem_free for id=%d\n", id);
+  abort();
 }
 
 int

@@ -20,7 +20,6 @@
 #include "arm.h"
 #include "rom.h"
 #include "swi.h"
-#include "swih_all.h"
 
 static swi_handler * handler;
 extern struct swi_chunk __chunk_00000000;
@@ -36,11 +35,16 @@ swi_number_to_name(WORD num, char *buf)
 {
   WORD chunk = SWI_CHUNK(num);
   struct swi_chunk *c;
+  
+  if (SWI_OS(num) == SWI_OS_TRAP)
+    chunk = num & 0x3dff00;
+  
   for (c = &__chunk_00000000; chunk > c->base; c++)
     ;
+  
   if (chunk == c->base)
     {
-      WORD nr = num & 0x3f;
+      WORD nr = num & 0xff;
       if (c->names && c->names[nr])
 	sprintf(buf, "%s_%s", c->prefix, c->names[nr]);
       else
@@ -56,10 +60,22 @@ swi_trap(WORD num)
   WORD e;
   struct swi_chunk *c;
   WORD chunk = SWI_CHUNK(num);
-    
+
+#ifdef CONFIG_TRACE_SWIS
+  {
+    char b[256];
+    swi_number_to_name(num, b);
+    fprintf(stderr, "SWI %s (%08x) called ", b, num);
+    fprintf(stderr, "(%08lx %08lx %08lx %08lx)", ARM_R0, ARM_R1, ARM_R2, ARM_R3);
+    fprintf(stderr, "\n");
+  }
+#endif
+  
+  
   if (SWI_OS(num) == SWI_OS_TRAP)
     {
      WORD r;
+     
      
 #ifndef NATIVE
      if (num == SWI_MAGIC_RETURN)
@@ -68,6 +84,9 @@ swi_trap(WORD num)
      if (((r = swih_sharedclibrary_entry(num)) & SWIH_EXIT_HANDLED) == 0)
        arm_set_pc(ARM_R14);
      r &= !3;
+#ifdef CONFIG_TRACE_SWIS
+  fprintf(stderr, "return R0 = %x\n", ARM_R0);
+#endif
      return;
     }
 

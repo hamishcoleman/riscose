@@ -2601,12 +2601,6 @@ ARMul_Emulate26 (register ARMul_State * state)
 		  break;
 		}
 
-#ifdef CONFIG_TRACE_SWIS
-            fprintf(stderr, "SWI %08lx called ", BITS(0, 23));
-            fprintf(stderr, "(%08lx %08lx %08lx %08lx)", state->Reg[0], state->Reg[1], state->Reg[2], state->Reg[3]);
-            fprintf(stderr, "\n");
-#endif
-
 	      if (!ARMul_OSHandleSWI (state, BITS (0, 23)))
 		{
 		  ARMul_Abort (state, ARMul_SWIV);

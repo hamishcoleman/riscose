@@ -62,6 +62,16 @@ void	arm_set_reg(WORD num, WORD val);
                                      ) \
                         )
 
+#define ARM_V_FLAG (1<<28)
+#define ARM_C_FLAG (1<<29)
+#define ARM_Z_FLAG (1<<30)
+#define ARM_N_FLAG (1<<31)
+
+#define ARM_V_SET (ARM_R15 & ARM_V_FLAG)
+#define ARM_C_SET (ARM_R15 & ARM_C_FLAG)
+#define ARM_Z_SET (ARM_R15 & ARM_Z_FLAG)
+#define ARM_N_SET (ARM_R15 & ARM_N_FLAG)
+
 void	arm_clear_v();
 void	arm_set_v();
 

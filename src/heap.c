@@ -8,7 +8,8 @@
 **   General-purpose heap manager designed to emulate OS_Heap under RISC OS:
 **   i.e. you allocate the memory, this'll manage it for you, keeping all its
 **   guts inside the block you've given it, and if you need to move the memory,
-**   these routines should cope.
+**   these routines should cope.  It's just a simple first-fit algorithm which
+**   we can improve when we need to.
 **
 **   $Revision$
 **   $Date$
@@ -20,10 +21,10 @@
 #include <stdio.h>
 #include "heap.h"
 
-#define HEAP_ALIGN_SIZE (size += (4-(size&3)))
+#define HEAP_ALIGN_SIZE (size += (size&3) ? 4-(size&3) : 0)
 
 #define MAGIC_HEAP_VALUE  0x70616548
-#define MAGIC_BLOCK_VALUE 0x27111979 /* ha ha */
+#define MAGIC_BLOCK_VALUE 0x27111979 /* don't forget to send me a card */
 
 #define BLOCK_AT(o) ( (heap_block_t*) (h->data+(o)))
 
@@ -40,20 +41,24 @@ static
 void check_integrity(heap_t *h)
 {
   ULONG off = 0;
-  
-  return;
-  
+    
   assert(h->magic == MAGIC_HEAP_VALUE);
   
   while (off != h->size)
     {
-     /*printf("offset %ld size %ld next %ld gap %ld\n", off, BLOCK_AT(off)->size, BLOCK_AT(off)->next, space_between(h, off, BLOCK_AT(off)->size));*/
+#define HEAP_DEBUG 1
+#if HEAP_DEBUG
+     printf("Heap dump: offset %ld size %ld next %ld gap %ld\n", off, BLOCK_AT(off)->size, BLOCK_AT(off)->next, space_between(h, off, BLOCK_AT(off)->size));
+#endif
      assert(BLOCK_AT(off)->magic == MAGIC_BLOCK_VALUE);
      assert(BLOCK_AT(off)->next > off);
      assert(BLOCK_AT(off)->size < h->size);
      assert(space_between(h, off, BLOCK_AT(off)->size) >=0 );
      off = BLOCK_AT(off)->next;
     }
+#if HEAP_DEBUG
+  printf("Heap dump: --- Done\n");
+#endif
 }
 
 void
@@ -64,7 +69,7 @@ heap_init(heap_t* h, ULONG size)
   HEAP_ALIGN_SIZE;
   
   h->magic = MAGIC_HEAP_VALUE;
-  /*h->first = */h->size = size-sizeof(heap_block_t);
+  h->size = size-sizeof(heap_block_t);
   anchor->magic = MAGIC_BLOCK_VALUE;
   anchor->size = 0;
   anchor->next = h->size;
@@ -96,6 +101,7 @@ _heap_describe(heap_t* h, ULONG *largest_ptr, WORD excluding)
         if (space > largest)
           largest = space;
        }
+
      lastoff = off;
      if (off != h->size)
        {
@@ -121,7 +127,6 @@ heap_describe(heap_t* h, ULONG *largest_ptr)
 BYTE*
 heap_block_alloc(heap_t* h, ULONG size)
 {
-  ULONG actual_size = size + sizeof(heap_block_t);
   ULONG lastoff, off, newoff;
   heap_block_t  *block = NULL;
   
@@ -129,15 +134,11 @@ heap_block_alloc(heap_t* h, ULONG size)
   
   assert(h->magic == MAGIC_HEAP_VALUE);
   
-  /*{
-    WORD largest, left = heap_describe(h, &largest);
-    printf("heap: %ld left, %ld largest\n", left, largest);
-  }*/
-  
   off     = BLOCK_AT(0)->next;
   lastoff = 0;
 
-  while (off != h->size && space_between(h, lastoff, off) < actual_size)
+  while (off != h->size &&
+         space_between(h, lastoff, off) < size+sizeof(heap_block_t))
     {
      block = BLOCK_AT(off);
      assert(block->magic == MAGIC_BLOCK_VALUE);
@@ -147,7 +148,8 @@ heap_block_alloc(heap_t* h, ULONG size)
      assert(lastoff < off);
     }
     
-  if (off == h->size && space_between(h, lastoff, off) < actual_size)
+  if (off == h->size && 
+      space_between(h, lastoff, off) < size+sizeof(heap_block_size))
     return NULL; /* no suitably-sized space left */
 
   newoff = lastoff + sizeof(heap_block_t) + (BLOCK_AT(lastoff)->size);
@@ -170,7 +172,11 @@ heap_block_free(heap_t* h, BYTE *d)
 {
   ULONG lastoff, off;
   heap_block_t *block = (heap_block_t*) (d-sizeof(heap_block_t));
-    
+
+  check_integrity(h);  
+  printf("freeing a block at %p (off %d), magic = %08x, size %d\n", d, (BYTE*)d-(BYTE*)h, block->magic, h->size);
+
+  // assert(((BYTE*)d - (BYTE*)h)  < (sizeof(heap_t)+h->size));
   assert(block->magic == MAGIC_BLOCK_VALUE);
   assert(h->magic  == MAGIC_HEAP_VALUE);
 

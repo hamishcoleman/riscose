@@ -51,12 +51,18 @@ void
 arm_set_pc(WORD addr)
 {
   ARMul_SetPC(arm, addr);
+  ARMul_R15Altered(arm);
 }
 
 void
 arm_run_routine(WORD addr)
 {
   WORD old_pc = ARM_R15, old_r14 = ARM_R14;
+  
+  if (addr == 0) {
+    fprintf(stderr, "Branch through zero, aborting!\n");
+    exit(1);
+  }
   
   ARM_SET_R14(WORD_MAGIC_RETURN_ADDRESS);
   ARMul_SetPC(arm, addr);

@@ -49,6 +49,7 @@
 */
 #define SWIH_EXIT_HANDLED 1
 typedef WORD (*swi_handler)(WORD);
+#define SWI_EXIT_ERROR(c) { ARM_SET_R0((c)); arm_set_v();
 
 void osfile(void);
 void osbyte(void);

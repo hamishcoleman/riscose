@@ -5,37 +5,28 @@
 ** See http://riscose.sourceforge.net/ for terms of distribution, and to
 ** pick up a later version of the software.
 **
-**   Emulation of the system variable list; lazy reliance on gdbm.
+**   Emulation of the system variable list
 **
 **   $Revision$
 **   $Date$
 */
-#include <gdbm.h>
-#include <unistd.h>
-#include <sys/stat.h>
-
-#define TEMPDIR "/tmp"
-
+#include "libdict/dict.h"
 #include "riscostypes.h"
+#include "heap.h"
 #include "util.h"
 
-GDBM_FILE vars;
+static WORD  sysvars;
+rb_tree     *sysvars_n;
 
 int
 sysvars_init()
 {
-  char filename[256] = TEMPDIR;
-  
-  sprintf(filename, "%s/riscose.sysvars.%d", TEMPDIR, getppid());
+  sysvars = mem_rma_alloc(32<<10);
+  sysvars_n = MEM_TOHOST(sysvars);
 
-  vars = gdbm_open(filename, 4096, GDBM_NEWDB | GDBM_FAST,
-                                      S_IRUSR | S_IWUSR, NULL);
-  if (!vars)
-    {
-     perror("gdbm_open");
-     exit(1);
-    }
-  unlink(filename);
+  dict_set_malloc(sysvars_malloc);
+  dict_set_free(sysvars_free);
+  sysvars_n = rb_tree_new(sysvars_n);
 }
 
 void

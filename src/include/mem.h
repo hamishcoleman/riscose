@@ -20,9 +20,6 @@
 #define ERR_MEM_BADFILE 1
 #define ERR_MEM_TOOLONG 2
 
-#define MAX_TASKS 64
-#define RMA_START_SIZE 512*1024
-
 typedef struct {
   BYTE cli[256];
   BYTE time[8]; /* actually five, but we're relying on this */
@@ -32,46 +29,43 @@ typedef struct {
 }
 mem_private;
 
-typedef struct {
-  WORD wimpslot;
-  BYTE *app;
-  BYTE *stack;
-  BYTE *env;
-  void *info; /* for our WIMP to use */
-}
-mem_wimp_task;
-
-typedef struct {
-  WORD            task_current;
-  mem_wimp_task  *tasks;
-  BYTE           *rma;
-  WORD            rma_size;
-  BYTE		 *rom;
-}
-mem_state;
-
+/* Startup / shutdown functions to be called once */
 void	mem_init(void);
 void	mem_final(void);
 
+/* Task management */
 WORD	mem_task_new(WORD wimpslot, char *image_filename, void *info);
 WORD	mem_task_which(void);
 void	mem_task_switch(WORD n);
-void*	mem_get_private(void);
-WORD	mem_get_wimpslot(void);
 
-WORD	mem_rma_alloc(WORD size);
-void    mem_rma_free(WORD arm_addr);
-WORD	mem_rma_resize(WORD addr, WORD newsize);
+/* Memory that RISC OS doens't need to see; use instead of malloc() */
+void*   mem_private_alloc(WORD size);
+
+/* Memory from the relocatable module area */
+void*   mem_rma_alloc(WORD size);
+
+/* Memory which is read-only to RISC OS, but read-write to native code */
+void*   mem_readonly_alloc(WORD size);
+
+/* Memory from the current task's heap (assuming a SharedCLib program) */
+void*   mem_taskheap_alloc(WORD size);
+
+void	mem_free(void *ptr);
+void*   mem_resize(void *ptr, WORD newsize);
 
 int 	mem_load_file_at(const char * file, WORD arm_addr);
 
 #ifdef CONFIG_MEM_ONE2ONE
 
+  #define mem_get_private()  ((void*) MMAP_USRSTACK_BASE)
+  #define mem_get_wimpslot() ((void*) MMAP_APP_BASE)
   #define MEM_TOHOST(a) ((BYTE*)(a))
   #define MEM_TOARM(a) ((WORD)(a))
 
 #else
 
+  void*   mem_get_private(void);
+  WORD    mem_get_wimpslot(void);
   BYTE*   mem_f_tohost(WORD arm_addr);
   WORD    mem_f_toarm(void *ptr);
   #define MEM_TOHOST(a) (mem_f_tohost(a))
@@ -83,5 +77,8 @@ int 	mem_load_file_at(const char * file, WORD arm_addr);
 #define MEM_READ_BYTE(a) (*((BYTE*)MEM_TOHOST((a))))
 #define MEM_WRITE_WORD(a,v) ((*((WORD*)MEM_TOHOST((a)))) = (v))
 #define MEM_WRITE_BYTE(a,v) ((*((BYTE*)MEM_TOHOST((a)))) = (v))
+
+#define MEM_PLACE_ENVIRONMENT 0x1000
+#define MEM_MODULE_PRIVATES   0x2000
 
 #endif

@@ -67,32 +67,31 @@ main(int argc, char **argv)
   static const struct option long_options[] = {
     { "help", no_argument, NULL, 'h' },
     { "version", no_argument, NULL, 'v' },
+    { "module", no_argument, NULL, 'm' },
     { "wimpslot", required_argument, NULL, 'w' }
   };
   
   int module=0, c;
-  char *file;
+  char *file = NULL;
   mem_private *priv;
   WORD  count = 0, o;
   
   progname = argv[0];
   wimpslot = 640*1024;
   
-  while ((c = getopt_long(argc, argv, "hvw:", long_options, NULL)) != EOF)
+  while ((c = getopt_long(argc, argv, "hvmw:", long_options, NULL)) != EOF)
     {
      switch (c)
        {
        case 'h' : help();
        case 'v' : version();
        case 'w' : wimpslot = atoi(optarg); break;
-       case 'm' : module = 1;
+       case 'm' : module = 1; break;
        }
     }
   
   if (optind < argc)
     file = argv[optind++];
-  else
-    error("No RISC OS filename supplied");
   
   mem_init();
   module_init();
@@ -101,7 +100,11 @@ main(int argc, char **argv)
   
   mem_task_switch(mem_task_new(wimpslot, module ? NULL : file, NULL));
   if (module)
-    module = module_load(file);
+    if ( (module = module_load(file)) == -1)
+      {
+        fprintf(stderr, "Module load failed\n");
+        exit(1);
+      }
 
   /* Set up unprocessed + processed command line storage thingies */
     
@@ -126,7 +129,7 @@ main(int argc, char **argv)
   if (!module)
     arm_run_routine(0x8000);
   else
-    arm_run_routine(module);
-   
+    arm_run_routine(module_base(module)+MODULE_START(module_base(module)));
+
   return 0;
 }

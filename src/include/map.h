@@ -28,6 +28,9 @@ RISC OS logical memory map
 Because the ARM program counter (when in USR_26 mode, as RISC OS nearly always is, and riscose always is) is limited to 26 bits wide, code must be kept below the 64MB limit.  Because we can use the full 32 bit address space for indirect addressing (i.e. LDR R0,[R1]) data loading + storing can access the full 4 gig.
 */
 
+#ifndef _MAP_H
+#define _MAP_H
+
 #define KB  (1<<10)
 #define MEG (1<<20)
 #define GIG (1<<30)
@@ -45,3 +48,5 @@ Because the ARM program counter (when in USR_26 mode, as RISC OS nearly always i
 #define MMAP_ROM_BASE (56*MEG)
 #define MMAP_ROM_SIZE (64*KB) /* actually 8MB, but hey... */
 #define MMAP_SLOT_BASE	(128*MEG)
+
+#endif

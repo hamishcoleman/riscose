@@ -37,6 +37,7 @@
 #include "map.h"
 #include "util.h"
 
+#define USR26_MODE	(0)
 #define CC_V_BIT	(1 << 28)
 #define CC_C_BIT	(1 << 29)
 #define CC_Z_BIT	(1 << 30)
@@ -65,7 +66,7 @@ struct sigcontext * where;
 #define SIGSWI		32
 
 int user_size = 16*1024*1024;
-
+#undef personality
 extern int personality(int);
 
 void dump_context(struct sigcontext *ctx)
@@ -82,15 +83,14 @@ void dump_context(struct sigcontext *ctx)
 }
 
 static void
-sigswi_handler(int sig, int _a2, int _a3, int _a4, struct siginfo *info, 
-	       struct ucontext *uc)
+sigswi_handler(int sig, struct siginfo *info, struct ucontext *uc) 
 {
   struct sigcontext *sc = &uc->uc_mcontext;
   int n = info->si_errno;
   context = (union context *)sc;
   where = sc;
 #ifdef DEBUG
-  fprintf(stderr," swi %x found at %x lr=%x\n",n,sc->arm_pc -4,sc->arm_lr);
+  fprintf(stderr," swi %x found at %lx lr=%lx\n",n,sc->arm_pc -4,sc->arm_lr);
   fflush(stderr);
 #endif
 
@@ -107,14 +107,13 @@ sigswi_handler(int sig, int _a2, int _a3, int _a4, struct siginfo *info,
     }
   swi_trap(n);
 #ifdef DEBUG
-  fprintf(stderr,"returning to %x\n",sc->arm_pc); 
+  fprintf(stderr,"returning to %lx\n",sc->arm_pc); 
 #endif
   sc->arm_cpsr = USR26_MODE;
 }
 
 static void
-sigsegv_handler(int sig, int _a2, int _a3, int _a4, struct siginfo *info, 
-	       struct ucontext *uc)
+sigsegv_handler(int sig, struct siginfo *info, struct ucontext *uc)
 {
   struct sigcontext *sc = &uc->uc_mcontext;
   int core_file;
@@ -123,11 +122,8 @@ sigsegv_handler(int sig, int _a2, int _a3, int _a4, struct siginfo *info,
   fprintf(stderr, "*** Segmentation fault\n");
   dump_context(sc);
   fflush(stderr);
-  core_file=open("core",O_RDWR|O_CREAT);
-  write(core_file,0x8000,0x20000);
-  close(core_file);
-  core_file=open("core2",O_RDWR|O_CREAT);
-  write(core_file,0x4000,0x4000);
+  core_file=open("core",O_RDWR|O_CREAT,0666);
+  write(core_file,(void *)0x8000,0x20000);
   close(core_file);
   
   exit(1);
@@ -137,10 +133,55 @@ sigsegv_handler(int sig, int _a2, int _a3, int _a4, struct siginfo *info,
 static unsigned char svc_stack[SVC_STACK_SIZE];
 
 void
+arm_run_routine(WORD addr)
+{
+  struct sigaltstack ss, oss;
+  register unsigned long sp asm("sp");
+  unsigned long old_sp;
+  void *stack = malloc(SVC_STACK_SIZE);
+
+  if (!stack)
+    {
+       perror("malloc");
+       exit(1);
+    }
+
+  /*
+   * Setup signal stack
+   */
+  ss.ss_sp    = stack;
+  ss.ss_size  = SVC_STACK_SIZE;
+  ss.ss_flags = SS_ONSTACK;
+
+  /*
+   * Switch into new stack
+   */
+  old_sp = sp;
+  sp = stack + SVC_STACK_SIZE;
+
+  if (sigaltstack(&ss, &oss))
+    {
+      perror("sigaltstack");
+      exit(1);
+    }
+
+  /*
+   * Restore original stack
+   */
+  sp = old_sp;
+  _arm_run_routine(addr);
+
+  if (sigaltstack(&oss, NULL))
+    {
+      perror("sigaltstack");
+      exit(1);
+    }
+}
+
+void
 install_signal(void)
 {
   struct sigaction sa;
-  struct sigaltstack ss;
   sa.sa_handler = sigswi_handler;
   sigemptyset(&sa.sa_mask);
   sa.sa_flags = SA_SIGINFO | SA_THIRTYTWO | SA_NOMASK | SA_ONSTACK;
@@ -155,14 +196,6 @@ install_signal(void)
   if (sigaction(SIGSEGV, &sa, NULL))
     {
       perror("sigaction");
-      exit(1);
-    }
-  ss.ss_sp = svc_stack;
-  ss.ss_size = SVC_STACK_SIZE;
-  ss.ss_flags = SS_ONSTACK;
-  if (sigaltstack(&ss, NULL))
-    {
-      perror("sigaltstack");
       exit(1);
     }
 }
@@ -229,5 +262,9 @@ arm_init(void)
   memset(context, 0, sizeof(*context));
 
   /* Tell it how it is. */
-  personality(PER_RISCOS);
+  if (personality(PER_RISCOS) < 0)
+    {
+      perror("personality");
+      exit(1);
+    }
 }

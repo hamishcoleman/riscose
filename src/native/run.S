@@ -9,9 +9,9 @@
 ** Don't forget, it can be called recursively.
 */
 
-	.globl	arm_run_routine
-	.type	arm_run_routine, %function
-arm_run_routine:
+	.globl	_arm_run_routine
+	.type	_arm_run_routine, %function
+_arm_run_routine:
 	stmfd	sp!, {r4 - r11, lr}
 	ldr	ip, 2f
 	ldr	lr, [ip]

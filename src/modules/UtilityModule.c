@@ -22,6 +22,7 @@
 #elif HAVE_READLINE_READLINE_H
 #include <readline/readline.h>
 #endif
+/* FIXME: wrap gdbm use with configure in case it isn't available. */
 #include <gdbm.h>
 
 #include <getopt.h>

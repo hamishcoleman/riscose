@@ -19,6 +19,8 @@ armul) ;;
 esac
 AC_SUBST(ARM)
 
+# FIXME: we should only use readline if --with-readline is used, or at
+# least allow it to be disabled with --without-readline.
 AC_CHECK_HEADERS(readline.h readline/readline.h)
 
 AC_OUTPUT([ \

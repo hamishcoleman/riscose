@@ -13,6 +13,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <readline/readline.h>
 #include <gdbm.h>
 #include <getopt.h>
@@ -21,8 +22,6 @@
 #ifndef TEMPDIR
 #  define TEMPDIR "/tmp"
 #endif
-
-char *prompt = "*\0";
 
 GDBM_FILE cmds;
 
@@ -69,7 +68,7 @@ void cmd_gos(void)
   printf("Supervisor\n");
   while(1)
     {
-     char *line = readline(prompt);
+     char *line = readline("*");
      if (line && *line)
       {
        /*add_history(line);*/

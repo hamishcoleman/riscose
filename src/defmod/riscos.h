@@ -63,9 +63,6 @@ extern char *riscos_format_dec (char *s, int i, int width, int prec);
 extern char *riscos_format_hex (char *s, int i, int width, int prec);
       /*sprintf (s, "%*.*X", width, prec, i)*/
 
-extern char *riscos_format_char (char *s, char c);
-      /*sprintf (s, "%c", c)*/
-
  /* Functions to read back the items above - these return the number of
   * characters successfully read, 0 for error.
   */

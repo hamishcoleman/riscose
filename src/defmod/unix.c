@@ -186,21 +186,6 @@ char *riscos_format_hex
 }
 /*------------------------------------------------------------------------*/
 
-char *riscos_format_char
-(
-   char *s,
-   char  c
-)
-{
-   tracef ("riscos_format_char ('%c')\n" _ c);
-
-   if (sprintf (s, "%c", c) < 1)
-      CLEAR (s);
-
-   return s;
-}
-/*------------------------------------------------------------------------*/
-
 static _kernel_oserror last_error_v;
 static _kernel_oserror *last_error;
 

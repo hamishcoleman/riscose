@@ -1047,10 +1047,6 @@ os_error *xos_generate_error (os_error const *e)
   fprintf(stderr, "os_generate_error\n");
   fprintf(stderr, "  In: e = %x\n", (int) e);
 
-  fprintf(stderr, "*** Error from RISC OS (%08x): %s\n", e->errnum, e->errmess);
-
-  /*  exit(1);  */ /* FIXME: Sort the error handlers! */
-
   return e;
 }
 

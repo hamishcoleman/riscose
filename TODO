@@ -51,3 +51,14 @@ Is just naff and will slow programs down that allocate and deallocate lots
 of memory: when asked to allocate memory out of a heap, it just starts at
 the beginning of the list of allocated blocks and steps over 'til it hits
 he end or finds a suitable gap.
+
+* Documentation
+
+Create riscose and riscosehack man pages.  Spell out the `aclocal &&
+autoheader && automake && autoconf' required on check-out from CVS.
+
+* Build
+
+See if GNU readline is mandatory.  If it doesn't add much, remove it.
+Else get configure to check for it and either insist on its presence or
+adapt accordingly.

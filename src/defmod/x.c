@@ -27,6 +27,11 @@
 
 /*x.c*/
 
+#include <stdio.h>
+
+#include "monty/monty.h"
+#include "monty/mem.h"
+
 /*From CLib*/
 #include "kernel.h"
 #include <setjmp.h>
@@ -226,26 +231,14 @@ os_error *x__last_error (void)
 /*------------------------------------------------------------------------*/
 void *x__alloc (int size)
 {
-  void *ptr;
-
-   if ((ptr = malloc (size)) == NULL && size != 0)
-      messagetrans_error_lookup (Error_No_Memory, NULL, NULL, 0, SKIP,
-            SKIP, SKIP, SKIP);
-
-   return ptr;
+    return emalloc(size);
 }
 
 
 /*------------------------------------------------------------------------*/
 void *x__calloc (int count, int size)
 {
-  void *ptr;
-
-  if ((ptr = calloc (count, size)) == NULL && size != 0 && count != 0)
-      messagetrans_error_lookup (Error_No_Memory, NULL, NULL, 0, SKIP,
-            SKIP, SKIP, SKIP);
-
-   return ptr;
+    return ecalloc(count * size);
 }
 
 
@@ -256,12 +249,5 @@ void x__free (void *ptr, int size) {NOT_USED (size) free (ptr);}
 /*------------------------------------------------------------------------*/
 void *x__realloc (void *ptr, int old_size, int size)
 {
-//  NOT_USED (old_size)
-//  NOT_USED (size)
-
-  if ((ptr = realloc (ptr, size)) == NULL && size != 0)
-      messagetrans_error_lookup (Error_No_Memory, NULL, NULL, 0, SKIP,
-            SKIP, SKIP, SKIP);
-
-   return ptr;
+    return erealloc(ptr, size);
 }

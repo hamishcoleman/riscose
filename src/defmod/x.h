@@ -60,9 +60,7 @@ extern void x__catch (x_exception *);
 
 /* Strange pseudo-declaration thing to make an |os_error *| from an error
  * number and a message. Declares |id| to be an |os_error *| pointing at the
- * block {num, mess}, without wasting 252 bytes of empty error block. Can
- * also be used if you want an international message that will be passed to
- * messagetrans_error_lookup.
+ * block {num, mess}, without wasting 252 bytes of empty error block.
  */
 
 #define x_LOCAL_ERROR(id, num, mess) \
@@ -72,9 +70,7 @@ extern void x__catch (x_exception *);
 
 /* Another declaration, to make an |os_error *| from an error
  * number and a message. Declares |id| to be an |os_error *| pointing at the
- * block {num, mess}, without wasting 252 bytes of empty error block. Can
- * also be used if you want an international message that will be passed to
- * messagetrans_error_lookup.
+ * block {num, mess}, without wasting 252 bytes of empty error block.
  */
 
 #define x_GLOBAL_ERROR(id, num, mess) \

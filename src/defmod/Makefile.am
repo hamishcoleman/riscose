@@ -5,6 +5,8 @@ defmod_SOURCES = \
     main.h messagetrans.h m.h os.h riscoseapi.c riscoseapi.h riscose.c \
     riscose.h riscosehdr.c riscosehdr.h riscosetpl.c riscosetpl.h \
     riscosever.h riscos.h trace.h types.h unix.c x.c x.h
+INCLUDES = -I$(srcdir)/..
+defmod_LDADD = ../monty/libmonty.a
 
 # FIXME:  why doesn't automake get rid of this anyway?  is it an
 # automake bug?

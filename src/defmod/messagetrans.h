@@ -31,7 +31,4 @@
 
 typedef struct {int cb [4];} messagetrans_control_block;
 
-extern void messagetrans_error_lookup(_kernel_oserror *, void *, _kernel_oserror *,
-  int, char *, char *, char *, char *);
-
 #endif

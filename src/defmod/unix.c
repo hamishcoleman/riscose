@@ -641,14 +641,6 @@ void os_generate_error(_kernel_oserror *e)
   raise(SIGOSERROR);
 }
 
-void messagetrans_error_lookup(_kernel_oserror *e, void *fd, _kernel_oserror *buf,
-  int size, char *s1, char *s2, char *s3, char *s4)
-{
-  last_error_v.errnum = e->errnum;
-  riscos_strcpy(last_error_v.errmess, e->errmess);
-  os_generate_error(&last_error_v);
-}
-
 os_error *xos_pretty_print(char *string, void *arg1, void *arg2)
 {
   for (;;) {

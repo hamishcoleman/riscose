@@ -9,7 +9,7 @@
 */
 
 #include <stdio.h>
-#include <ncurses.h>
+#include <curses.h>
 
 #include "vdu.h"
 

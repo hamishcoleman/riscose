@@ -31,7 +31,6 @@
 /*From Support*/
 #include "lookup.h"
 #include "m.h"
-#include "riscos.h"
 #include "trace.h"
 
 typedef

@@ -33,7 +33,6 @@
 
 /*From Support*/
 #include "m.h"
-#include "riscos.h"
 #include "trace.h"
 #include "x.h"
 

@@ -295,41 +295,6 @@ int riscos_scan_fixed
 }
 /*------------------------------------------------------------------------*/
 
-/*Returns a new heap pointer to the value, or NULL if not found.*/
-
-os_error *riscos_var_val_alloc
-(
-   char  *var,
-   char **val_out
-)
-{
-   char     *env = getenv(var);
-   int       len = env ? strlen(env) : -1;
-   char     *val;
-   os_error *error;
-
-   if (len == -1)
-      val = NULL;
-   else
-   {
-      if ((val = m_ALLOC (len + 1)) == NULL)
-      {
-         error = (os_error *) m_ALLOC(sizeof(*error));
-         error->errnum = os_GLOBAL_NO_MEM;
-         riscos_strcpy(error->errmess, "NoMem");
-         goto finish;
-      }
-
-      memcpy(val, env, len);
-      val [len] = '\0';
-   }
-
-   if (val_out != NULL) *val_out = val;
-
-finish:
-   return error;
-}
-
 static _kernel_oserror last_error_v;
 static _kernel_oserror *last_error;
 

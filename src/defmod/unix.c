@@ -664,17 +664,6 @@ _kernel_oserror *_kernel_last_oserror(void)
   return last_error;
 }
 
-os_error *xosfile_create_dir(char *name, int entries)
-{
-  errno = (mkdir(name, 0755)<0) && errno != EEXIST ? errno : 0;
-  return _kernel_last_oserror();
-}
-
-void osfile_create_dir(char *name, int entries)
-{
-  if (xosfile_create_dir(name, entries)) raise(SIGOSERROR);
-}
-
 void os_generate_error(_kernel_oserror *e)
 {
   last_error = e;

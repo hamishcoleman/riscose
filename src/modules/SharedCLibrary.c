@@ -350,6 +350,28 @@ swih_sharedclibrary_entry(WORD num)
         return 0;
       }
     
+    case CLIB_KERN_OSFIND: /* FIXME: 4-273? */
+      osfind();
+      return 0;
+    
+    case CLIB_KERN_OSGBPB: /* FIXME: 2-274? */
+      {
+          WORD* gbpb_block = (WORD*) MEM_TOHOST(ARM_R2);
+          WORD preserveR4 = ARM_R4;
+          WORD preserveR2 = ARM_R2;
+          ARM_SET_R2(gbpb_block[0]);
+          ARM_SET_R3(gbpb_block[1]);
+          ARM_SET_R4(gbpb_block[2]);
+          /*printf("%08x %08x %08x %08x %08x\n", gbpb_block[0], gbpb_block[1], gbpb_block[2], gbpb_block[3], gbpb_block[4]);*/
+          osgbpb();
+          gbpb_block[0] = ARM_R2;
+          gbpb_block[1] = ARM_R3;
+          gbpb_block[2] = ARM_R4;
+          ARM_SET_R2(preserveR2);
+          ARM_SET_R4(preserveR4);
+      }
+      return 0;
+    
     case CLIB_KERN_OSFILE: /* 4-274 */
       {
         WORD* osfile_block = (WORD*) MEM_TOHOST(ARM_R2);
@@ -372,6 +394,10 @@ swih_sharedclibrary_entry(WORD num)
         ARM_SET_R4(r4);
         ARM_SET_R5(r5);
       }
+      return 0;
+    
+    case CLIB_KERN_OSARGS: /* 4-275? */  
+      osargs();
       return 0;
     
     case CLIB_KERN_UDIV10: /* 4-277 */
@@ -502,6 +528,15 @@ swih_sharedclibrary_entry(WORD num)
       free(arm_va_list);
       return 0;
 
+    case CLIB_CLIB_FPUTC: /* FIXME: 4-31? */  
+      ARM_SET_R0(fputc(ARM_R0, clib_file_real(ARM_R1)));
+      return 0;        
+    
+    case CLIB_CLIB_FPUTS: /* FIXME: 4-31? */  
+      ARM_SET_R0(fputs(MEM_TOHOST(ARM_R0),
+                 clib_file_real(ARM_R1)));
+      return 0;        
+    
     case CLIB_CLIB_UNGETC: /* 4-315 */
       ARM_SET_R0(ungetc(ARM_R0, clib_file_real(ARM_R1)));
       return 0;

@@ -77,6 +77,7 @@ main(int argc, char **argv)
     }
     file = argv[optind++];
 
+  filehandles_init();
   mem_init();
   module_init();
   swi_init();

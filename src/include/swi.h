@@ -51,7 +51,12 @@
 typedef WORD (*swi_handler)(WORD);
 #define SWI_EXIT_ERROR(c) { ARM_SET_R0((c)); arm_set_v();
 
+void filehandles_init(void); /* FIXME: wrong implementation, wrong place... */
 void osfile(void);
+void osfind(void);
+void osgbpb(void);
+void osargs(void);
+
 void osbyte(void);
 
 void swi_init(void);

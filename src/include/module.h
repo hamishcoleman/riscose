@@ -12,14 +12,9 @@
 **   $Date$
 */
 
-/**
- * Gives you the absolute start address of a module entry point.  So if you call
- * MODULE_ENTRY(module_start, offset_in_header) where offset_in_header is 4,
- * it'll return either the absolute start address of the initialisation code, or
- * zero if there is none.
- */
-#define MODULE_ENTRY(a,o) ( ((a) + MEM_READ_WORD((a)+(o))) == (a) ? 0 \
-                       :  (  (a) + MEM_READ_WORD((a)+(o))) == (a)     )
+/* arm address `a', byte offset `o'. */
+#define MODULE_ENTRY(a, o) \
+    (MEM_READ_WORD((a) + (o)) ? (a) + MEM_READ_WORD((a) + (o)) : 0)
 
 #define MODULE_START(a)			MODULE_ENTRY((a), 0)
 #define MODULE_INIT(a) 			MODULE_ENTRY((a), 4)

@@ -53,16 +53,6 @@ extern int riscos_strcmp (char *s0, char *s1);
 
 extern char *riscos_strncpy (char *s1, char *s, int n);
 
- /* Useful string processing functions, designed to allow safe in-line use
-  * by taking a buffer argument, the pointer to which they return.
-  */
-
-extern char *riscos_format_dec (char *s, int i, int width, int prec);
-      /*sprintf (s, "%*.*d", width, prec, i)*/
-
-extern char *riscos_format_hex (char *s, int i, int width, int prec);
-      /*sprintf (s, "%*.*X", width, prec, i)*/
-
  /* Functions to read back the items above - these return the number of
   * characters successfully read, 0 for error.
   */

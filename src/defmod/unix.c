@@ -152,40 +152,6 @@ char *riscos_strncpy
 }
 /*------------------------------------------------------------------------*/
 
-char *riscos_format_dec
-(
-   char *s,
-   int   i,
-   int   width,
-   int   prec
-)
-{
-   tracef ("riscos_format_dec (%d)\n" _ i);
-
-   if (sprintf (s, "%*.*d", width, prec, i) < 1)
-      CLEAR (s);
-
-   return s;
-}
-/*------------------------------------------------------------------------*/
-
-char *riscos_format_hex
-(
-   char *s,
-   int   i,
-   int   width,
-   int   prec
-)
-{
-   tracef ("riscos_format_hex (0x%X)\n" _ i);
-
-   if (sprintf (s, "%*.*X", width, prec, i) < 1)
-      CLEAR (s);
-
-   return s;
-}
-/*------------------------------------------------------------------------*/
-
 static _kernel_oserror last_error_v;
 static _kernel_oserror *last_error;
 

@@ -161,8 +161,6 @@ extern void def_as_extern (char *s0, const char *s1);
 ** in the form "ModuleName" */
 extern void def_as_prefix( char* s0, char* s1 );
 
-extern void def_as_c_plus_plus (char *, char *, def_s);
-
 /* Whether the given SWI should be defined using _BLOCK:
 **
 ** no output arguments

@@ -1060,36 +1060,35 @@ int main (int argc, char *argv [])
       else if (strcmp (argv [i], "-o") == 0)
          output = argv [++i];
       else if (strcmp (argv [i], "-help") == 0)
-      {  if ((error = xos_pretty_print ("DefMod " VERSION_INFO
-               ". Copyright © Jonathan Coxhead, 1994.\r"
-               "DefMod comes with ABSOLUTELY NO WARRANTY.\r"
+      {  fputs("DefMod " VERSION_INFO
+               ". Copyright © Jonathan Coxhead, 1994.\n"
+               "DefMod comes with ABSOLUTELY NO WARRANTY.\n"
                "This is free software, and you are welcome to redistribute it "
-               "under certain conditions. See the file Copying for details.\r"
+               "under certain conditions. See the file Copying for details.\n"
                "Usage: DefMod <type> [-v] [-help] "
                      "[-o <output-dir> | > <output-file>] "
                      "[-byte_wide <byte-wide-file>] "
                      "[-26bit | -32bit] "
-                     "< <module-interface-file>\r"
-               "Purpose: generate output from a module interface file\r"
-               "-v\t\t"             "verbose\r"
-               "-q\t\t"             "quiet\r"
+                     "< <module-interface-file>\n"
+               "Purpose: generate output from a module interface file\n"
+               "-v\t\t"             "verbose\n"
+               "-q\t\t"             "quiet\n"
                "-o\t\t"             "is required when generating a "
-                                    "directory\r"
-               "<output-dir>\t"     "directory to create\r"
+                                    "directory\n"
+               "<output-dir>\t"     "directory to create\n"
                "-byte_wide\t"       "is required with -s or -l for a "
                                     "module interface using byte-wide "
-                                    "types defined elsewhere\r"
+                                    "types defined elsewhere\n"
                "<byte-wide-file>\t" "file containing whitespace-separated "
-                                    "names of byte-wide types\r"
-               "-26bit\t\t"         "generate 26 bit code" HELP_STRING_26 "\r"
-               "-32bit\t\t"         "generate 32 bit code" HELP_STRING_32 "\r"
+                                    "names of byte-wide types\n"
+               "-26bit\t\t"         "generate 26 bit code" HELP_STRING_26 "\n"
+               "-32bit\t\t"         "generate 32 bit code" HELP_STRING_32 "\n"
 
-               "<type> is one of:\r"
-               "\t-riscose_osapi\t\t"     "riscose osapi .c file\r"
-               "\t-riscose_template\t\t"     "riscose template .c file\r"
-               "\t-riscose_header\t\t"     "riscose osapi .h file\r",
-               NULL, NULL)) != NULL)
-            goto finish;
+               "<type> is one of:\n"
+               "\t-riscose_osapi\t\t"     "riscose osapi .c file\n"
+               "\t-riscose_template\t\t"     "riscose template .c file\n"
+               "\t-riscose_header\t\t"     "riscose osapi .h file\n",
+               stdout);
       }
       else if (strcmp (argv [i], "-byte_wide") == 0)
       {  /*Add the contents of the given file to the byte wide table.*/

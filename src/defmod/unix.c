@@ -352,18 +352,3 @@ void os_generate_error(_kernel_oserror *e)
   last_error = e;
   raise(SIGOSERROR);
 }
-
-os_error *xos_pretty_print(char *string, void *arg1, void *arg2)
-{
-  for (;;) {
-    char *s = strchr(string, '\r');
-    if (!s) {
-      puts(string);
-      return NULL;
-    }
-    fwrite(string, s - string, 1, stdout);
-    putc('\n', stdout);
-    string = s + 1;
-  }
-}
-

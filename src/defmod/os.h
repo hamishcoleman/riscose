@@ -129,6 +129,4 @@ typedef byte os_date_and_time [5];
 #define os_GLOBAL_NO_ANY 9
 #define os_GLOBAL_NO_MEM 49
 
-extern os_error *xos_pretty_print(char *, void *, void *);
-
 #endif

@@ -152,14 +152,17 @@ void riscose_osapi_output
                  title, DEFMOD_RISCOSE_VERSION);
 
 
-   /* Includes */
-   fprintf(file, "#include <stdio.h>\n"
-                 "#include \"monty/monty.h\"\n"
-                 "#include \"riscostypes.h\"\n"
-                 "#include \"swi.h\"\n"
-                 "#include \"arm.h\"\n"
-                 "#include \"mem.h\"\n");
-   fprintf(file, "#include \"%s.h\"\n\n", c_name);
+    fprintf(file,
+        "#include <stdio.h>\n"
+        "\n"
+        "#include \"config.h\"\n"
+        "#include \"monty/monty.h\"\n"
+        "#include \"riscose.h\"\n"
+        "#include \"riscostypes.h\"\n"
+        "#include \"swi.h\"\n"
+        "#include \"arm.h\"\n"
+        "#include \"mem.h\"\n"
+        "#include \"%s.h\"\n", c_name);
 
    /* Write a marshalling SWI handler for each SWI */
    context = 0;
@@ -213,13 +216,13 @@ void riscose_osapi_output
 
          /* Write some debugging messages; the routine name and the
           * input registers */
-         fprintf(file, "  VERBOSE((\"%s\\n\"));\n", c_name);
+         fprintf(file, "    DEBUG(SWI, (\"%s\\n\"));\n", c_name);
          for (i = 0; i < 10; i++)
          {
            if (s->i & (1 << i))
              fprintf(file,
-                 "  VERBOSE((\"  In: r%d = %%x\\n\", ARM_R%d));\n", i,
-                 i);
+                 "    DEBUG(SWI, (\"  In: r%d = %%x\\n\", ARM_R%d));\n",
+                 i, i);
          }
          fprintf(file, "\n");
 
@@ -296,11 +299,13 @@ void riscose_osapi_output
              if (s->o & (1 << i))
              {
                if ( s->outputs[i]->tag == def_TYPE_REF || (s->ro & (1 << i)) )
-                 fprintf(file, "  VERBOSE((\"  Out: r%d = %%x\\n\", "
-                               "MEM_TOARM((void *) r%d)));\n", i, i);
+                 fprintf(file,
+                     "    DEBUG(SWI, (\"  Out: r%d = %%x\\n\", "
+                     "MEM_TOARM((void *)r%d)));\n", i, i);
                else
                  fprintf(file,
-                    "  VERBOSE((\"  Out: r%d = %%x\\n\", r%d));\n", i, i);
+                    "    DEBUG(SWI, (\"  Out: r%d = %%x\\n\", r%d));\n",
+                    i, i);
              }
            }
            if (s->o)

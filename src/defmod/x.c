@@ -35,9 +35,9 @@
 #include <string.h>
 
 /*From OSLib*/
-#include "bootstrap/macros.h"
-#include "bootstrap/messagetrans.h"
-#include "bootstrap/os.h"
+#include "macros.h"
+#include "messagetrans.h"
+#include "os.h"
 
 /*From Support*/
 #include "x.h"

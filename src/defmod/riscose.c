@@ -12,7 +12,7 @@
 #include <string.h>
 
 /* OSLib */
-#include "bootstrap/types.h"
+#include "types.h"
 
 /* defmod */
 #include "def.h"

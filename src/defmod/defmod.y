@@ -36,9 +36,9 @@ TV    20000503    |bool| replaced by |osbool|
    #include <string.h>
 
    /*From OSLib*/
-   #include "bootstrap/types.h"
-   #include "bootstrap/macros.h"
-   #include "bootstrap/os.h"
+   #include "types.h"
+   #include "macros.h"
+   #include "os.h"
 
    /*From Support*/
    #include "lookup.h"

@@ -28,7 +28,7 @@
 #endif
 
 #ifndef os_H
-   #include "bootstrap/os.h"
+   #include "os.h"
 #endif
 
 #if TRACE

@@ -24,7 +24,7 @@
 */
 
 #ifndef os_H
-   #include "bootstrap/os.h"
+   #include "os.h"
 #endif
 
 /* Implement ation of an abstract lookup table consisting of a token

@@ -24,7 +24,7 @@
 #include <kernel.h>
 
 #ifndef types_H
-   #include "bootstrap/types.h"
+   #include "types.h"
 #endif
 
 #define osbyte_IN_KEY ((byte) 129)

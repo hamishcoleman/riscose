@@ -16,9 +16,9 @@
 #include <time.h>
 #include <kernel.h>      /* TV 980115 */
 
-#include "bootstrap/types.h"
-#include "bootstrap/macros.h"
-#include "bootstrap/os.h"
+#include "types.h"
+#include "macros.h"
+#include "os.h"
 
 #include "lookup.h"
 

@@ -23,7 +23,7 @@
 
 /*From OSLib*/
 #ifndef os_H
-   #include "bootstrap/os.h"
+   #include "os.h"
 #endif
 
  /* Macro to provide an assertion facility using Wimp_ReportError.

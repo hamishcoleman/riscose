@@ -3,7 +3,7 @@
 #define def_H
 
 #ifndef types_H
-   #include "bootstrap/types.h"
+   #include "types.h"
 #endif
 
 #define def_ID_LIMIT 255  /* max number of names of types */

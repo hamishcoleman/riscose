@@ -26,7 +26,7 @@
 #include <string.h>
 
 /*From OSLib*/
-#include "bootstrap/os.h"
+#include "os.h"
 
 /*From Support*/
 #include "lookup.h"

@@ -24,7 +24,7 @@
 #include <kernel.h>
 
 #ifndef types_H
-   #include "bootstrap/types.h"
+   #include "types.h"
 #endif
 
 #define messagetrans_DIRECT_ACCESS (1 << 0)

@@ -201,45 +201,6 @@ char *riscos_format_char
 }
 /*------------------------------------------------------------------------*/
 
-/*Like |sprintf (s, "*.*f", width, prec, mul/div)|, but using integers
-   only. |Div| must be > 0.*/
-
-char *riscos_format_fixed
-(
-   char *s,
-   int   mul,
-   int   div,
-   int   width,
-   int   prec
-)
-{
-   int i, scale;
-
-   tracef ("riscos_format_fixed (%d/%d)\n" _ mul _ div);
-
-   scale = 1;
-   for (i = 0; i < prec; i++) scale *= 10;
-
-   i = SGN (mul)*((unsigned) ABS (mul)/div);
-
-   if (prec > 0)
-   {
-      int f = (scale*ABS (mul)/div)%scale;
-
-      if (sprintf (s, "%*d%s%*.*d\n", MAX (width - prec - 1, 0), i,
-            Decimal_Point, prec, prec, f) < 2)
-         CLEAR (s);
-   }
-   else
-   {
-      if (sprintf (s, "%*d\n", width, i) < 1)
-         CLEAR (s);
-   }
-
-   return s;
-}
-/*------------------------------------------------------------------------*/
-
 static _kernel_oserror last_error_v;
 static _kernel_oserror *last_error;
 

@@ -16,6 +16,8 @@
 #include <string.h>
 #include <ctype.h>
 #include <time.h>
+#include <stdlib.h>
+#include <assert.h>
 
 #include <monty/monty.h>
 #include "riscostypes.h"
@@ -49,6 +51,16 @@ static void clib_file_sync(WORD arm_addr)
   
   rof->__pos  = ftell(real);
   rof->__file = fileno(real);
+  rof->__icnt = -1;
+  rof->__ocnt = -1;
+  rof->__flag = 0;
+}
+
+static void clib_file_mark_eof(WORD arm_addr)
+{
+  riscos_FILE* rof = (riscos_FILE*) MEM_TOHOST(arm_addr);
+
+  rof->__flag |= 0x40;
 }
 
 static WORD clib_file_new(FILE *real)
@@ -59,8 +71,6 @@ static WORD clib_file_new(FILE *real)
   rof->real   = real;
   rof->__base = MEM_TOARM(mem_rma_alloc(1));
   rof->__bufsiz = 0;
-  rof->__icnt = -1;
-  rof->__ocnt = -1;
   clib_file_sync(rof_arm);
   
   return rof_arm;
@@ -88,7 +98,8 @@ void fill_statics(WORD addr) /* 4-252 */
   WORD riscos_stdin  = clib_file_new(stdin);
   WORD riscos_stdout = clib_file_new(stdout);
   WORD riscos_stderr = clib_file_new(stderr);
-  
+  int ch;
+
   memcpy(MEM_TOHOST(addr+CLIB_SHARED_STDIN), MEM_TOHOST(riscos_stdin),
          sizeof(riscos_FILE));
   memcpy(MEM_TOHOST(addr+CLIB_SHARED_STDOUT), MEM_TOHOST(riscos_stdout),
@@ -99,16 +110,39 @@ void fill_statics(WORD addr) /* 4-252 */
   mem_free(MEM_TOHOST(riscos_stdin));
   mem_free(MEM_TOHOST(riscos_stdout));
   mem_free(MEM_TOHOST(riscos_stderr));
+
+  for (ch = 0; ch < 256; ch++)
+    {
+      int msk;
+      msk  = isspace(ch) ? 1 : 0;
+      msk |= ispunct(ch) ? 2 : 0;
+      msk |= islower(ch) ? 8 : 0;
+      msk |= isupper(ch) ? 16 : 0;
+      msk |= isdigit(ch) ? 32 : 0;
+      msk |= iscntrl(ch) ? 64 : 0;
+      msk |= (isxdigit(ch) && !isdigit(ch)) ? 128 : 0;
+      *(unsigned char *)MEM_TOHOST(addr+CLIB_SHARED_CTYPE+ch) = msk;
+    }
+}
+
+static
+int countpercents(char *str)
+{
+  int count=0;
+  for (; *str; str++)
+    if (*str == '%')
+      count++;
+  return count;
 }
 
 /* FIXME: this function is probably quite dependent on how a particular
 ** system implements va_list, and might want rewriting.
 */
-static char* arm_va_list[32];
-static
-void prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf)
+static char**
+prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf)
 {
-  int l=0;
+  char **arm_va_list = malloc((countpercents(str)+1)*sizeof(char*));
+  int arg=0;
   
   while (*str)
     switch (*str++)
@@ -120,17 +154,17 @@ void prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf)
         while (strchr("0123456789", *str)) str++;
         while (strchr("hlLqjzt", *str))    str++;
         if (*str++ == 's' || is_scanf)
-          arm_va_list[l++] = MEM_TOHOST(ARM_APCS_ARG(apcs_arg));
+          arm_va_list[arg++] = MEM_TOHOST(ARM_APCS_ARG(apcs_arg));
         else
-          arm_va_list[l++] = (char*) ARM_APCS_ARG(apcs_arg);
+          arm_va_list[arg++] = (char*) ARM_APCS_ARG(apcs_arg);
         apcs_arg++; /* best not use post-increment with macros! */
         
       default:
         continue;
       }
   
-  arm_va_list[l] = 0;
-  return;
+  arm_va_list[arg] = 0;
+  return arm_va_list;
 }
 
 #if defined(NATIVE) && defined(NATIVE_FASTCALL)
@@ -220,6 +254,8 @@ swih_sharedclibrary(WORD num)
 WORD
 swih_sharedclibrary_entry(WORD num)
 {
+  char **arm_va_list;
+  
   switch(SWI_NUM(num))
     {
 
@@ -264,13 +300,40 @@ swih_sharedclibrary_entry(WORD num)
       printf("signal %d = %d\n", (unsigned)ARM_R0, (unsigned)ARM_R1);
       return 0;
 
+      
+#if 0
+    /* FIXME: setjmp / longjmp should also keep track of:
+    **  
+    **   - floating point registers
+    **   - memory blocks allocated between setjmp and longjmp calls
+    **
+    ** possibly also doesn't need to bother storing some registers, see APCS
+    */
+    case CLIB_CLIB_SETJMP: /* 4-301 */
+        {
+            WORD reg;
+            for (reg = 1; reg < 16; reg++)
+                MEM_WRITE_WORD(ARM_R0+(reg*4), arm_get_reg(reg));
+        }
+        break;
+        
+     case CLIB_CLIB_LONGJMP:  4-301 
+        {
+            WORD reg;
+            for (reg = 1; reg < 16; reg++)
+                arm_set_reg(reg, MEM_READ_WORD(ARM_R0+(reg*4)));
+            arm_set_pc(ARM_R15+4);
+        }
+        break;    
+#endif
+      
     case CLIB_CLIB_ATEXIT:
       printf("atexit(%#lx) called, nothing will be done.\n", ARM_R0);
       break;
 
     case CLIB_CLIB_EXIT: /* 4-322 */ 
     case CLIB_CLIB__EXIT:
-      printf("*** finished!\n");
+      /*printf("*** finished!\n");*/
       exit(ARM_R0);
       return 0;
     
@@ -356,7 +419,8 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
     
     case CLIB_CLIB_REMOVE: /* 4-304 */
-      ARM_SET_R0(remove(MEM_TOHOST(ARM_R0)));
+      /*ARM_SET_R0(remove(MEM_TOHOST(ARM_R0)));*/
+        fprintf(stderr, "File %s not removed\n", (char*) MEM_TOHOST(ARM_R0));
       return 0;
     
     /* FIXME: These functions will only work on 32-bit machines! */
@@ -368,7 +432,7 @@ swih_sharedclibrary_entry(WORD num)
     case CLIB_CLIB_FREOPEN:
       {
         FILE *fh = freopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), clib_file_real(ARM_R2));
-	fprintf(stderr, "reopened file %p `%s' to %p\n", MEM_TOHOST(ARM_R2), MEM_TOHOST(ARM_R0), fh);
+	/*fprintf(stderr, "reopened file %p `%s' to %p\n", MEM_TOHOST(ARM_R2), MEM_TOHOST(ARM_R0), fh);*/
 	clib_file_dispose(ARM_R2);
         ARM_SET_R0(fh == NULL ? 0 : clib_file_new(fh));
         return 0;
@@ -377,7 +441,7 @@ swih_sharedclibrary_entry(WORD num)
     case CLIB_CLIB_FOPEN: /* 4-306 */
       {
         FILE *fh = fopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
-	fprintf(stderr, "opening file `%s' = %p\n", MEM_TOHOST(ARM_R0), fh);
+	/*fprintf(stderr, "opening file `%s' = %p\n", MEM_TOHOST(ARM_R0), fh);*/
         ARM_SET_R0(fh == NULL ? 0 : clib_file_new(fh));
         return 0;
       }
@@ -393,42 +457,52 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB__SPRINTF:
     case CLIB_CLIB_SPRINTF:
-      prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
       ARM_SET_R0(vsprintf(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), arm_va_list));
+      free(arm_va_list);
       return 0;
     
     case CLIB_CLIB_SCANF:
-      prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 1);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 1);
       ARM_SET_R0(scanf(MEM_TOHOST(ARM_R0), arm_va_list));
+      free(arm_va_list);
       return 0;
     
     case CLIB_CLIB__PRINTF:
     case CLIB_CLIB_PRINTF:
-      prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 0);
       ARM_SET_R0(vprintf(MEM_TOHOST(ARM_R0), arm_va_list));
+      free(arm_va_list);
       return 0;
       
     case CLIB_CLIB__FPRINTF:
     case CLIB_CLIB_FPRINTF:
-      prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
       ARM_SET_R0(vfprintf(clib_file_real(ARM_R0),
                           MEM_TOHOST(ARM_R1),
                           arm_va_list));
+      free(arm_va_list);
       return 0;
 
     case CLIB_CLIB__VPRINTF:
     case CLIB_CLIB_VPRINTF:
-      prepare_arm_va_list(MEM_TOHOST(ARM_R0), 2, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 2, 0);
       ARM_SET_R0(vfprintf(stdout,
                           MEM_TOHOST(ARM_R0),
                           arm_va_list));
+      free(arm_va_list);
       return 0;
       
     case CLIB_CLIB_VFPRINTF: /* 4-312 */
-      prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
+      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0);
       ARM_SET_R0(vfprintf(clib_file_real(ARM_R0),
                      MEM_TOHOST(ARM_R1),
                      arm_va_list));
+      free(arm_va_list);
+      return 0;
+
+    case CLIB_CLIB_UNGETC: /* 4-315 */
+      ARM_SET_R0(ungetc(ARM_R0, clib_file_real(ARM_R1)));
       return 0;
 
     case CLIB_CLIB_FWRITE: /* 4-316 */
@@ -445,9 +519,13 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
     
     case CLIB_CLIB___FILBUF: /* 4-318 */
-      ARM_SET_R0(getc(clib_file_real(ARM_R0)));
+      {
+      	int ch = getc(clib_file_real(ARM_R0));
+      	if (ch == EOF)
+      	  clib_file_mark_eof(ARM_R0);
+        ARM_SET_R0(ch);
+      }
       return 0;
-    
     
     case CLIB_CLIB___FLSBUF: /* 4-318 */
       ARM_SET_R0(putc(ARM_R0, clib_file_real(ARM_R1)));
@@ -580,6 +658,10 @@ swih_sharedclibrary_entry(WORD num)
       ARM_SET_R0((WORD) time(NULL));
       if (ARM_R1 != 0)
         MEM_WRITE_WORD(ARM_R1, ARM_R0);
+      return 0;
+
+    case CLIB_CLIB_TMPNAM:
+      ARM_SET_R0(MEM_TOARM(tmpnam(MEM_TOHOST(ARM_R0))));
       return 0;
 
     default:

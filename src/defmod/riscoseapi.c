@@ -394,13 +394,13 @@ void riscose_osapi_output
    fprintf(file, "/* Machine generated file --- do not edit */\n\n"
                  "/* riscose OS API .c file for %s\n"
                  "**\n"
-                 "** Written by defmod (riscose version %s) on %s"
+                 "** Written by defmod (riscose version %s)\n"
                  "**\n"
                  "** See http://riscose.sourceforge.net/ for terms of distribution, and to\n"
                  "** pick up a later version of the software.\n"
                  "*/\n"
                  "\n",
-                 title, DEFMOD_RISCOSE_VERSION, ctime((time(&now), &now)) );
+                 title, DEFMOD_RISCOSE_VERSION);
 
 
    /* Includes */

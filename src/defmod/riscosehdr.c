@@ -363,7 +363,7 @@ void riscose_header_output
          "**\n"
          "*/\n"
          "\n",
-         title, DEFMOD_RISCOSE_VERSION, ctime((time(&now), &now))) ) < 0)
+         title, DEFMOD_RISCOSE_VERSION)) < 0)
       goto finish;
 
    /*Make sure we have "types.h".*/

@@ -580,6 +580,8 @@ swih_sharedclibrary_entry(WORD num)
 {
   char **arm_va_list;
 
+    DEBUG(SWI, ("sharedclib swi %#x\n", num));
+
   switch(SWI_NUM(num))
     {
 

@@ -20,6 +20,7 @@
 #include <assert.h>
 
 #include <monty/monty.h>
+#include <monty/mem.h>
 #include "riscostypes.h"
 #include "swi.h"
 #include <rom/rom.h>
@@ -751,7 +752,7 @@ swih_sharedclibrary_entry(WORD num)
 
         /* Drop the stack two words and put the args in r2 and r3 on */
         ARM_SET_R13(ARM_R13 - 8);
-        args = MEM_TOHOST(ARM_R13);
+        args = (WORD *)MEM_TOHOST(ARM_R13);
         args[0] = ARM_R2;
         args[1] = ARM_R3;
 
@@ -774,8 +775,7 @@ swih_sharedclibrary_entry(WORD num)
         ** that we change so that we can restore them later.
         */
         outputs = 0;
-        for (i = 0; i <= 9; i++)
-        {
+        for (i = 0; i < DIM(preserve); i++) {
           if (flags & (1 << i))
           {
             preserve[i] = arm_get_reg(i);
@@ -786,8 +786,7 @@ swih_sharedclibrary_entry(WORD num)
 
         /* Count past outputs so that we find any PC output register */
         pc = outputs;
-        for (i = 0; i <= 9; i++)
-        {
+        for (i = 0; i < DIM(preserve); i++) {
           if ( flags & (1 << (31 - i)) )
             pc++;
         }
@@ -813,8 +812,7 @@ swih_sharedclibrary_entry(WORD num)
         /* Put outputs into appropriate args */
         fprintf(stderr, "SWIX: write outputs\n");
         n = outputs;
-        for (i = 0; i <= 9; i++)
-        {
+        for (i = 0; i < DIM(preserve); i++) {
           if ( flags & (1 << (31 - i)) )
           {
             MEM_WRITE_WORD(args[n], arm_get_reg(i));
@@ -829,6 +827,7 @@ swih_sharedclibrary_entry(WORD num)
           ARM_SET_R0(arm_get_reg(r));
         else if (r == 15)
           ARM_SET_R0(ARM_R15_ALL);
+	/* FIXME: else error(). */
 
         fprintf(stderr, "SWIX: write PC output\n");
         /* Write the PC output if required */
@@ -836,9 +835,9 @@ swih_sharedclibrary_entry(WORD num)
           MEM_WRITE_WORD(args[pc], ARM_R15_ALL);
 
         fprintf(stderr, "SWIX: restore regs\n");
-        /* Restore any input or block input registers that we corrupted earlier */
-        for (i = 0; i <= 9; i++)
-        {
+	/* Restore any input or block input registers that we corrupted
+	 * earlier */
+        for (i = 0; i < DIM(preserve); i++) {
           if (flags & (1 << i))
             arm_set_reg(i, preserve[i]);
         }

@@ -125,16 +125,23 @@ main(int argc, char **argv)
   
   /* Run the code */
 
-  if (utility) {
-    utility_run(file, priv);
-  } else if (module) {
-    module = module_load(file);
-    if (module == -1)
-      error("module load of `%s' failed\n", file);
-    arm_run_routine(module_base(module)+MODULE_START(module_base(module)));
-  } else {
-    arm_run_routine(0x8000);
-  }
+    if (utility) {
+        utility_run(file, priv);
+    } else if (module) {
+        WORD start;
+
+        module = module_load(file);
+        if (module == -1) {
+            error("module load of `%s' failed\n", file);
+        }
+        start = MODULE_START(module_base(module));
+        if (!start) {
+            error("module `%s' doesn't have a start entry point\n", file);
+        }
+        arm_run_routine(start);
+    } else {
+        arm_run_routine(0x8000);
+    }
 
   return 0;
 }

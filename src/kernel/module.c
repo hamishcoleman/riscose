@@ -66,6 +66,7 @@ module_load(char *name)
 {
   void *base;
   WORD len;
+    WORD init;
   
   if (!file_isfile(name))
     return -1;
@@ -78,12 +79,13 @@ module_load(char *name)
   file_loadat(name, base);
 
   module_bases[modules] = MEM_TOARM(base);
-  
-  if (MODULE_INIT(module_bases[modules])) {
-    ARM_SET_R12(module_privates+(modules*4));
-    arm_run_routine(MODULE_INIT(module_bases[modules]));
-  }
-  
+
+    init = MODULE_INIT(module_bases[modules]);
+    if (init) {
+        ARM_SET_R12(module_privates + modules * 4);
+        arm_run_routine(init);
+    }
+
   if (ARM_V_SET) {
     fprintf(stderr, "FIXME: No error checking on module initialisation!\n");
     exit(1);
@@ -97,12 +99,14 @@ module_kill(int num)
 {
   int c;
   WORD* module_privates_n = (WORD*) MEM_TOHOST(module_privates);
-  
-  if (MODULE_FINAL(module_bases[num])) {
-    ARM_SET_R12(module_privates+(num*4));
-    arm_run_routine(MODULE_FINAL(module_bases[num]));
-  }
-  
+    WORD final;
+
+    final = MODULE_FINAL(module_bases[num]);
+    if (final) {
+        ARM_SET_R12(module_privates + num * 4);
+        arm_run_routine(final);
+    }
+
   if (ARM_V_SET) {
     fprintf(stderr, "FIXME: No error checking on module finalisation!\n");
     exit(1);

@@ -171,10 +171,10 @@ initEmulatedFS(void)
   if (reg == -1)
     return reg;
 
-  fileSystem[reg]->csd = xstrcpy("$");
-  fileSystem[reg]->csl = xstrcpy("$");
-  fileSystem[reg]->psd = xstrcpy("$");
-  fileSystem[reg]->urd = xstrcpy("$");
+  fileSystem[reg]->csd = estrdup("$");
+  fileSystem[reg]->csl = estrdup("$");
+  fileSystem[reg]->psd = estrdup("$");
+  fileSystem[reg]->urd = estrdup("$");
 
   return reg;
 }
@@ -187,8 +187,8 @@ fileSystem_addriscosefsdrive(char *spec, char *path)
 	
   if (emulatedDrives < MAXMAPPINGS)
   {
-    emulatedDrive[emulatedDrives] = xstrcpy(spec);    
-    emulatedPath[emulatedDrives]  = xstrcpy(path);
+    emulatedDrive[emulatedDrives] = estrdup(spec);    
+    emulatedPath[emulatedDrives]  = estrdup(path);
   
     emulatedDrives++;
   

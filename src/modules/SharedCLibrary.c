@@ -323,9 +323,9 @@ swih_sharedclibrary_entry(WORD num)
       break;
     
     case CLIB_KERN_SDIV:
-    case CLIB_CLIB_X$DIVIDE:
+    case CLIB_CLIB_X_DOLLAR_DIVIDE:
     case CLIB_KERN_UDIV: /* 4-277 */
-    case CLIB_CLIB_X$UDIVIDE:
+    case CLIB_CLIB_X_DOLLAR_UDIVIDE:
       {
         WORD div = ARM_R1 / ARM_R0;
         WORD rem = ARM_R1 % ARM_R0;
@@ -460,8 +460,8 @@ swih_sharedclibrary_entry(WORD num)
     case CLIB_CLIB__CLIB_INITIALISE: /* 4-292 */
       return 0;
       
-    /*case CLIB_CLIB_X$STACK_OVERFLOW:*/ /* 4-290 */
-    /*case CLIB_CLIB_X$STACK_OVERFLOW_1:*/ /* 4-290 */
+    /*case CLIB_CLIB_X_DOLLAR_STACK_OVERFLOW:*/ /* 4-290 */
+    /*case CLIB_CLIB_X_DOLLAR_STACK_OVERFLOW_1:*/ /* 4-290 */
       /*return 0;*/
     
 /*     case CLIB_CLIB__COUNT1: 4-293
@@ -810,7 +810,6 @@ swih_sharedclibrary_entry(WORD num)
         swi_trap(swi_number);
 
         /* Put outputs into appropriate args */
-        fprintf(stderr, "SWIX: write outputs\n");
         n = outputs;
         for (i = 0; i < DIM(preserve); i++) {
           if ( flags & (1 << (31 - i)) )
@@ -820,21 +819,19 @@ swih_sharedclibrary_entry(WORD num)
           }
         }
 
-        fprintf(stderr, "SWIX: set up r0 return\n");
         /* Return something in r0 */
         r = (flags & 0xf0000) >> 16;
         if (r <= 9)
           ARM_SET_R0(arm_get_reg(r));
         else if (r == 15)
           ARM_SET_R0(ARM_R15_ALL);
-	/* FIXME: else error(). */
+        else
+          error("invalid return value specified in call to swi[x]");
 
-        fprintf(stderr, "SWIX: write PC output\n");
         /* Write the PC output if required */
         if (flags & (1 << 21))
           MEM_WRITE_WORD(args[pc], ARM_R15_ALL);
 
-        fprintf(stderr, "SWIX: restore regs\n");
 	/* Restore any input or block input registers that we corrupted
 	 * earlier */
         for (i = 0; i < DIM(preserve); i++) {
@@ -845,10 +842,7 @@ swih_sharedclibrary_entry(WORD num)
           arm_set_reg(block_reg, preserve[block_reg]);
 
         /* Put the stack pointer back */
-        fprintf(stderr, "SWIX: restore SP\n");
         ARM_SET_R13(ARM_R13 + 8);
-
-        fprintf(stderr, "SWIX: done\n");
 
       }
       return 0;

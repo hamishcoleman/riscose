@@ -3,59 +3,82 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+
+#include <monty/monty.h>
+#include <monty/mem.h>
 #include "heap.h"
 
-#define HEAP_SIZE (512)
-#define MAX_BLOCKS 1024
+#define HEAP_SIZE 1024
 
-int
-main(void)
+typedef struct {
+    BYTE *data;
+    ULONG size;
+    BYTE content;
+} test;
+
+int main(void)
 {
-  BYTE *blocks[MAX_BLOCKS];
-  heap_t *test = malloc(HEAP_SIZE);
-  
-  bzero(blocks, MAX_BLOCKS*sizeof(BYTE*));
-  heap_init(test, HEAP_SIZE);
-  
-  for (;;)
-    {
-     int num = rand()%MAX_BLOCKS, c;
-     int size = (rand()%(HEAP_SIZE/8));
-     
-     (size+=(4-(size&3)));
-          
-     if (rand()%5 == 0 && !blocks[num])
-       {
-        blocks[num] = heap_block_alloc(test, size);
-        if (blocks[num] != NULL)
-          {
-           for (c=0; c!=size; c++)
-             blocks[num][c] = num%256;
-           printf("allocated block %d @ %08x, size %d (described %d)\n", num, (unsigned int)blocks[num], size, heap_block_size(test, blocks[num]));
-           for (c=0; c!=size; c++)
-              if ( (blocks[num][c]&0xff) != num%256)
-        	 abort();
-          }
-	else
-	  {
-	   printf("alloc failed for block %d, size %d\n", num, size);
-	  }
-       }
-     num = rand()%MAX_BLOCKS;
-     if (rand()%5 == 0 && blocks[num])
-       {
-        size = heap_block_size(test, blocks[num]);
-        printf("checking block %d (fill byte %02x) size %d\n", num, num%256, size);
-        for (c=0; c!=size; c++)
-           if ( (blocks[num][c]&0xff) != num%256)
-	     {
-	      printf("aborting on byte %d = %d\n", c, blocks[num][c]&0xff);
-              abort();
-	     }
-        heap_block_free(test, blocks[num]);
-        blocks[num] = NULL;
-        printf("freed block %d\n", num);
-       }
-     //printf("Heap free %d bytes, largest %d\n", heap_describe(test, &num), num); 
+    test block[100];
+    test *b;
+    heap_t *h;
+    int size;
+    BYTE *p;
+    BYTE *new;
+
+    debugf = verbosef = stderr;
+
+    for (b = block; b < END(block); b++) {
+        b->data = NULL;
+        b->size = 0;
+        b->content = 0;
     }
+
+    h = emalloc(HEAP_SIZE);
+    heap_init(h, HEAP_SIZE);
+
+    while (1) {
+        b = block + rand() % DIM(block);
+        size = ((rand() % (HEAP_SIZE / 8)) + 3) & ~3;
+
+        debug("block %2d, size %3d", b - block, size);
+
+        if (b->data) {
+            for (p = b->data; p < b->data + b->size; p++) {
+                if (*p != b->content) {
+                    error("content wrong: block %p byte %p was "
+                        "%ud not %ud\n", b->data, p, *p, b->content);
+                }
+            }
+
+            switch (rand() % 2) {
+            case 0:
+                debug(", free\n");
+                heap_block_free(h, b->data);
+                b->data = NULL;
+                break;
+            case 1:
+                if ((new = heap_block_resize(h, b->data, size))) {
+                    debug(", resized %p\n", new);
+                    b->data = new;
+                    b->size = size;
+                    memset(b->data, b->content, b->size);
+                } else {
+                    debug(", resize failed\n");
+                }
+                break;
+            }
+        } else {
+            if ((new = heap_block_alloc(h, size))) {
+                debug(", allocated %p\n", new);
+                b->data = new;
+                b->size = size;
+                b->content = rand() % 0x100;
+                memset(b->data, b->content, b->size);
+            } else {
+                debug(", allocation failed\n");
+            }
+        }
+    }
+
+    return 0;
 }

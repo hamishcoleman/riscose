@@ -34,7 +34,6 @@
 
 /*From Support*/
 #include "lookup.h"
-#include "trace.h"
 
 typedef
    struct

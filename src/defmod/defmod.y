@@ -49,13 +49,14 @@ TV    20000503    |bool| replaced by |osbool|
 
    /*From Support*/
    #include "lookup.h"
-   #include "trace.h"
 
    /*Local*/
    #include "def.h"
    #include "riscoseapi.h"
    #include "riscosetpl.h"
    #include "riscosehdr.h"
+
+#define tracef(a)
 
 #define Module_MajorVersion_CMHG        6.22
 #define Module_MinorVersion_CMHG        
@@ -1041,8 +1042,6 @@ int main (int argc, char *argv [])
    enum {APCS26, APCS32} mode = DEFAULT_TO_APCS_32 ? APCS32 : APCS26;
    char *output = NULL;
 
-   trace_initialise ("Trace$To");
-
    if (  (error = lookup_new (&needses, 16)) != NULL ||
          (error = lookup_new (&needsatends, 16)) != NULL ||
          (error = lookup_new (&consts, 16)) != NULL ||
@@ -1198,7 +1197,6 @@ int main (int argc, char *argv [])
    }
 
 finish:
-   trace_terminate ();
    if (error == NULL)
       exit (Parse_Error? 1: 0);
    else

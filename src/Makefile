@@ -35,7 +35,7 @@ export CC CFLAGS SRCDIR LDFLAGS
 
 CORE = heap.o mem.o swi.o swichunk.o util.o
 
-OBJS = $(CORE) kernel/libkernel.a modules/libmodules.a \
+OBJS = $(CORE) modules/libmodules.a kernel/libkernel.a \
     $(ARM_SELECT)/lib$(ARM_SELECT).a monty/libmonty.a
 
 %.o:    %.c mem.h arm.h

@@ -117,5 +117,7 @@ int main(int argc, char *argv[])
         }
     } while (testnum -= testdec);
 
+    efree(h);
+
     return 0;
 }

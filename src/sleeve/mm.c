@@ -7,13 +7,15 @@
 
 /* --- Header files --- */
 
-#include "sleeve.h"
 #include <errno.h>
 #include <unistd.h>
 #include <sys/mman.h>
 #include <mLib/alloc.h>
 #include <mLib/exc.h>
 #include <mLib/report.h>
+#include <monty/mem.h>
+
+#include "sleeve.h"
 #include "mm.h"
 
 /* --- Make sure we're supporting at least one translation mode --- */
@@ -85,7 +87,7 @@ void mm_init (unsigned t, size_t l, unsigned p, ptrdiff_t o)
       mm_pageLog = p + 2;
       mm_pageSize = 4 << p;
       mm_pageMask = mm_pageSize - 1;
-      mm_page = xmalloc((sizeof (arm_byte *)) * (mm_pageEnd / mm_pageSize));
+      mm_page = emalloc((sizeof (arm_byte *)) * (mm_pageEnd / mm_pageSize));
 
       /* --- Set them all as unmapped --- */
 

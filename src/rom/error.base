@@ -4,11 +4,6 @@
 WORD magic_return_address            ef3dffff
 
 ERROR em_unhandledswi                 0       Unhandled SWI
-ERROR em_branchzero                   0       Branch through zero
-
-ERROR os_filenotfound                 0       File not found
-ERROR os_filenotread                  0       File could not be opened for reading
 
 ERROR sharedclibrary_badchunkid       80680   Bad chunk ID
 ERROR sharedclibrary_vectortoosmall   80681   Vector list supplied too short
-

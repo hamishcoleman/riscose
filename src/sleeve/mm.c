@@ -147,7 +147,8 @@ arm_byte *mm_map (arm_word q, size_t l)
 
       /* --- Allocate a block and patch it in --- */
 
-      pb = xmalloc(l);
+      /* FIXME: does this need to be zero'd? */
+      pb = ecalloc(l);
 
       sleeve_printf("mm_map: Mapping %p into 0x%x -> 0x%x (%d bytes).\n",
                      pb, q, q + l, l);

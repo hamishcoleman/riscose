@@ -24,6 +24,7 @@
 
 #include <readline/readline.h>
 
+/* FIXME: this should be in a header file, osmodule.h? */
 void osmodule(void);
 
 WORD
@@ -47,9 +48,8 @@ swih_os(WORD num)
 
     case 0x1 : /* OS_WriteS */
       {
-	WORD pc = ARM_R15 & 0x02fffffc, psr = ARM_R15 & 0xfc000003;
+	WORD pc = ARM_R15 & 0x02fffffc;
 	char *p = (char *)MEM_TOHOST(pc);
-        psr=psr; /* FIXME: Do we need this?  */
 	while (*p)
 	  {
 	    vdu(*(p++));
@@ -138,11 +138,11 @@ swih_os(WORD num)
       return ARM_R0;
       
     case 0x6f: /* OS_CallASWI */
-      printf("OS_CallASWI\n");
+      printf("OS_CallASWI %x\n", (unsigned int)ARM_R10);
       swi_trap(ARM_R10);
       return 0;
     case 0x71: /* OS_CallASWIR12 */
-      printf("OS_CallASWI %x\n", (signed int) ARM_R12);
+      printf("OS_CallASWIR12 %x\n", (unsigned int)ARM_R12);
       swi_trap(ARM_R12);
       return 0;
     }

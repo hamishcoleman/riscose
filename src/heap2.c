@@ -101,7 +101,7 @@ heap_dump(heap_t *h)
 {
   fprintf(stderr, "\nheap_t     Magic    Address    Size     Gap      Limit     Next\n");
   while (h) {
-    fprintf(stderr, "%8p %8x %8p %8d %8d %8p %8p\n",
+    fprintf(stderr, "%8p %8lu %8p %8lu %8d %8p %8p\n",
                     h, h->magic, h->addr, h->size, GAP_SIZE(h), h->limit, h->next);
     h = h->next;
   }
@@ -193,24 +193,27 @@ coalesce_empty(heap_t* h)
  *    Compact the heap.
  *    Of course we don't want to do this if we are emulating OS_Heap,
  *    since OS_Heap's blocks do not move once allocated!
+ *
+ *    Commented out for now to stop the compiler warning about this
+ *    function being defined but not used.
  */
 
-static heap_t*
+/* static heap_t*
 compact_blocks(heap_t* h)
 {
   while (h->next) {
     
-    coalesce_empty(h);
+    coalesce_empty(h); */
     
     /* Shuffle following block up to end of this block */
     
-    memmove(GAP_ADDR(h), h->next, TOTAL(h->next->size));
+/*    memmove(GAP_ADDR(h), h->next, TOTAL(h->next->size));
     h->next       = (heap_t*) GAP_ADDR(h);
     h->next->addr = (BYTE*) h->next;
     h = h->next;
   }
   return h;
-}
+} */
 
 BYTE*
 heap_block_alloc(heap_t* h, ULONG size)

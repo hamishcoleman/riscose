@@ -156,14 +156,7 @@ os_error *xbasictrans_help (char *help_text,
       byte *lexical_table,
       osbool *unclaimed)
 {
-  fprintf(stderr, "basictrans_help\n");
-  fprintf(stderr, "  In: help_text = %x\n", (int) help_text);
-  fprintf(stderr, "  In: prog_name = %x\n", (int) prog_name);
-  fprintf(stderr, "  In: lexical_table = %x\n", (int) lexical_table);
-
     *unclaimed = TRUE;
-
-  fprintf(stderr, "  Out: unclaimed = %x\n", (int) *unclaimed);
 
   return 0;
 }
@@ -184,10 +177,6 @@ os_error *xbasictrans_error(int error_no, char *error_buffer)
     static os_error standin = {
         0, "FIXME: what does the real thing do?"
     };
-
-  fprintf(stderr, "basictrans_error\n");
-  fprintf(stderr, "  In: error_no = %x\n", (int) error_no);
-  fprintf(stderr, "  In: error_buffer = %x\n", (int) error_buffer);
 
     /* FIXME: we should probably get these from a messages file. */
     if (error_no < 0 || error_no >= DIM(basictrans_errors)) {
@@ -220,12 +209,6 @@ os_error *xbasictrans_message (int message_no,
     static os_error unknown = {
         0x1e6, "Unknown BASICTrans operation"
     };
-
-  fprintf(stderr, "basictrans_message\n");
-  fprintf(stderr, "  In: message_no = %x\n", (int) message_no);
-  fprintf(stderr, "  In: arg0 = %x\n", (int) arg0);
-  fprintf(stderr, "  In: arg1 = %x\n", (int) arg1);
-  fprintf(stderr, "  In: arg2 = %x\n", (int) arg2);
 
     return &unknown;
 }

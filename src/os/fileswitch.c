@@ -37,10 +37,7 @@ os_error *xos_bgetw (os_fw file,
       char *c,
       bits *psr)
 {
-  fprintf(stderr, "os_bgetw\n");
-  fprintf(stderr, "  In: file = %x\n", (int) file);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: c = %x\n", (int) *c);
   return 0;
 }
 
@@ -63,10 +60,7 @@ os_error *xbgetvw (os_fw file,
       char *c,
       bits *psr)
 {
-  fprintf(stderr, "bgetvw\n");
-  fprintf(stderr, "  In: file = %x\n", (int) file);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: c = %x\n", (int) *c);
   return 0;
 }
 
@@ -84,9 +78,6 @@ os_error *xbgetvw (os_fw file,
 os_error *xos_bputw (char c,
       os_fw file)
 {
-  fprintf(stderr, "os_bputw\n");
-  fprintf(stderr, "  In: c = %x\n", (int) c);
-  fprintf(stderr, "  In: file = %x\n", (int) file);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -105,9 +96,6 @@ os_error *xos_bputw (char c,
 os_error *xbputvw (char c,
       os_fw file)
 {
-  fprintf(stderr, "bputvw\n");
-  fprintf(stderr, "  In: c = %x\n", (int) c);
-  fprintf(stderr, "  In: file = %x\n", (int) file);
   error("*** SWI unimplemented\n");
   return 0;
 }

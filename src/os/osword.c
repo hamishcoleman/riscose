@@ -30,8 +30,6 @@ void osword_swi_register_extra(void)
 
 os_error *xosword_read_system_clock (osword_timer_block *clock)
 {
-  fprintf(stderr, "osword_read_system_clock\n");
-  fprintf(stderr, "  In: clock = %x\n", (int) clock);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -48,8 +46,6 @@ os_error *xosword_read_system_clock (osword_timer_block *clock)
 
 os_error *xosword_write_system_clock (osword_timer_block *clock)
 {
-  fprintf(stderr, "osword_write_system_clock\n");
-  fprintf(stderr, "  In: clock = %x\n", (int) clock);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -66,8 +62,6 @@ os_error *xosword_write_system_clock (osword_timer_block *clock)
 
 os_error *xosword_read_interval_timer (osword_timer_block *timer)
 {
-  fprintf(stderr, "osword_read_interval_timer\n");
-  fprintf(stderr, "  In: timer = %x\n", (int) timer);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -84,8 +78,6 @@ os_error *xosword_read_interval_timer (osword_timer_block *timer)
 
 os_error *xosword_write_interval_timer (osword_timer_block *timer)
 {
-  fprintf(stderr, "osword_write_interval_timer\n");
-  fprintf(stderr, "  In: timer = %x\n", (int) timer);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -103,8 +95,6 @@ os_error *xosword_write_interval_timer (osword_timer_block *timer)
 
 os_error *xosword_read_char_definition (osword_char_definition_block *definition)
 {
-  fprintf(stderr, "osword_read_char_definition\n");
-  fprintf(stderr, "  In: definition = %x\n", (int) definition);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -122,8 +112,6 @@ os_error *xosword_read_char_definition (osword_char_definition_block *definition
 
 os_error *xosword_read_palette (osword_palette_block *entry)
 {
-  fprintf(stderr, "osword_read_palette\n");
-  fprintf(stderr, "  In: entry = %x\n", (int) entry);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -141,8 +129,6 @@ os_error *xosword_read_palette (osword_palette_block *entry)
 
 os_error *xosword_write_palette (osword_palette_block *entry)
 {
-  fprintf(stderr, "osword_write_palette\n");
-  fprintf(stderr, "  In: entry = %x\n", (int) entry);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -160,8 +146,6 @@ os_error *xosword_write_palette (osword_palette_block *entry)
 
 os_error *xosword_read_cursor_position (osword_cursor_position_block *position)
 {
-  fprintf(stderr, "osword_read_cursor_position\n");
-  fprintf(stderr, "  In: position = %x\n", (int) position);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -180,8 +164,6 @@ os_error *xosword_read_cursor_position (osword_cursor_position_block *position)
 
 os_error *xoswordreadclock_local_string (oswordreadclock_local_string_block *string)
 {
-  fprintf(stderr, "oswordreadclock_local_string\n");
-  fprintf(stderr, "  In: string = %x\n", (int) string);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -200,8 +182,6 @@ os_error *xoswordreadclock_local_string (oswordreadclock_local_string_block *str
 
 os_error *xoswordreadclock_local_bcd (oswordreadclock_local_bcd_block *bcd)
 {
-  fprintf(stderr, "oswordreadclock_local_bcd\n");
-  fprintf(stderr, "  In: bcd = %x\n", (int) bcd);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -219,8 +199,6 @@ os_error *xoswordreadclock_local_bcd (oswordreadclock_local_bcd_block *bcd)
 
 os_error *xoswordreadclock_convert_bcd_to_string (oswordreadclock_convert_bcd_to_string_block *convert_bcd_to_String)
 {
-  fprintf(stderr, "oswordreadclock_convert_bcd_to_string\n");
-  fprintf(stderr, "  In: convert_bcd_to_String = %x\n", (int) convert_bcd_to_String);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -238,8 +216,6 @@ os_error *xoswordreadclock_convert_bcd_to_string (oswordreadclock_convert_bcd_to
 
 os_error *xoswordreadclock_utc (oswordreadclock_utc_block *utc)
 {
-  fprintf(stderr, "oswordreadclock_utc\n");
-  fprintf(stderr, "  In: utc = %x\n", (int) utc);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -258,8 +234,6 @@ os_error *xoswordreadclock_utc (oswordreadclock_utc_block *utc)
 
 os_error *xoswordwriteclock_time_local_string (oswordwriteclock_block *time)
 {
-  fprintf(stderr, "oswordwriteclock_time_local_string\n");
-  fprintf(stderr, "  In: time = %x\n", (int) time);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -278,8 +252,6 @@ os_error *xoswordwriteclock_time_local_string (oswordwriteclock_block *time)
 
 os_error *xoswordwriteclock_date_local_string (oswordwriteclock_block *date)
 {
-  fprintf(stderr, "oswordwriteclock_date_local_string\n");
-  fprintf(stderr, "  In: date = %x\n", (int) date);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -298,8 +270,6 @@ os_error *xoswordwriteclock_date_local_string (oswordwriteclock_block *date)
 
 os_error *xoswordwriteclock_date_and_time_local_string (oswordwriteclock_block *date_and_time)
 {
-  fprintf(stderr, "oswordwriteclock_date_and_time_local_string\n");
-  fprintf(stderr, "  In: date_and_time = %x\n", (int) date_and_time);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -318,8 +288,6 @@ os_error *xoswordwriteclock_date_and_time_local_string (oswordwriteclock_block *
 
 os_error *xoswordpointer_define (oswordpointer_define_block *define)
 {
-  fprintf(stderr, "oswordpointer_define\n");
-  fprintf(stderr, "  In: define = %x\n", (int) define);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -337,8 +305,6 @@ os_error *xoswordpointer_define (oswordpointer_define_block *define)
 
 os_error *xoswordpointer_set_bbox (oswordpointer_bbox_block *bbox)
 {
-  fprintf(stderr, "oswordpointer_set_bbox\n");
-  fprintf(stderr, "  In: bbox = %x\n", (int) bbox);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -356,8 +322,6 @@ os_error *xoswordpointer_set_bbox (oswordpointer_bbox_block *bbox)
 
 os_error *xoswordpointer_step (oswordpointer_step_block *step)
 {
-  fprintf(stderr, "oswordpointer_step\n");
-  fprintf(stderr, "  In: step = %x\n", (int) step);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -375,8 +339,6 @@ os_error *xoswordpointer_step (oswordpointer_step_block *step)
 
 os_error *xoswordpointer_set_position (oswordpointer_position_block *pos)
 {
-  fprintf(stderr, "oswordpointer_set_position\n");
-  fprintf(stderr, "  In: pos = %x\n", (int) pos);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -394,8 +356,6 @@ os_error *xoswordpointer_set_position (oswordpointer_position_block *pos)
 
 os_error *xoswordpointer_read_position (oswordpointer_position_block *pos)
 {
-  fprintf(stderr, "oswordpointer_read_position\n");
-  fprintf(stderr, "  In: pos = %x\n", (int) pos);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -413,8 +373,6 @@ os_error *xoswordpointer_read_position (oswordpointer_position_block *pos)
 
 os_error *xoswordpointer_set_unlinked_position (oswordpointer_position_block *pos)
 {
-  fprintf(stderr, "oswordpointer_set_unlinked_position\n");
-  fprintf(stderr, "  In: pos = %x\n", (int) pos);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -432,8 +390,6 @@ os_error *xoswordpointer_set_unlinked_position (oswordpointer_position_block *po
 
 os_error *xoswordpointer_read_unlinked_position (oswordpointer_position_block *pos)
 {
-  fprintf(stderr, "oswordpointer_read_unlinked_position\n");
-  fprintf(stderr, "  In: pos = %x\n", (int) pos);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -451,8 +407,6 @@ os_error *xoswordpointer_read_unlinked_position (oswordpointer_position_block *p
 
 os_error *xosword_write_screen_base (osword_screen_base_block *screen_base)
 {
-  fprintf(stderr, "osword_write_screen_base\n");
-  fprintf(stderr, "  In: screen_base = %x\n", (int) screen_base);
   error("*** SWI unimplemented\n");
   return 0;
 }

@@ -83,14 +83,7 @@ os_error *xos_read_var_val_size (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  fprintf(stderr, "os_read_var_val_size\n");
-  fprintf(stderr, "  In: var = %x\n", (int) var);
-  fprintf(stderr, "  In: context = %x\n", (int) context);
-  fprintf(stderr, "  In: var_type = %x\n", (int) var_type);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
-  fprintf(stderr, "  Out: context_out = %x\n", (int) *context_out);
-  fprintf(stderr, "  Out: var_type_out = %x\n", (int) *var_type_out);
   return 0;
 }
 
@@ -106,8 +99,6 @@ os_error *xos_read_var_val_size (char *var,
 
 os_error *xos_writec (char c)
 {
-  fprintf(stderr, "os_writec\n");
-  fprintf(stderr, "  In: c = %x\n", (int) c);
 
   vdu(c);
 
@@ -126,8 +117,6 @@ os_error *xos_writec (char c)
 
 os_error *xos_write0 (char *s)
 {
-  fprintf(stderr, "os_write0\n");
-  fprintf(stderr, "  In: s = %x\n", (int) s);
 
   while (*s)
     vdu(*(s++));
@@ -146,7 +135,6 @@ os_error *xos_write0 (char *s)
 
 os_error *xos_new_line (void)
 {
-  fprintf(stderr, "os_new_line\n");
 
   vdu(10);
   vdu(13);
@@ -170,9 +158,7 @@ os_error *xos_new_line (void)
 os_error *xos_readc (char *c,
       bits *psr)
 {
-  fprintf(stderr, "os_readc\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: c = %x\n", (int) *c);
   return 0;
 }
 
@@ -188,8 +174,6 @@ os_error *xos_readc (char *c,
 
 os_error *xos_cli (char *command)
 {
-  fprintf(stderr, "os_cli\n");
-  fprintf(stderr, "  In: command = %x\n", (int) command);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -222,11 +206,6 @@ os_error *xos_read_line (char *buffer,
   char* l;
   int len;
 
-  fprintf(stderr, "os_read_line\n");
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
-  fprintf(stderr, "  In: min_char = %x\n", (int) min_char);
-  fprintf(stderr, "  In: max_char = %x\n", (int) max_char);
 
   /* FIXME: not quite right! */
   l = readline(NULL);
@@ -242,7 +221,6 @@ os_error *xos_read_line (char *buffer,
   if (psr)
     *psr = 0;
 
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
   return 0;
 }
 
@@ -274,18 +252,11 @@ os_error *xos_read_line_given_echo (char *buffer,
       int *used,
       bits *psr)
 {
-  fprintf(stderr, "os_read_line_given_echo\n");
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
-  fprintf(stderr, "  In: min_char = %x\n", (int) min_char);
-  fprintf(stderr, "  In: max_char = %x\n", (int) max_char);
-  fprintf(stderr, "  In: echo = %x\n", (int) echo);
 
   /* FIXME --- not sure if there should be two readline SWIs in the .osl */
   return xos_read_line(buffer, size, min_char, max_char, used, psr);
 
   /* FIXME --- unreachable */
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
 }
 
 /* ------------------------------------------------------------------------
@@ -314,13 +285,7 @@ os_error *xos_read_line_suppress_invalid (char *buffer,
       int *used,
       bits *psr)
 {
-  fprintf(stderr, "os_read_line_suppress_invalid\n");
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
-  fprintf(stderr, "  In: min_char = %x\n", (int) min_char);
-  fprintf(stderr, "  In: max_char = %x\n", (int) max_char);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
   return 0;
 }
 
@@ -352,14 +317,7 @@ os_error *xos_read_line_given_echo_suppress_invalid (char *buffer,
       int *used,
       bits *psr)
 {
-  fprintf(stderr, "os_read_line_given_echo_suppress_invalid\n");
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
-  fprintf(stderr, "  In: min_char = %x\n", (int) min_char);
-  fprintf(stderr, "  In: max_char = %x\n", (int) max_char);
-  fprintf(stderr, "  In: echo = %x\n", (int) echo);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
   return 0;
 }
 
@@ -391,16 +349,7 @@ os_error *xos_control (void *error_handler,
       void **old_escape_handler,
       void **old_event_handler)
 {
-  fprintf(stderr, "os_control\n");
-  fprintf(stderr, "  In: error_handler = %x\n", (int) error_handler);
-  fprintf(stderr, "  In: error_buffer = %x\n", (int) error_buffer);
-  fprintf(stderr, "  In: escape_handler = %x\n", (int) escape_handler);
-  fprintf(stderr, "  In: event_handler = %x\n", (int) event_handler);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_error_handler = %x\n", (int) *old_error_handler);
-  fprintf(stderr, "  Out: old_error_buffer = %x\n", (int) *old_error_buffer);
-  fprintf(stderr, "  Out: old_escape_handler = %x\n", (int) *old_escape_handler);
-  fprintf(stderr, "  Out: old_event_handler = %x\n", (int) *old_event_handler);
   return 0;
 }
 
@@ -448,10 +397,6 @@ os_error *xos_exit (os_error *e,
       int abex,
       int rc)
 {
-  fprintf(stderr, "os_exit\n");
-  fprintf(stderr, "  In: e = %x\n", (int) e);
-  fprintf(stderr, "  In: abex = %x\n", (int) abex);
-  fprintf(stderr, "  In: rc = %x\n", (int) rc);
 
     /* FIXME: what's the intended use of e?  What if an e and rc are
      * specified? */
@@ -498,20 +443,7 @@ os_error *xos_set_env (void *exit_handler,
       void **old_data_abort_handler,
       void **old_address_exception_handler)
 {
-  fprintf(stderr, "os_set_env\n");
-  fprintf(stderr, "  In: exit_handler = %x\n", (int) exit_handler);
-  fprintf(stderr, "  In: ram_limit = %x\n", (int) ram_limit);
-  fprintf(stderr, "  In: undefined_instruction_handler = %x\n", (int) undefined_instruction_handler);
-  fprintf(stderr, "  In: prefetch_abort_handler = %x\n", (int) prefetch_abort_handler);
-  fprintf(stderr, "  In: data_abort_handler = %x\n", (int) data_abort_handler);
-  fprintf(stderr, "  In: address_exception_handler = %x\n", (int) address_exception_handler);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_exit_handler = %x\n", (int) *old_exit_handler);
-  fprintf(stderr, "  Out: old_ram_limit = %x\n", (int) *old_ram_limit);
-  fprintf(stderr, "  Out: old_undefined_instruction_handler = %x\n", (int) *old_undefined_instruction_handler);
-  fprintf(stderr, "  Out: old_prefetch_abort_handler = %x\n", (int) *old_prefetch_abort_handler);
-  fprintf(stderr, "  Out: old_data_abort_handler = %x\n", (int) *old_data_abort_handler);
-  fprintf(stderr, "  Out: old_address_exception_handler = %x\n", (int) *old_address_exception_handler);
   return 0;
 }
 
@@ -525,7 +457,6 @@ os_error *xos_set_env (void *exit_handler,
 
 os_error *xos_int_on (void)
 {
-  fprintf(stderr, "os_int_on\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -540,7 +471,6 @@ os_error *xos_int_on (void)
 
 os_error *xos_int_off (void)
 {
-  fprintf(stderr, "os_int_off\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -565,12 +495,7 @@ os_error *xos_call_back (os_register_block *register_block,
       os_register_block **old_register_block,
       void **old_call_back_handler)
 {
-  fprintf(stderr, "os_call_back\n");
-  fprintf(stderr, "  In: register_block = %x\n", (int) register_block);
-  fprintf(stderr, "  In: call_back_handler = %x\n", (int) call_back_handler);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_register_block = %x\n", (int) *old_register_block);
-  fprintf(stderr, "  Out: old_call_back_handler = %x\n", (int) *old_call_back_handler);
   return 0;
 }
 
@@ -585,7 +510,6 @@ os_error *xos_call_back (os_register_block *register_block,
 
 os_error *xos_break_pt (void)
 {
-  fprintf(stderr, "os_break_pt\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -610,12 +534,7 @@ os_error *xos_break_ctrl (os_register_block *register_block,
       os_register_block **old_register_block,
       void **old_break_pt_handler)
 {
-  fprintf(stderr, "os_break_ctrl\n");
-  fprintf(stderr, "  In: register_block = %x\n", (int) register_block);
-  fprintf(stderr, "  In: break_pt_handler = %x\n", (int) break_pt_handler);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_register_block = %x\n", (int) *old_register_block);
-  fprintf(stderr, "  Out: old_break_pt_handler = %x\n", (int) *old_break_pt_handler);
   return 0;
 }
 
@@ -637,10 +556,7 @@ os_error *xos_break_ctrl (os_register_block *register_block,
 os_error *xos_unused_swi (void *unused_swi_handler,
       void **old_unused_swi_handler)
 {
-  fprintf(stderr, "os_unused_swi\n");
-  fprintf(stderr, "  In: unused_swi_handler = %x\n", (int) unused_swi_handler);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_unused_swi_handler = %x\n", (int) *old_unused_swi_handler);
   return 0;
 }
 
@@ -663,11 +579,7 @@ os_error *xos_update_memc (bits value,
       bits mask,
       bits *old_value)
 {
-  fprintf(stderr, "os_update_memc\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: mask = %x\n", (int) mask);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_value = %x\n", (int) *old_value);
   return 0;
 }
 
@@ -681,7 +593,6 @@ os_error *xos_update_memc (bits value,
 
 os_error *xos_set_call_back (void)
 {
-  fprintf(stderr, "os_set_call_back\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -704,12 +615,7 @@ os_error *xos_mouse (int *x,
       bits *buttons,
       os_t *t)
 {
-  fprintf(stderr, "os_mouse\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: x = %x\n", (int) *x);
-  fprintf(stderr, "  Out: y = %x\n", (int) *y);
-  fprintf(stderr, "  Out: buttons = %x\n", (int) *buttons);
-  fprintf(stderr, "  Out: t = %x\n", (int) *t);
   return 0;
 }
 
@@ -729,10 +635,6 @@ os_error *xos_claim (int vector,
       void *routine,
       byte *handle)
 {
-  fprintf(stderr, "os_claim\n");
-  fprintf(stderr, "  In: vector = %x\n", (int) vector);
-  fprintf(stderr, "  In: routine = %x\n", (int) routine);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -754,10 +656,6 @@ os_error *xos_release (int vector,
       void *routine,
       byte *handle)
 {
-  fprintf(stderr, "os_release\n");
-  fprintf(stderr, "  In: vector = %x\n", (int) vector);
-  fprintf(stderr, "  In: routine = %x\n", (int) routine);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -785,13 +683,7 @@ os_error *xos_read_unsigned (os_read_unsigned_flags flags,
       char **end,
       bits *value)
 {
-  fprintf(stderr, "os_read_unsigned\n");
-  fprintf(stderr, "  In: flags = %x\n", (int) flags);
-  fprintf(stderr, "  In: number = %x\n", (int) number);
-  fprintf(stderr, "  In: limit = %x\n", (int) limit);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
-  fprintf(stderr, "  Out: value = %x\n", (int) *value);
   return 0;
 }
 
@@ -825,16 +717,7 @@ os_error *xos_read_var_val (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  fprintf(stderr, "os_read_var_val\n");
-  fprintf(stderr, "  In: var = %x\n", (int) var);
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
-  fprintf(stderr, "  In: context = %x\n", (int) context);
-  fprintf(stderr, "  In: var_type = %x\n", (int) var_type);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
-  fprintf(stderr, "  Out: context_out = %x\n", (int) *context_out);
-  fprintf(stderr, "  Out: var_type_out = %x\n", (int) *var_type_out);
   return 0;
 }
 
@@ -865,15 +748,7 @@ os_error *xos_set_var_val (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  fprintf(stderr, "os_set_var_val\n");
-  fprintf(stderr, "  In: var = %x\n", (int) var);
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
-  fprintf(stderr, "  In: context = %x\n", (int) context);
-  fprintf(stderr, "  In: var_type = %x\n", (int) var_type);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: context_out = %x\n", (int) *context_out);
-  fprintf(stderr, "  Out: var_type_out = %x\n", (int) *var_type_out);
   return 0;
 }
 
@@ -896,12 +771,7 @@ os_error *xos_gs_init (char *s,
       int *context1,
       int *context2)
 {
-  fprintf(stderr, "os_gs_init\n");
-  fprintf(stderr, "  In: s = %x\n", (int) s);
-  fprintf(stderr, "  In: flags = %x\n", (int) flags);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: context1 = %x\n", (int) *context1);
-  fprintf(stderr, "  Out: context2 = %x\n", (int) *context2);
   return 0;
 }
 
@@ -931,13 +801,7 @@ os_error *xos_gs_read (int context1,
       int *context2_out,
       bits *psr)
 {
-  fprintf(stderr, "os_gs_read\n");
-  fprintf(stderr, "  In: context1 = %x\n", (int) context1);
-  fprintf(stderr, "  In: context2 = %x\n", (int) context2);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: context1_out = %x\n", (int) *context1_out);
-  fprintf(stderr, "  Out: c = %x\n", (int) *c);
-  fprintf(stderr, "  Out: context2_out = %x\n", (int) *context2_out);
   return 0;
 }
 
@@ -965,12 +829,7 @@ os_error *xos_gs_trans (char *s,
       int *used,
       bits *psr)
 {
-  fprintf(stderr, "os_gs_trans\n");
-  fprintf(stderr, "  In: s = %x\n", (int) s);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
   return 0;
 }
 
@@ -995,12 +854,7 @@ os_error *xos_binary_to_decimal (int i,
       int size,
       int *used)
 {
-  fprintf(stderr, "os_binary_to_decimal\n");
-  fprintf(stderr, "  In: i = %x\n", (int) i);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
   return 0;
 }
 
@@ -1023,11 +877,7 @@ os_error *xos_change_dynamic_area (os_dynamic_area_no area_type,
       int change,
       int *change_out)
 {
-  fprintf(stderr, "os_change_dynamic_area\n");
-  fprintf(stderr, "  In: area_type = %x\n", (int) area_type);
-  fprintf(stderr, "  In: change = %x\n", (int) change);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: change_out = %x\n", (int) *change_out);
   return 0;
 }
 
@@ -1043,8 +893,6 @@ os_error *xos_change_dynamic_area (os_dynamic_area_no area_type,
 
 os_error *xos_generate_error (os_error *e)
 {
-  fprintf(stderr, "os_generate_error\n");
-  fprintf(stderr, "  In: e = %x\n", (int) e);
 
   return e;
 }
@@ -1063,7 +911,6 @@ os_error *xos_generate_error (os_error *e)
 
 os_error *xos_read_escape_state (bits *psr)
 {
-  fprintf(stderr, "os_read_escape_state\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1092,13 +939,7 @@ os_error *xos_evaluate_expression (char *expr,
       osbool *expr_is_str,
       int *int_value_or_str_used)
 {
-  fprintf(stderr, "os_evaluate_expression\n");
-  fprintf(stderr, "  In: expr = %x\n", (int) expr);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: expr_is_str = %x\n", (int) *expr_is_str);
-  fprintf(stderr, "  Out: int_value_or_str_used = %x\n", (int) *int_value_or_str_used);
   return 0;
 }
 
@@ -1121,12 +962,7 @@ os_error *xos_read_palette (os_colour_number entry,
       os_colour *on,
       os_colour *off)
 {
-  fprintf(stderr, "os_read_palette\n");
-  fprintf(stderr, "  In: entry = %x\n", (int) entry);
-  fprintf(stderr, "  In: colour_type = %x\n", (int) colour_type);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: on = %x\n", (int) *on);
-  fprintf(stderr, "  Out: off = %x\n", (int) *off);
   return 0;
 }
 
@@ -1144,9 +980,6 @@ os_error *xos_read_palette (os_colour_number entry,
 os_error *xos_read_vdu_variables (os_vdu_var_list *var_list,
       int *value_list)
 {
-  fprintf(stderr, "os_read_vdu_variables\n");
-  fprintf(stderr, "  In: var_list = %x\n", (int) var_list);
-  fprintf(stderr, "  In: value_list = %x\n", (int) value_list);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1174,13 +1007,7 @@ os_error *xos_read_point (int x,
       os_tint *tint,
       osbool *off_screen)
 {
-  fprintf(stderr, "os_read_point\n");
-  fprintf(stderr, "  In: x = %x\n", (int) x);
-  fprintf(stderr, "  In: y = %x\n", (int) y);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: gcol = %x\n", (int) *gcol);
-  fprintf(stderr, "  Out: tint = %x\n", (int) *tint);
-  fprintf(stderr, "  Out: off_screen = %x\n", (int) *off_screen);
   return 0;
 }
 
@@ -1205,11 +1032,7 @@ os_error *xos_read_mode_variable (os_mode mode,
       int *var_val,
       bits *psr)
 {
-  fprintf(stderr, "os_read_mode_variable\n");
-  fprintf(stderr, "  In: mode = %x\n", (int) mode);
-  fprintf(stderr, "  In: var = %x\n", (int) var);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: var_val = %x\n", (int) *var_val);
   return 0;
 }
 
@@ -1223,7 +1046,6 @@ os_error *xos_read_mode_variable (os_mode mode,
 
 os_error *xos_remove_cursors (void)
 {
-  fprintf(stderr, "os_remove_cursors\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1238,7 +1060,6 @@ os_error *xos_remove_cursors (void)
 
 os_error *xos_restore_cursors (void)
 {
-  fprintf(stderr, "os_restore_cursors\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1264,12 +1085,7 @@ os_error *xos_swi_number_to_string (int swi,
       int size,
       int *used)
 {
-  fprintf(stderr, "os_swi_number_to_string\n");
-  fprintf(stderr, "  In: swi = %x\n", (int) swi);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
   return 0;
 }
 
@@ -1290,10 +1106,7 @@ os_error *xos_swi_number_to_string (int swi,
 os_error *xos_swi_number_from_string (char *swi_name,
       int *swi)
 {
-  fprintf(stderr, "os_swi_number_from_string\n");
-  fprintf(stderr, "  In: swi_name = %x\n", (int) swi_name);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: swi = %x\n", (int) *swi);
   return 0;
 }
 
@@ -1316,9 +1129,6 @@ os_error *xos_validate_address (byte *min,
       byte *max,
       bits *psr)
 {
-  fprintf(stderr, "os_validate_address\n");
-  fprintf(stderr, "  In: min = %x\n", (int) min);
-  fprintf(stderr, "  In: max = %x\n", (int) max);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1339,10 +1149,6 @@ os_error *xos_call_after (int delay,
       void *code,
       byte *handle)
 {
-  fprintf(stderr, "os_call_after\n");
-  fprintf(stderr, "  In: delay = %x\n", (int) delay);
-  fprintf(stderr, "  In: code = %x\n", (int) code);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1363,10 +1169,6 @@ os_error *xos_call_every (int delay,
       void *code,
       byte *handle)
 {
-  fprintf(stderr, "os_call_every\n");
-  fprintf(stderr, "  In: delay = %x\n", (int) delay);
-  fprintf(stderr, "  In: code = %x\n", (int) code);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1386,9 +1188,6 @@ os_error *xos_call_every (int delay,
 os_error *xos_remove_ticker_event (void *code,
       byte *handle)
 {
-  fprintf(stderr, "os_remove_ticker_event\n");
-  fprintf(stderr, "  In: code = %x\n", (int) code);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1411,10 +1210,7 @@ os_error *xos_remove_ticker_event (void *code,
 os_error *xos_install_key_handler (os_key_handler *key_handler,
       os_key_handler **old_key_handler)
 {
-  fprintf(stderr, "os_install_key_handler\n");
-  fprintf(stderr, "  In: key_handler = %x\n", (int) key_handler);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_key_handler = %x\n", (int) *old_key_handler);
   return 0;
 }
 
@@ -1439,11 +1235,7 @@ os_error *xos_check_mode_valid (os_mode mode,
       os_mode *alternative_mode,
       bits *psr)
 {
-  fprintf(stderr, "os_check_mode_valid\n");
-  fprintf(stderr, "  In: mode = %x\n", (int) mode);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: mode_status = %x\n", (int) *mode_status);
-  fprintf(stderr, "  Out: alternative_mode = %x\n", (int) *alternative_mode);
   return 0;
 }
 
@@ -1474,17 +1266,9 @@ os_error *xos_change_environment (os_handler_type handler_type,
       byte **old_handle,
       byte **old_buffer)
 {
-  fprintf(stderr, "os_change_environment\n");
-  fprintf(stderr, "  In: handler_type = %x\n", (int) handler_type);
-  fprintf(stderr, "  In: handler = %x\n", (int) handler);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
 
   fprintf(stderr, "FIXME --- OS_ChangeEnvironment unimplemented\n");
   
-  fprintf(stderr, "  Out: old_handler = %x\n", (int) *old_handler);
-  fprintf(stderr, "  Out: old_handle = %x\n", (int) *old_handle);
-  fprintf(stderr, "  Out: old_buffer = %x\n", (int) *old_buffer);
   return 0;
 }
 
@@ -1510,11 +1294,7 @@ os_error *xosclaimscreenmemory_alloc (int size,
       void **blk,
       bits *psr)
 {
-  fprintf(stderr, "osclaimscreenmemory_alloc\n");
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: size_out = %x\n", (int) *size_out);
-  fprintf(stderr, "  Out: blk = %x\n", (int) *blk);
   return 0;
 }
 
@@ -1529,7 +1309,6 @@ os_error *xosclaimscreenmemory_alloc (int size,
 
 os_error *xosclaimscreenmemory_free (void)
 {
-  fprintf(stderr, "osclaimscreenmemory_free\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1549,9 +1328,7 @@ os_error *xosclaimscreenmemory_free (void)
 
 os_error *xos_read_monotonic_time (os_t *t)
 {
-  fprintf(stderr, "os_read_monotonic_time\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: t = %x\n", (int) *t);
   return 0;
 }
 
@@ -1580,14 +1357,7 @@ os_error *xos_substitute_args (char *args,
       int source_size,
       int *used)
 {
-  fprintf(stderr, "os_substitute_args\n");
-  fprintf(stderr, "  In: args = %x\n", (int) args);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
-  fprintf(stderr, "  In: source = %x\n", (int) source);
-  fprintf(stderr, "  In: source_size = %x\n", (int) source_size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
   return 0;
 }
 
@@ -1608,10 +1378,6 @@ os_error *xos_pretty_print (char *string,
       byte *dictionary,
       char *special)
 {
-  fprintf(stderr, "os_pretty_print\n");
-  fprintf(stderr, "  In: string = %x\n", (int) string);
-  fprintf(stderr, "  In: dictionary = %x\n", (int) dictionary);
-  fprintf(stderr, "  In: special = %x\n", (int) special);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1632,10 +1398,6 @@ os_error *xos_plot (os_plot_code plot_code,
       int x,
       int y)
 {
-  fprintf(stderr, "os_plot\n");
-  fprintf(stderr, "  In: plot_code = %x\n", (int) plot_code);
-  fprintf(stderr, "  In: x = %x\n", (int) x);
-  fprintf(stderr, "  In: y = %x\n", (int) y);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1657,9 +1419,6 @@ os_error *xos_writen (char *s,
 {
   int c;
 
-  fprintf(stderr, "os_writen\n");
-  fprintf(stderr, "  In: s = %x\n", (int) s);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
 
   for (c = 0; c < size; c++)
     vdu(s[c]);
@@ -1683,10 +1442,6 @@ os_error *xos_add_to_vector (int vector,
       void *routine,
       byte *handle)
 {
-  fprintf(stderr, "os_add_to_vector\n");
-  fprintf(stderr, "  In: vector = %x\n", (int) vector);
-  fprintf(stderr, "  In: routine = %x\n", (int) routine);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1706,9 +1461,6 @@ os_error *xos_add_to_vector (int vector,
 os_error *xos_write_env (char *command,
       os_date_and_time *start)
 {
-  fprintf(stderr, "os_write_env\n");
-  fprintf(stderr, "  In: command = %x\n", (int) command);
-  fprintf(stderr, "  In: start = %x\n", (int) start);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1736,13 +1488,7 @@ os_error *xos_read_args (char *keywords,
       int size,
       int *spare)
 {
-  fprintf(stderr, "os_read_args\n");
-  fprintf(stderr, "  In: keywords = %x\n", (int) keywords);
-  fprintf(stderr, "  In: input = %x\n", (int) input);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: spare = %x\n", (int) *spare);
   return 0;
 }
 
@@ -1760,10 +1506,7 @@ os_error *xos_read_args (char *keywords,
 os_error *xos_read_ram_fs_limits (byte **start,
       char **end)
 {
-  fprintf(stderr, "os_read_ram_fs_limits\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: start = %x\n", (int) *start);
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -1787,12 +1530,6 @@ os_error *xos_claim_device_vector (os_device_type device,
       int *status,
       bits mask)
 {
-  fprintf(stderr, "os_claim_device_vector\n");
-  fprintf(stderr, "  In: device = %x\n", (int) device);
-  fprintf(stderr, "  In: driver = %x\n", (int) driver);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
-  fprintf(stderr, "  In: status = %x\n", (int) status);
-  fprintf(stderr, "  In: mask = %x\n", (int) mask);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1817,12 +1554,6 @@ os_error *xos_release_device_vector (os_device_type device,
       int *status,
       bits mask)
 {
-  fprintf(stderr, "os_release_device_vector\n");
-  fprintf(stderr, "  In: device = %x\n", (int) device);
-  fprintf(stderr, "  In: driver = %x\n", (int) driver);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
-  fprintf(stderr, "  In: status = %x\n", (int) status);
-  fprintf(stderr, "  In: mask = %x\n", (int) mask);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1846,11 +1577,7 @@ os_error *xos_delink_application (byte *vector_details,
       int size,
       int *used)
 {
-  fprintf(stderr, "os_delink_application\n");
-  fprintf(stderr, "  In: vector_details = %x\n", (int) vector_details);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: used = %x\n", (int) *used);
   return 0;
 }
 
@@ -1867,8 +1594,6 @@ os_error *xos_delink_application (byte *vector_details,
 
 os_error *xos_relink_application (byte *vector_details)
 {
-  fprintf(stderr, "os_relink_application\n");
-  fprintf(stderr, "  In: vector_details = %x\n", (int) vector_details);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1897,14 +1622,6 @@ os_error *xos_heap_sort (int count,
       int object_size,
       void *workspace)
 {
-  fprintf(stderr, "os_heap_sort\n");
-  fprintf(stderr, "  In: count = %x\n", (int) count);
-  fprintf(stderr, "  In: array = %x\n", (int) array);
-  fprintf(stderr, "  In: compare_fn = %x\n", (int) compare_fn);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
-  fprintf(stderr, "  In: objects = %x\n", (int) objects);
-  fprintf(stderr, "  In: object_size = %x\n", (int) object_size);
-  fprintf(stderr, "  In: workspace = %x\n", (int) workspace);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1926,10 +1643,6 @@ os_error *xos_exit_and_die (os_error *e,
       int rc,
       char *module_name)
 {
-  fprintf(stderr, "os_exit_and_die\n");
-  fprintf(stderr, "  In: e = %x\n", (int) e);
-  fprintf(stderr, "  In: rc = %x\n", (int) rc);
-  fprintf(stderr, "  In: module_name = %x\n", (int) module_name);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1948,10 +1661,7 @@ os_error *xos_exit_and_die (os_error *e,
 os_error *xos_read_mem_map_info (int *page_size,
       int *page_count)
 {
-  fprintf(stderr, "os_read_mem_map_info\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: page_size = %x\n", (int) *page_size);
-  fprintf(stderr, "  Out: page_count = %x\n", (int) *page_count);
   return 0;
 }
 
@@ -1968,8 +1678,6 @@ os_error *xos_read_mem_map_info (int *page_size,
 
 os_error *xos_read_mem_map_entries (os_mem_map_request_list *request_list)
 {
-  fprintf(stderr, "os_read_mem_map_entries\n");
-  fprintf(stderr, "  In: request_list = %x\n", (int) request_list);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -1987,8 +1695,6 @@ os_error *xos_read_mem_map_entries (os_mem_map_request_list *request_list)
 
 os_error *xos_set_mem_map_entries (os_mem_map_request_list *request_list)
 {
-  fprintf(stderr, "os_set_mem_map_entries\n");
-  fprintf(stderr, "  In: request_list = %x\n", (int) request_list);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2007,9 +1713,6 @@ os_error *xos_set_mem_map_entries (os_mem_map_request_list *request_list)
 os_error *xos_add_call_back (void *call_back,
       byte *handle)
 {
-  fprintf(stderr, "os_add_call_back\n");
-  fprintf(stderr, "  In: call_back = %x\n", (int) call_back);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2035,12 +1738,7 @@ os_error *xos_read_default_handler (int handler_type,
       byte **handle,
       byte **buffer)
 {
-  fprintf(stderr, "os_read_default_handler\n");
-  fprintf(stderr, "  In: handler_type = %x\n", (int) handler_type);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: handler = %x\n", (int) *handler);
-  fprintf(stderr, "  Out: handle = %x\n", (int) *handle);
-  fprintf(stderr, "  Out: buffer = %x\n", (int) *buffer);
   return 0;
 }
 
@@ -2058,9 +1756,6 @@ os_error *xos_read_default_handler (int handler_type,
 os_error *xos_set_ecf_origin (int x,
       int y)
 {
-  fprintf(stderr, "os_set_ecf_origin\n");
-  fprintf(stderr, "  In: x = %x\n", (int) x);
-  fprintf(stderr, "  In: y = %x\n", (int) y);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2081,9 +1776,7 @@ os_error *xos_set_ecf_origin (int x,
 os_error *xos_confirm (char *key,
       bits *psr)
 {
-  fprintf(stderr, "os_confirm\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: key = %x\n", (int) *key);
   return 0;
 }
 
@@ -2106,11 +1799,7 @@ os_error *xos_changed_box (os_changed_box_state state,
       osbool *enabled,
       os_change_box **change_box)
 {
-  fprintf(stderr, "os_changed_box\n");
-  fprintf(stderr, "  In: state = %x\n", (int) state);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: enabled = %x\n", (int) *enabled);
-  fprintf(stderr, "  Out: change_box = %x\n", (int) *change_box);
   return 0;
 }
 
@@ -2138,13 +1827,7 @@ os_error *xos_crc (int crc_in,
       int stride,
       int *crc)
 {
-  fprintf(stderr, "os_crc\n");
-  fprintf(stderr, "  In: crc_in = %x\n", (int) crc_in);
-  fprintf(stderr, "  In: block = %x\n", (int) block);
-  fprintf(stderr, "  In: end = %x\n", (int) end);
-  fprintf(stderr, "  In: stride = %x\n", (int) stride);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: crc = %x\n", (int) *crc);
   return 0;
 }
 
@@ -2169,12 +1852,7 @@ os_error *xos_read_dynamic_area (os_dynamic_area_no area,
       int *size,
       int *size_limit)
 {
-  fprintf(stderr, "os_read_dynamic_area\n");
-  fprintf(stderr, "  In: area = %x\n", (int) area);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: area_start = %x\n", (int) *area_start);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: size_limit = %x\n", (int) *size_limit);
   return 0;
 }
 
@@ -2190,8 +1868,6 @@ os_error *xos_read_dynamic_area (os_dynamic_area_no area,
 
 os_error *xos_print_char (char c)
 {
-  fprintf(stderr, "os_print_char\n");
-  fprintf(stderr, "  In: c = %x\n", (int) c);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2216,12 +1892,7 @@ os_error *xos_change_redirectionw (os_fw input,
       os_fw *old_input,
       os_fw *old_output)
 {
-  fprintf(stderr, "os_change_redirectionw\n");
-  fprintf(stderr, "  In: input = %x\n", (int) input);
-  fprintf(stderr, "  In: output = %x\n", (int) output);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_input = %x\n", (int) *old_input);
-  fprintf(stderr, "  Out: old_output = %x\n", (int) *old_output);
   return 0;
 }
 
@@ -2239,9 +1910,6 @@ os_error *xos_change_redirectionw (os_fw input,
 os_error *xos_remove_call_back (void *call_back,
       byte *handle)
 {
-  fprintf(stderr, "os_remove_call_back\n");
-  fprintf(stderr, "  In: call_back = %x\n", (int) call_back);
-  fprintf(stderr, "  In: handle = %x\n", (int) handle);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2259,8 +1927,6 @@ os_error *xos_remove_call_back (void *call_back,
 
 os_error *xos_find_mem_map_entries (os_mem_map_request_list *request_list)
 {
-  fprintf(stderr, "os_find_mem_map_entries\n");
-  fprintf(stderr, "  In: request_list = %x\n", (int) request_list);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2279,9 +1945,6 @@ os_error *xos_find_mem_map_entries (os_mem_map_request_list *request_list)
 os_error *xos_set_colour (os_colour_flags flags,
       os_colour_number colour_number)
 {
-  fprintf(stderr, "os_set_colour\n");
-  fprintf(stderr, "  In: flags = %x\n", (int) flags);
-  fprintf(stderr, "  In: colour_number = %x\n", (int) colour_number);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2308,12 +1971,7 @@ os_error *xos_read_colour (os_colour_flags flags,
       os_colour_flags *flags_out,
       os_colour_number *colour_number)
 {
-  fprintf(stderr, "os_read_colour\n");
-  fprintf(stderr, "  In: flags = %x\n", (int) flags);
-  fprintf(stderr, "  In: pattern = %x\n", (int) pattern);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: flags_out = %x\n", (int) *flags_out);
-  fprintf(stderr, "  Out: colour_number = %x\n", (int) *colour_number);
   return 0;
 }
 
@@ -2332,9 +1990,7 @@ os_error *xos_read_colour (os_colour_flags flags,
 
 os_error *xospointer_get (os_pointer_type *pointer_type)
 {
-  fprintf(stderr, "ospointer_get\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: pointer_type = %x\n", (int) *pointer_type);
   return 0;
 }
 
@@ -2351,8 +2007,6 @@ os_error *xospointer_get (os_pointer_type *pointer_type)
 
 os_error *xospointer_set (os_pointer_type pointer_type)
 {
-  fprintf(stderr, "ospointer_set\n");
-  fprintf(stderr, "  In: pointer_type = %x\n", (int) pointer_type);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2369,8 +2023,6 @@ os_error *xospointer_set (os_pointer_type pointer_type)
 
 os_error *xosscreenmode_select (os_mode mode)
 {
-  fprintf(stderr, "osscreenmode_select\n");
-  fprintf(stderr, "  In: mode = %x\n", (int) mode);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2390,9 +2042,7 @@ os_error *xosscreenmode_select (os_mode mode)
 
 os_error *xosscreenmode_current (os_mode *mode)
 {
-  fprintf(stderr, "osscreenmode_current\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: mode = %x\n", (int) *mode);
   return 0;
 }
 
@@ -2423,15 +2073,7 @@ os_error *xosscreenmode_enumerate (int context,
       byte **end,
       int *free)
 {
-  fprintf(stderr, "osscreenmode_enumerate\n");
-  fprintf(stderr, "  In: context = %x\n", (int) context);
-  fprintf(stderr, "  In: block = %x\n", (int) block);
-  fprintf(stderr, "  In: block_size = %x\n", (int) block_size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: complete = %x\n", (int) *complete);
-  fprintf(stderr, "  Out: context_out = %x\n", (int) *context_out);
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
-  fprintf(stderr, "  Out: free = %x\n", (int) *free);
   return 0;
 }
 
@@ -2457,12 +2099,7 @@ os_error *xosscreenmode_cache_control (osscreenmode_cache_flags flags,
       osscreenmode_cache_flags *current_flags,
       osscreenmode_cleaner_laziness *current_laziness)
 {
-  fprintf(stderr, "osscreenmode_cache_control\n");
-  fprintf(stderr, "  In: flags = %x\n", (int) flags);
-  fprintf(stderr, "  In: laziness = %x\n", (int) laziness);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: current_flags = %x\n", (int) *current_flags);
-  fprintf(stderr, "  Out: current_laziness = %x\n", (int) *current_laziness);
   return 0;
 }
 
@@ -2476,7 +2113,6 @@ os_error *xosscreenmode_cache_control (osscreenmode_cache_flags flags,
 
 os_error *xosscreenmode_request_clean (void)
 {
-  fprintf(stderr, "osscreenmode_request_clean\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2491,7 +2127,6 @@ os_error *xosscreenmode_request_clean (void)
 
 os_error *xosscreenmode_force_clean (void)
 {
-  fprintf(stderr, "osscreenmode_force_clean\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2531,19 +2166,7 @@ os_error *xosdynamicarea_create (os_dynamic_area_no area,
       byte **base_address_out,
       int *size_limit_out)
 {
-  fprintf(stderr, "osdynamicarea_create\n");
-  fprintf(stderr, "  In: area = %x\n", (int) area);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
-  fprintf(stderr, "  In: base_address = %x\n", (int) base_address);
-  fprintf(stderr, "  In: flags = %x\n", (int) flags);
-  fprintf(stderr, "  In: size_limit = %x\n", (int) size_limit);
-  fprintf(stderr, "  In: handler = %x\n", (int) handler);
-  fprintf(stderr, "  In: workspace = %x\n", (int) workspace);
-  fprintf(stderr, "  In: description = %x\n", (int) description);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: area_out = %x\n", (int) *area_out);
-  fprintf(stderr, "  Out: base_address_out = %x\n", (int) *base_address_out);
-  fprintf(stderr, "  Out: size_limit_out = %x\n", (int) *size_limit_out);
   return 0;
 }
 
@@ -2559,8 +2182,6 @@ os_error *xosdynamicarea_create (os_dynamic_area_no area,
 
 os_error *xosdynamicarea_delete (os_dynamic_area_no area)
 {
-  fprintf(stderr, "osdynamicarea_delete\n");
-  fprintf(stderr, "  In: area = %x\n", (int) area);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2592,16 +2213,7 @@ os_error *xosdynamicarea_read (os_dynamic_area_no area,
       void **workspace,
       char **description)
 {
-  fprintf(stderr, "osdynamicarea_read\n");
-  fprintf(stderr, "  In: area = %x\n", (int) area);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: base_address = %x\n", (int) *base_address);
-  fprintf(stderr, "  Out: flags = %x\n", (int) *flags);
-  fprintf(stderr, "  Out: size_limit = %x\n", (int) *size_limit);
-  fprintf(stderr, "  Out: handler = %x\n", (int) *handler);
-  fprintf(stderr, "  Out: workspace = %x\n", (int) *workspace);
-  fprintf(stderr, "  Out: description = %x\n", (int) *description);
   return 0;
 }
 
@@ -2622,10 +2234,7 @@ os_error *xosdynamicarea_read (os_dynamic_area_no area,
 os_error *xosdynamicarea_enumerate (int context,
       int *context_out)
 {
-  fprintf(stderr, "osdynamicarea_enumerate\n");
-  fprintf(stderr, "  In: context = %x\n", (int) context);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: context_out = %x\n", (int) *context_out);
   return 0;
 }
 
@@ -2643,9 +2252,6 @@ os_error *xosdynamicarea_enumerate (int context,
 os_error *xosdynamicarea_renumber (os_dynamic_area_no old_area,
       os_dynamic_area_no new_area)
 {
-  fprintf(stderr, "osdynamicarea_renumber\n");
-  fprintf(stderr, "  In: old_area = %x\n", (int) old_area);
-  fprintf(stderr, "  In: new_area = %x\n", (int) new_area);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2668,10 +2274,7 @@ os_error *xosdynamicarea_renumber (os_dynamic_area_no old_area,
 os_error *xosdynamicarea_free_space (os_dynamic_area_no exclude_area,
       int *free_space)
 {
-  fprintf(stderr, "osdynamicarea_free_space\n");
-  fprintf(stderr, "  In: exclude_area = %x\n", (int) exclude_area);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: free_space = %x\n", (int) *free_space);
   return 0;
 }
 
@@ -2699,14 +2302,7 @@ os_error *xosdynamicarea_set_clamps (int unlimited_area_clamp,
       int *old_limited_area_clamp,
       int *old_sparse_area_clamp)
 {
-  fprintf(stderr, "osdynamicarea_set_clamps\n");
-  fprintf(stderr, "  In: unlimited_area_clamp = %x\n", (int) unlimited_area_clamp);
-  fprintf(stderr, "  In: limited_area_clamp = %x\n", (int) limited_area_clamp);
-  fprintf(stderr, "  In: sparse_area_clamp = %x\n", (int) sparse_area_clamp);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_unlimited_area_clamp = %x\n", (int) *old_unlimited_area_clamp);
-  fprintf(stderr, "  Out: old_limited_area_clamp = %x\n", (int) *old_limited_area_clamp);
-  fprintf(stderr, "  Out: old_sparse_area_clamp = %x\n", (int) *old_sparse_area_clamp);
   return 0;
 }
 
@@ -2727,10 +2323,6 @@ os_error *xosdynamicarea_ensure_region (os_dynamic_area_no area,
       byte *base_address,
       int size)
 {
-  fprintf(stderr, "osdynamicarea_ensure_region\n");
-  fprintf(stderr, "  In: area = %x\n", (int) area);
-  fprintf(stderr, "  In: base_address = %x\n", (int) base_address);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2752,10 +2344,6 @@ os_error *xosdynamicarea_release_region (os_dynamic_area_no area,
       byte *base_address,
       int size)
 {
-  fprintf(stderr, "osdynamicarea_release_region\n");
-  fprintf(stderr, "  In: area = %x\n", (int) area);
-  fprintf(stderr, "  In: base_address = %x\n", (int) base_address);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2776,10 +2364,6 @@ os_error *xosmemory_page_op (osmemory_flags flags,
       os_page_block *page_block,
       int page_count)
 {
-  fprintf(stderr, "osmemory_page_op\n");
-  fprintf(stderr, "  In: flags = %x\n", (int) flags);
-  fprintf(stderr, "  In: page_block = %x\n", (int) page_block);
-  fprintf(stderr, "  In: page_count = %x\n", (int) page_count);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2801,10 +2385,7 @@ os_error *xosmemory_page_op (osmemory_flags flags,
 os_error *xosmemory_read_arrangement_table_size (int *table_size,
       int *page_size)
 {
-  fprintf(stderr, "osmemory_read_arrangement_table_size\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: table_size = %x\n", (int) *table_size);
-  fprintf(stderr, "  Out: page_size = %x\n", (int) *page_size);
   return 0;
 }
 
@@ -2821,8 +2402,6 @@ os_error *xosmemory_read_arrangement_table_size (int *table_size,
 
 os_error *xosmemory_read_arrangement_table (byte *arrangement_table)
 {
-  fprintf(stderr, "osmemory_read_arrangement_table\n");
-  fprintf(stderr, "  In: arrangement_table = %x\n", (int) arrangement_table);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2845,11 +2424,7 @@ os_error *xosmemory_read_size (osmemory_type_flags type,
       int *page_count,
       int *page_size)
 {
-  fprintf(stderr, "osmemory_read_size\n");
-  fprintf(stderr, "  In: type = %x\n", (int) type);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: page_count = %x\n", (int) *page_count);
-  fprintf(stderr, "  Out: page_size = %x\n", (int) *page_size);
   return 0;
 }
 
@@ -2869,10 +2444,7 @@ os_error *xosmemory_read_size (osmemory_type_flags type,
 os_error *xosmemory_read_controller (osmemory_controller_flags controller,
       void **controller_addr)
 {
-  fprintf(stderr, "osmemory_read_controller\n");
-  fprintf(stderr, "  In: controller = %x\n", (int) controller);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: controller_addr = %x\n", (int) *controller_addr);
   return 0;
 }
 
@@ -2895,10 +2467,7 @@ os_error *xosmemory_read_controller (osmemory_controller_flags controller,
 os_error *xosmemory_find_contiguous (int size,
       int *page_number)
 {
-  fprintf(stderr, "osmemory_find_contiguous\n");
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: page_number = %x\n", (int) *page_number);
   return 0;
 }
 
@@ -2921,11 +2490,7 @@ os_error *xosclaimprocessorvector_alloc (bits vector,
       void *routine,
       void **old_routine)
 {
-  fprintf(stderr, "osclaimprocessorvector_alloc\n");
-  fprintf(stderr, "  In: vector = %x\n", (int) vector);
-  fprintf(stderr, "  In: routine = %x\n", (int) routine);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_routine = %x\n", (int) *old_routine);
   return 0;
 }
 
@@ -2943,9 +2508,6 @@ os_error *xosclaimprocessorvector_alloc (bits vector,
 os_error *xosclaimprocessorvector_free (bits vector,
       void *old_routine)
 {
-  fprintf(stderr, "osclaimprocessorvector_free\n");
-  fprintf(stderr, "  In: vector = %x\n", (int) vector);
-  fprintf(stderr, "  In: old_routine = %x\n", (int) old_routine);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2960,7 +2522,6 @@ os_error *xosclaimprocessorvector_free (bits vector,
 
 os_error *xos_reset (void)
 {
-  fprintf(stderr, "os_reset\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -2985,11 +2546,7 @@ os_error *xos_mmu_control (bits eor_mask,
       bits and_mask,
       bits *old_value)
 {
-  fprintf(stderr, "os_mmu_control\n");
-  fprintf(stderr, "  In: eor_mask = %x\n", (int) eor_mask);
-  fprintf(stderr, "  In: and_mask = %x\n", (int) and_mask);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_value = %x\n", (int) *old_value);
   return 0;
 }
 
@@ -3009,10 +2566,7 @@ os_error *xos_mmu_control (bits eor_mask,
 os_error *xosplatformfeatures_get_features (os_platform_feature_flags *flags,
       void **predisable_fn)
 {
-  fprintf(stderr, "osplatformfeatures_get_features\n");
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: flags = %x\n", (int) *flags);
-  fprintf(stderr, "  Out: predisable_fn = %x\n", (int) *predisable_fn);
   return 0;
 }
 
@@ -3033,10 +2587,6 @@ os_error *xos_synchronise_code_areas (bits flags,
       void *start,
       void *end)
 {
-  fprintf(stderr, "os_synchronise_code_areas\n");
-  fprintf(stderr, "  In: flags = %x\n", (int) flags);
-  fprintf(stderr, "  In: start = %x\n", (int) start);
-  fprintf(stderr, "  In: end = %x\n", (int) end);
 
   /* FIXME --- I don't think we need to do anything here */
   return 0;
@@ -3052,7 +2602,6 @@ os_error *xos_synchronise_code_areas (bits flags,
 
 os_error *xos_enter_usr32 (void)
 {
-  fprintf(stderr, "os_enter_usr32\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -3067,7 +2616,6 @@ os_error *xos_enter_usr32 (void)
 
 os_error *xos_enter_usr26 (void)
 {
-  fprintf(stderr, "os_enter_usr26\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -3094,12 +2642,7 @@ os_error *xos_convert_standard_date_and_time (os_date_and_time *date_and_time,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_standard_date_and_time\n");
-  fprintf(stderr, "  In: date_and_time = %x\n", (int) date_and_time);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3127,13 +2670,7 @@ os_error *xos_convert_date_and_time (os_date_and_time *date_and_time,
       char *format,
       char **end)
 {
-  fprintf(stderr, "os_convert_date_and_time\n");
-  fprintf(stderr, "  In: date_and_time = %x\n", (int) date_and_time);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
-  fprintf(stderr, "  In: format = %x\n", (int) format);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3158,12 +2695,7 @@ os_error *xos_convert_hex1 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_hex1\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3188,12 +2720,7 @@ os_error *xos_convert_hex2 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_hex2\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3218,12 +2745,7 @@ os_error *xos_convert_hex4 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_hex4\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3248,12 +2770,7 @@ os_error *xos_convert_hex6 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_hex6\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3278,12 +2795,7 @@ os_error *xos_convert_hex8 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_hex8\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3308,12 +2820,7 @@ os_error *xos_convert_cardinal1 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_cardinal1\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3338,12 +2845,7 @@ os_error *xos_convert_cardinal2 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_cardinal2\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3368,12 +2870,7 @@ os_error *xos_convert_cardinal3 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_cardinal3\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3398,12 +2895,7 @@ os_error *xos_convert_cardinal4 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_cardinal4\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3428,12 +2920,7 @@ os_error *xos_convert_integer1 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_integer1\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3458,12 +2945,7 @@ os_error *xos_convert_integer2 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_integer2\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3488,12 +2970,7 @@ os_error *xos_convert_integer3 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_integer3\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3518,12 +2995,7 @@ os_error *xos_convert_integer4 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_integer4\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3548,12 +3020,7 @@ os_error *xos_convert_binary1 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_binary1\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3578,12 +3045,7 @@ os_error *xos_convert_binary2 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_binary2\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3608,12 +3070,7 @@ os_error *xos_convert_binary3 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_binary3\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3638,12 +3095,7 @@ os_error *xos_convert_binary4 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_binary4\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3669,12 +3121,7 @@ os_error *xos_convert_spaced_cardinal1 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_spaced_cardinal1\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3700,12 +3147,7 @@ os_error *xos_convert_spaced_cardinal2 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_spaced_cardinal2\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3731,12 +3173,7 @@ os_error *xos_convert_spaced_cardinal3 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_spaced_cardinal3\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3762,12 +3199,7 @@ os_error *xos_convert_spaced_cardinal4 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_spaced_cardinal4\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3793,12 +3225,7 @@ os_error *xos_convert_spaced_integer1 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_spaced_integer1\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3824,12 +3251,7 @@ os_error *xos_convert_spaced_integer2 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_spaced_integer2\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3855,12 +3277,7 @@ os_error *xos_convert_spaced_integer3 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_spaced_integer3\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3886,12 +3303,7 @@ os_error *xos_convert_spaced_integer4 (int value,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_spaced_integer4\n");
-  fprintf(stderr, "  In: value = %x\n", (int) value);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3917,12 +3329,7 @@ os_error *xos_convert_fixed_net_station (os_station_number *station_number,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_fixed_net_station\n");
-  fprintf(stderr, "  In: station_number = %x\n", (int) station_number);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3948,12 +3355,7 @@ os_error *xos_convert_net_station (os_station_number *station_number,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_net_station\n");
-  fprintf(stderr, "  In: station_number = %x\n", (int) station_number);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -3979,12 +3381,7 @@ os_error *xos_convert_fixed_file_size (int file_size,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_fixed_file_size\n");
-  fprintf(stderr, "  In: file_size = %x\n", (int) file_size);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -4009,12 +3406,7 @@ os_error *xos_convert_file_size (int file_size,
       int size,
       char **end)
 {
-  fprintf(stderr, "os_convert_file_size\n");
-  fprintf(stderr, "  In: file_size = %x\n", (int) file_size);
-  fprintf(stderr, "  In: buffer = %x\n", (int) buffer);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: end = %x\n", (int) *end);
   return 0;
 }
 
@@ -4028,7 +3420,6 @@ os_error *xos_convert_file_size (int file_size,
 
 os_error *xos_null (void)
 {
-  fprintf(stderr, "os_null\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4044,7 +3435,6 @@ os_error *xos_null (void)
 
 os_error *xos_char_to_printer (void)
 {
-  fprintf(stderr, "os_char_to_printer\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4059,7 +3449,6 @@ os_error *xos_char_to_printer (void)
 
 os_error *xos_printer_on (void)
 {
-  fprintf(stderr, "os_printer_on\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4075,7 +3464,6 @@ os_error *xos_printer_on (void)
 
 os_error *xos_printer_off (void)
 {
-  fprintf(stderr, "os_printer_off\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4090,7 +3478,6 @@ os_error *xos_printer_off (void)
 
 os_error *xos_split_cursors (void)
 {
-  fprintf(stderr, "os_split_cursors\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4105,7 +3492,6 @@ os_error *xos_split_cursors (void)
 
 os_error *xos_join_cursors (void)
 {
-  fprintf(stderr, "os_join_cursors\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4120,7 +3506,6 @@ os_error *xos_join_cursors (void)
 
 os_error *xos_vdu_on (void)
 {
-  fprintf(stderr, "os_vdu_on\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4135,7 +3520,6 @@ os_error *xos_vdu_on (void)
 
 os_error *xos_bell (void)
 {
-  fprintf(stderr, "os_bell\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4150,7 +3534,6 @@ os_error *xos_bell (void)
 
 os_error *xos_backspace (void)
 {
-  fprintf(stderr, "os_backspace\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4165,7 +3548,6 @@ os_error *xos_backspace (void)
 
 os_error *xos_tab (void)
 {
-  fprintf(stderr, "os_tab\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4180,7 +3562,6 @@ os_error *xos_tab (void)
 
 os_error *xos_line_feed (void)
 {
-  fprintf(stderr, "os_line_feed\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4195,7 +3576,6 @@ os_error *xos_line_feed (void)
 
 os_error *xos_vertical_tab (void)
 {
-  fprintf(stderr, "os_vertical_tab\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4210,7 +3590,6 @@ os_error *xos_vertical_tab (void)
 
 os_error *xos_cls (void)
 {
-  fprintf(stderr, "os_cls\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4225,7 +3604,6 @@ os_error *xos_cls (void)
 
 os_error *xos_return (void)
 {
-  fprintf(stderr, "os_return\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4240,7 +3618,6 @@ os_error *xos_return (void)
 
 os_error *xos_page_mode_on (void)
 {
-  fprintf(stderr, "os_page_mode_on\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4255,7 +3632,6 @@ os_error *xos_page_mode_on (void)
 
 os_error *xos_page_mode_off (void)
 {
-  fprintf(stderr, "os_page_mode_off\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4270,7 +3646,6 @@ os_error *xos_page_mode_off (void)
 
 os_error *xos_clg (void)
 {
-  fprintf(stderr, "os_clg\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4286,7 +3661,6 @@ os_error *xos_clg (void)
 
 os_error *xos_set_text_colour (void)
 {
-  fprintf(stderr, "os_set_text_colour\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4302,7 +3676,6 @@ os_error *xos_set_text_colour (void)
 
 os_error *xos_set_gcol (void)
 {
-  fprintf(stderr, "os_set_gcol\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4318,7 +3691,6 @@ os_error *xos_set_gcol (void)
 
 os_error *xos_set_palette (void)
 {
-  fprintf(stderr, "os_set_palette\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4333,7 +3705,6 @@ os_error *xos_set_palette (void)
 
 os_error *xos_reset_colours (void)
 {
-  fprintf(stderr, "os_reset_colours\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4348,7 +3719,6 @@ os_error *xos_reset_colours (void)
 
 os_error *xos_vdu_off (void)
 {
-  fprintf(stderr, "os_vdu_off\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4364,7 +3734,6 @@ os_error *xos_vdu_off (void)
 
 os_error *xos_set_mode (void)
 {
-  fprintf(stderr, "os_set_mode\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4380,7 +3749,6 @@ os_error *xos_set_mode (void)
 
 os_error *xos_misc (void)
 {
-  fprintf(stderr, "os_misc\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4396,7 +3764,6 @@ os_error *xos_misc (void)
 
 os_error *xos_set_graphics_window (void)
 {
-  fprintf(stderr, "os_set_graphics_window\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4412,7 +3779,6 @@ os_error *xos_set_graphics_window (void)
 
 os_error *xos_plot_vdu (void)
 {
-  fprintf(stderr, "os_plot_vdu\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4427,7 +3793,6 @@ os_error *xos_plot_vdu (void)
 
 os_error *xos_reset_windows (void)
 {
-  fprintf(stderr, "os_reset_windows\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4442,7 +3807,6 @@ os_error *xos_reset_windows (void)
 
 os_error *xos_escape (void)
 {
-  fprintf(stderr, "os_escape\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4458,7 +3822,6 @@ os_error *xos_escape (void)
 
 os_error *xos_set_text_window (void)
 {
-  fprintf(stderr, "os_set_text_window\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4474,7 +3837,6 @@ os_error *xos_set_text_window (void)
 
 os_error *xos_set_graphics_origin (void)
 {
-  fprintf(stderr, "os_set_graphics_origin\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4489,7 +3851,6 @@ os_error *xos_set_graphics_origin (void)
 
 os_error *xos_home_text_cursor (void)
 {
-  fprintf(stderr, "os_home_text_cursor\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4505,7 +3866,6 @@ os_error *xos_home_text_cursor (void)
 
 os_error *xos_set_text_cursor (void)
 {
-  fprintf(stderr, "os_set_text_cursor\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4520,7 +3880,6 @@ os_error *xos_set_text_cursor (void)
 
 os_error *xos_space (void)
 {
-  fprintf(stderr, "os_space\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -4535,7 +3894,6 @@ os_error *xos_space (void)
 
 os_error *xos_delete (void)
 {
-  fprintf(stderr, "os_delete\n");
   error("*** SWI unimplemented\n");
   return 0;
 }

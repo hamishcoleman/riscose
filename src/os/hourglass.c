@@ -28,7 +28,6 @@ void hourglass_swi_register_extra(void)
 
 os_error *xhourglass_on (void)
 {
-  fprintf(stderr, "hourglass_on\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -43,7 +42,6 @@ os_error *xhourglass_on (void)
 
 os_error *xhourglass_off (void)
 {
-  fprintf(stderr, "hourglass_off\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -58,7 +56,6 @@ os_error *xhourglass_off (void)
 
 os_error *xhourglass_smash (void)
 {
-  fprintf(stderr, "hourglass_smash\n");
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -75,8 +72,6 @@ os_error *xhourglass_smash (void)
 
 os_error *xhourglass_start (int delay)
 {
-  fprintf(stderr, "hourglass_start\n");
-  fprintf(stderr, "  In: delay = %x\n", (int) delay);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -93,8 +88,6 @@ os_error *xhourglass_start (int delay)
 
 os_error *xhourglass_percentage (int percent)
 {
-  fprintf(stderr, "hourglass_percentage\n");
-  fprintf(stderr, "  In: percent = %x\n", (int) percent);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -119,11 +112,7 @@ os_error *xhourglass_leds (bits eor_mask,
       bits and_mask,
       bits *old_leds)
 {
-  fprintf(stderr, "hourglass_leds\n");
-  fprintf(stderr, "  In: eor_mask = %x\n", (int) eor_mask);
-  fprintf(stderr, "  In: and_mask = %x\n", (int) and_mask);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_leds = %x\n", (int) *old_leds);
   return 0;
 }
 
@@ -146,12 +135,7 @@ os_error *xhourglass_colours (os_colour sand,
       os_colour *old_sand,
       os_colour *old_glass)
 {
-  fprintf(stderr, "hourglass_colours\n");
-  fprintf(stderr, "  In: sand = %x\n", (int) sand);
-  fprintf(stderr, "  In: glass = %x\n", (int) glass);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: old_sand = %x\n", (int) *old_sand);
-  fprintf(stderr, "  Out: old_glass = %x\n", (int) *old_glass);
   return 0;
 }
 

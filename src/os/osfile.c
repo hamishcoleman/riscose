@@ -36,11 +36,6 @@ os_error *xosfile_save_stamped (char *file_name,
       byte *data,
       byte *end)
 {
-  fprintf(stderr, "osfile_save_stamped\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: file_type = %x\n", (int) file_type);
-  fprintf(stderr, "  In: data = %x\n", (int) data);
-  fprintf(stderr, "  In: end = %x\n", (int) end);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -64,11 +59,6 @@ os_error *xosfile_write (char *file_name,
       bits exec_addr,
       fileswitch_attr attr)
 {
-  fprintf(stderr, "osfile_write\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: load_addr = %x\n", (int) load_addr);
-  fprintf(stderr, "  In: exec_addr = %x\n", (int) exec_addr);
-  fprintf(stderr, "  In: attr = %x\n", (int) attr);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -87,9 +77,6 @@ os_error *xosfile_write (char *file_name,
 os_error *xosfile_write_load (char *file_name,
       bits load_addr)
 {
-  fprintf(stderr, "osfile_write_load\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: load_addr = %x\n", (int) load_addr);
 
   /* FIXME --- what are we going to do with load addresses? */
   
@@ -111,9 +98,6 @@ os_error *xosfile_write_load (char *file_name,
 os_error *xosfile_write_exec (char *file_name,
       bits exec_addr)
 {
-  fprintf(stderr, "osfile_write_exec\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: exec_addr = %x\n", (int) exec_addr);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -132,9 +116,6 @@ os_error *xosfile_write_exec (char *file_name,
 os_error *xosfile_write_attr (char *file_name,
       fileswitch_attr attr)
 {
-  fprintf(stderr, "osfile_write_attr\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: attr = %x\n", (int) attr);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -151,8 +132,6 @@ os_error *xosfile_write_attr (char *file_name,
 
 os_error *xosfile_stamp (char *file_name)
 {
-  fprintf(stderr, "osfile_stamp\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
 
   /* FIXME --- doesn't error so as to get Norcroft running */
   
@@ -173,9 +152,6 @@ os_error *xosfile_stamp (char *file_name)
 os_error *xosfile_set_type (char *file_name,
       bits file_type)
 {
-  fprintf(stderr, "osfile_set_type\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: file_type = %x\n", (int) file_type);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -205,14 +181,7 @@ os_error *xosfile_delete (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_delete\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -232,10 +201,6 @@ os_error *xosfile_create_stamped (char *file_name,
       bits file_type,
       int size)
 {
-  fprintf(stderr, "osfile_create_stamped\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: file_type = %x\n", (int) file_type);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -254,9 +219,6 @@ os_error *xosfile_create_stamped (char *file_name,
 os_error *xosfile_create_dir (char *dir_name,
       int entry_count)
 {
-  fprintf(stderr, "osfile_create_dir\n");
-  fprintf(stderr, "  In: dir_name = %x\n", (int) dir_name);
-  fprintf(stderr, "  In: entry_count = %x\n", (int) entry_count);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -289,15 +251,7 @@ os_error *xosfile_load_stamped (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_load_stamped\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: addr = %x\n", (int) addr);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -331,16 +285,7 @@ os_error *xosfile_load_stamped_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_load_stamped_path\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: addr = %x\n", (int) addr);
-  fprintf(stderr, "  In: path = %x\n", (int) path);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -374,16 +319,7 @@ os_error *xosfile_load_stamped_path_var (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_load_stamped_path_var\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: addr = %x\n", (int) addr);
-  fprintf(stderr, "  In: var = %x\n", (int) var);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -414,15 +350,7 @@ os_error *xosfile_load_stamped_no_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_load_stamped_no_path\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: addr = %x\n", (int) addr);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -440,9 +368,6 @@ os_error *xosfile_load_stamped_no_path (char *file_name,
 os_error *xosfile_make_error (char *file_name,
       fileswitch_object_type obj_type)
 {
-  fprintf(stderr, "osfile_make_error\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: obj_type = %x\n", (int) obj_type);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -475,15 +400,7 @@ os_error *xosfile_read_stamped (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  fprintf(stderr, "osfile_read_stamped\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
-  fprintf(stderr, "  Out: file_type = %x\n", (int) *file_type);
   return 0;
 }
 
@@ -517,16 +434,7 @@ os_error *xosfile_read_stamped_path (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  fprintf(stderr, "osfile_read_stamped_path\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: path = %x\n", (int) path);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
-  fprintf(stderr, "  Out: file_type = %x\n", (int) *file_type);
   return 0;
 }
 
@@ -561,16 +469,7 @@ os_error *xosfile_read_stamped_path_var (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  fprintf(stderr, "osfile_read_stamped_path_var\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: var = %x\n", (int) var);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
-  fprintf(stderr, "  Out: file_type = %x\n", (int) *file_type);
   return 0;
 }
 
@@ -602,15 +501,7 @@ os_error *xosfile_read_stamped_no_path (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  fprintf(stderr, "osfile_read_stamped_no_path\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
-  fprintf(stderr, "  Out: file_type = %x\n", (int) *file_type);
   return 0;
 }
 
@@ -631,10 +522,7 @@ os_error *xosfile_read_stamped_no_path (char *file_name,
 os_error *xosfile_read_block_size (char *file_name,
       int *block_size)
 {
-  fprintf(stderr, "osfile_read_block_size\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: block_size = %x\n", (int) *block_size);
   return 0;
 }
 
@@ -659,12 +547,6 @@ os_error *xosfile_save (char *file_name,
       byte *data,
       byte *end)
 {
-  fprintf(stderr, "osfile_save\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: load_addr = %x\n", (int) load_addr);
-  fprintf(stderr, "  In: exec_addr = %x\n", (int) exec_addr);
-  fprintf(stderr, "  In: data = %x\n", (int) data);
-  fprintf(stderr, "  In: end = %x\n", (int) end);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -696,14 +578,7 @@ os_error *xosfile_read (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_read\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -736,15 +611,7 @@ os_error *xosfile_read_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_read_path\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: path = %x\n", (int) path);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -777,15 +644,7 @@ os_error *xosfile_read_path_var (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_read_path_var\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: var = %x\n", (int) var);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -815,14 +674,7 @@ os_error *xosfile_read_no_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_read_no_path\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -845,11 +697,6 @@ os_error *xosfile_create (char *file_name,
       bits exec_addr,
       int size)
 {
-  fprintf(stderr, "osfile_create\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: load_addr = %x\n", (int) load_addr);
-  fprintf(stderr, "  In: exec_addr = %x\n", (int) exec_addr);
-  fprintf(stderr, "  In: size = %x\n", (int) size);
   error("*** SWI unimplemented\n");
   return 0;
 }
@@ -880,14 +727,7 @@ os_error *xosfile_load (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_load\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -919,15 +759,7 @@ os_error *xosfile_load_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_load_path\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: path = %x\n", (int) path);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -960,15 +792,7 @@ os_error *xosfile_load_path_var (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_load_path_var\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
-  fprintf(stderr, "  In: var = %x\n", (int) var);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 
@@ -998,14 +822,7 @@ os_error *xosfile_load_no_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  fprintf(stderr, "osfile_load_no_path\n");
-  fprintf(stderr, "  In: file_name = %x\n", (int) file_name);
   error("*** SWI unimplemented\n");
-  fprintf(stderr, "  Out: obj_type = %x\n", (int) *obj_type);
-  fprintf(stderr, "  Out: load_addr = %x\n", (int) *load_addr);
-  fprintf(stderr, "  Out: exec_addr = %x\n", (int) *exec_addr);
-  fprintf(stderr, "  Out: size = %x\n", (int) *size);
-  fprintf(stderr, "  Out: attr = %x\n", (int) *attr);
   return 0;
 }
 

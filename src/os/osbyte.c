@@ -42,10 +42,6 @@ os_error *xos_byte (osbyte_op op,
       int *r1_out,
       int *r2_out)
 {
-  fprintf(stderr, "os_byte\n");
-  fprintf(stderr, "  In: op = %x\n", (int) op);
-  fprintf(stderr, "  In: r1 = %x\n", (int) r1);
-  fprintf(stderr, "  In: r2 = %x\n", (int) r2);
 
   switch (op)
   {
@@ -109,7 +105,5 @@ os_error *xos_byte (osbyte_op op,
       break;
     }
   
-  fprintf(stderr, "  Out: r1_out = %x\n", (int) *r1_out);
-  fprintf(stderr, "  Out: r2_out = %x\n", (int) *r2_out);
   return 0;
 }

@@ -33,12 +33,29 @@ dumpregs(void)
     printf("r%d = %08x\n", c, arm_get_reg(c));
 }*/
 
+#include <stdio.h>
+static void arm_unsupported_instruction(ARMul_State *state,unsigned type,ARMword instr,ARMword value)
+{
+    fprintf(stderr, "Unsupported ARM instruction %08x found, aborting\n", instr);
+    abort();
+}
+  
 static WORD arm_run_depth;
 void
 arm_init(void)
 {
+  int dummyInstr;
+  
   ARMul_EmulateInit();
   arm = ARMul_NewState();
+  for (dummyInstr = 0; dummyInstr < 16; dummyInstr++)
+  {
+      arm->LDC[dummyInstr] =
+      arm->STC[dummyInstr] =
+      arm->MRC[dummyInstr] =
+      arm->MCR[dummyInstr] =
+      arm->CDP[dummyInstr] = (void*) arm_unsupported_instruction;
+  }
   ARMul_SelectProcessor(arm, ARM2);
   ARMul_Reset(arm);
   ARMul_SwitchMode(arm, SVC26MODE, USER26MODE);

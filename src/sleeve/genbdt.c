@@ -19,6 +19,8 @@
 
 /* --- Header files --- */
 
+#include <config.h>
+
 #include <stdio.h>
 
 #define LOAD 0

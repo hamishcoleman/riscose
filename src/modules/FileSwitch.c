@@ -14,6 +14,8 @@
 **   $Date$
 */
 
+#include <config.h>
+
 #ifndef RISCOSEFSNAME
 #  define RISCOSEFSNAME "RiscoseFS"
 #endif

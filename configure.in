@@ -23,6 +23,8 @@ AC_SUBST(ARM)
 # least allow it to be disabled with --without-readline.
 AC_CHECK_HEADERS(readline.h readline/readline.h)
 
+AC_C_INLINE
+
 AC_OUTPUT([ \
         Makefile \
         man/Makefile \

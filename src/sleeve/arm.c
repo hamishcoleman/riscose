@@ -7,6 +7,8 @@
 
 /* --- Header files --- */
 
+#include <config.h>
+
 #include "sleeve.h"
 #include <stdio.h>
 #include <mLib/exc.h>

@@ -13,6 +13,8 @@
 **   $Date$
 */
 
+#include <config.h>
+
 #include <string.h> /* for memmove() */
 #include <stdlib.h> /* for dubious use of malloc() */
 #include <assert.h>

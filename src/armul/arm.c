@@ -11,6 +11,9 @@
 **   $Revision$
 **   $Date$
 */
+
+#include <config.h>
+
 #include "riscostypes.h"
 #include "armdefs.h"
 #include "arminit.h"

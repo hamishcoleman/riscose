@@ -56,7 +56,7 @@ int walk_hash(hash *hash, int (*visit)(hash_elem *elem, void *closure),
 /* returns a pointer to a malloc'd area containing an array of pointers
  * to keys in a non-predictable order.  the list is NULL terminated.
  * numelem is the number of keys. */
-char **hash_keys(hash *hash, int *numelem);
+void **hash_keys(hash *hash, int *numelem);
 
 /* as hash_keys except the datums are returned. */
 void **hash_datums(hash *hash, int *numelem);

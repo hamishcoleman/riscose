@@ -269,11 +269,11 @@ static void dump_hash(hash *hash)
     return;
 }
 
-#define FLATTEN(type, member) \
-    type *array; \
+#define FLATTEN(member) \
+    void **array; \
     int bucket; \
     hash_elem *e; \
-    type *a; \
+    void **a; \
     \
     *numelem = hash->numelem; \
     array = a = emalloc(sizeof *array * (*numelem + 1)); \
@@ -287,12 +287,12 @@ static void dump_hash(hash *hash)
     \
     return array;
 
-char **hash_keys(hash *hash, int *numelem)
+void **hash_keys(hash *hash, int *numelem)
 {
-    FLATTEN(char *, key);
+    FLATTEN(key);
 }
 
 void **hash_datums(hash *hash, int *numelem)
 {
-    FLATTEN(void *, datum);
+    FLATTEN(datum);
 }

@@ -13,7 +13,7 @@
    #include "lookup.h"
 #endif
 
-extern os_error *riscose_template_output(
+void riscose_template_output(
                                 FILE *,           /* file to receive output */
                                 char *title,      /* module title */
                                 char *author,     /* module author */

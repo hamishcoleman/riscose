@@ -24,7 +24,6 @@
 */
 
 #ifndef os_H
-   #include "os.h"
 #endif
 
 /* Implement ation of an abstract lookup table consisting of a token
@@ -35,15 +34,15 @@
 typedef struct lookup_t *lookup_t;
 
 /* create a new abstract lookup table */
-extern os_error *lookup_new( lookup_t *,  /* updated with pointer to new table */
+void lookup_new(lookup_t *,  /* updated with pointer to new table */
                              int          /* initial size of table */
                            );
 
 /* delete the entire table */
-extern os_error *lookup_delete (lookup_t);
+void lookup_delete(lookup_t);
 
 /* search the table for a specific item */
-extern os_error *lookup(lookup_t, /* pointer to table */
+int lookup(lookup_t, /* pointer to table */
                         char *,   /* token to match */
                         void **   /* pointer to destination for result:
                                         NULL if entry not found
@@ -52,13 +51,13 @@ extern os_error *lookup(lookup_t, /* pointer to table */
                        );
 
 /* add an entry to the table */
-extern os_error *lookup_insert( lookup_t, /* table */
+void lookup_insert(lookup_t, /* table */
                                 char *,   /* pointer to token */
                                 void *    /* pointer to data item */
                               );
 
 /* sequentially retrieve all tokens in the table */
-extern os_error *lookup_enumerate(  lookup_t, /* table */
+void lookup_enumerate(lookup_t, /* table */
                                     char **,  /* destination for pointer to token */
                                     void **,  /* destination for pointer to data item */
                                     void **   /* context pointer; start with 0;

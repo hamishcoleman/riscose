@@ -19,7 +19,6 @@
 
 #include "types.h"
 #include "macros.h"
-#include "os.h"
 
 #include "lookup.h"
 
@@ -348,7 +347,7 @@ void condition(FILE* f, char* swi, def_s s)
 
 
 
-os_error *riscose_osapi_output
+void riscose_osapi_output
 (
    FILE     *file,
    char     *title,
@@ -360,7 +359,6 @@ os_error *riscose_osapi_output
    lookup_t  swis
 )
 {
-   os_error *error = NULL;
    char     *swi;
    char     *swi_a;
    char     *swi_b;
@@ -415,8 +413,7 @@ os_error *riscose_osapi_output
    context = 0;
    while (TRUE)
    {
-      if ((error = lookup_enumerate (swis, &swi, (void **) &s, &context)) != NULL)
-         goto finish;
+      lookup_enumerate(swis, &swi, (void **)&s, &context);
 
       check_for_wide_version(swis, &swi, &s, &context);
 
@@ -583,8 +580,7 @@ os_error *riscose_osapi_output
    context_a = 0;
    while (TRUE)
    {
-     if ((error = lookup_enumerate(swis, &swi_a, (void **) &s_a, &context_a)) != NULL)
-       goto finish;
+     lookup_enumerate(swis, &swi_a, (void **)&s_a, &context_a);
 
      check_for_wide_version(swis, &swi_a, &s_a, &context_a);
 
@@ -610,8 +606,7 @@ os_error *riscose_osapi_output
        if_written = FALSE;
        while (TRUE)
        {
-         if ((error = lookup_enumerate(swis, &swi_b, (void **) &s_b, &context_b)) != NULL)
-           goto finish;
+         lookup_enumerate(swis, &swi_b, (void **)&s_b, &context_b);
 
          check_for_wide_version(swis, &swi_b, &s_b, &context_b);
 
@@ -717,8 +712,7 @@ os_error *riscose_osapi_output
    {
      void *dbg;
 
-     if ((error = lookup_enumerate(swis, &swi_a, (void **) &s_a, &context_a)) != NULL)
-       goto finish;
+     lookup_enumerate(swis, &swi_a, (void **) &s_a, &context_a);
 
      check_for_wide_version(swis, &swi_a, &s_a, &context_a);
 
@@ -741,8 +735,7 @@ os_error *riscose_osapi_output
        found = FALSE;
        while (context_b != 0)
        {
-         if ((error = lookup_enumerate(swis, &swi_b, (void **) &s_b, &context_b)) != NULL)
-           goto finish;
+         lookup_enumerate(swis, &swi_b, (void **)&s_b, &context_b);
 
          check_for_wide_version(swis, &swi_b, &s_b, &context_b);
 
@@ -789,5 +782,5 @@ finish:
         exit(1);
     }
 
-   return error;
+   return;
 }

@@ -18,7 +18,6 @@
 
 #include "types.h"
 #include "macros.h"
-#include "os.h"
 
 #include "lookup.h"
 
@@ -309,7 +308,7 @@ finish:
    return rc;
 }
 /*-----------------------------------------------------------------------*/
-os_error *riscose_template_output
+void riscose_template_output
 (
    FILE     *file,
    char     *title,
@@ -321,7 +320,6 @@ os_error *riscose_template_output
    lookup_t  swis
 )
 {
-   os_error *error = NULL;
    char     *swi, *comment;
    def_s     s;
    char      c_name [def_ID_LIMIT + 1];
@@ -366,9 +364,7 @@ os_error *riscose_template_output
    {
       osbool first;
 
-      if ((error = lookup_enumerate (swis, &swi, (void **) &s, &context))
-            != NULL)
-         goto finish;
+      lookup_enumerate(swis, &swi, (void **)&s, &context);
 
       check_for_wide_version(swis, &swi, &s, &context);
 
@@ -555,5 +551,5 @@ finish:
             strerror(errno), errno);
         exit(1);
     }
-   return error;
+   return;
 }

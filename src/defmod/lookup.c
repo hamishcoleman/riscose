@@ -30,7 +30,6 @@
 #include "monty/mem.h"
 
 /*From OSLib*/
-#include "os.h"
 
 /*From Support*/
 #include "lookup.h"
@@ -49,21 +48,11 @@ struct lookup_t
       Entry *entries;
    };
 
-static os_error noany = {
-    os_GLOBAL_NO_ANY,
-    "NoAny"
-};
-
 /*------------------------------------------------------------------------*/
 
-os_error *lookup_new
-(
-   lookup_t *t_out,
-   int       start_count
-)
+void lookup_new(lookup_t *t_out, int start_count)
 {
    int       i;
-   os_error *error = NULL;
    lookup_t  t;
 
 //   tracef ("lookup_new\n");
@@ -78,25 +67,11 @@ os_error *lookup_new
 
    if (t_out != NULL) *t_out = t;
 
-finish:
-   if (error != NULL)
-   {
-//      tracef ("ERROR: %s (error 0x%X)\n" _ error->errmess _ error->errnum);
-      if (t != NULL)
-      {
-         efree(t->entries);
-         efree(t);
-      }
-   }
-
-   return error;
+   return;
 }
 /*------------------------------------------------------------------------*/
 
-os_error *lookup_delete
-(
-   lookup_t t
-)
+void lookup_delete(lookup_t t)
 {
 //   tracef ("lookup_delete\n");
 
@@ -111,7 +86,7 @@ os_error *lookup_delete
       efree(t);
    }
 
-   return NULL;
+   return;
 }
 /*------------------------------------------------------------------------*/
 
@@ -125,7 +100,7 @@ os_error *lookup_delete
       *e_out == NULL:
             |s| is not in the table, and the table should be extended.*/
 
-static os_error *Lookup
+static void Lookup
 (
    lookup_t   t,
    char      *s,
@@ -133,7 +108,6 @@ static os_error *Lookup
 )
 {
    int       i, collate;
-   os_error *error = NULL;
    Entry    *e = NULL;
 
 //   tracef ("Lookup\n");
@@ -164,49 +138,37 @@ static os_error *Lookup
 /*finish:*/
 //   if (error != NULL)
 //      tracef ("ERROR: %s (error 0x%X)\n" _ error->errmess _ error->errnum);
-   return error;
+   return;
 }
 /*------------------------------------------------------------------------*/
 
-os_error *lookup
-(
-   lookup_t   t,
-   char      *s,
-   void     **ptr_out
-)
+int lookup(lookup_t t, char *s, void **ptr_out)
 {
-   os_error *error = NULL;
    Entry    *e;
 
 //   tracef ("lookup (0x%X, \"%s\",)\n" _ t _ s);
 
-   if ((error = Lookup (t, s, &e)) != NULL)
-      goto finish;
+    Lookup(t, s, &e);
 
    if (e == NULL || e->token == NULL)
    {
-      error = &noany;
-      goto finish;
+        return FALSE;
    }
 
    if (ptr_out != NULL) *ptr_out = e->ptr;
 
-finish:
 //   if (error != NULL)
 //      tracef ("ERROR: %s (error 0x%X)\n" _ error->errmess _ error->errnum);
-   return error;
+    return TRUE;
 }
 /*------------------------------------------------------------------------*/
-os_error *lookup_insert (lookup_t t, char *s, void *ptr)
-
+void lookup_insert(lookup_t t, char *s, void *ptr)
 {
-   os_error *error = NULL;
    Entry    *e;
 
 //   tracef ("lookup_insert (0x%X, \"%s\", 0x%X)\n" _ t _ s _ ptr);
 
-   if ((error = Lookup (t, s, &e)) != NULL)
-      goto finish;
+    Lookup(t, s, &e);
 
    if (e == NULL)
    {
@@ -238,11 +200,11 @@ os_error *lookup_insert (lookup_t t, char *s, void *ptr)
 finish:
 //   if (error != NULL)
 //      tracef ("ERROR: %s (error 0x%X)\n" _ error->errmess _ error->errnum);
-   return error;
+   return;
 }
 /*------------------------------------------------------------------------*/
 
-os_error *lookup_enumerate
+void lookup_enumerate
 (
    lookup_t   t,
    char     **token,
@@ -264,5 +226,5 @@ os_error *lookup_enumerate
       /*Not found.*/
       *context = NULL;
 
-   return NULL;
+   return;
 }

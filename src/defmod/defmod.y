@@ -45,7 +45,6 @@ TV    20000503    |bool| replaced by |osbool|
    /*From OSLib*/
    #include "types.h"
    #include "macros.h"
-   #include "os.h"
 
    /*From Support*/
    #include "lookup.h"
@@ -199,31 +198,17 @@ author_decl: AUTHOR DESCRIPTION {strcpy (Author, $2);};
 
 needs_decl: NEEDS needs_LIST {};
 
-needs: ID
-   {  os_error *error;
-
-      if ((error = lookup_insert (needses, $1, NULL)) != NULL)
-      {  yyerror (error->errmess);
-         YYERROR;
-      }
-   };
+needs: ID { lookup_insert(needses, $1, NULL); };
 
 needsatend_decl: NEEDSATEND needsatend_LIST {};
 
-needsatend: ID
-   {  os_error *error;
-
-      if ((error = lookup_insert (needsatends, $1, NULL)) != NULL)
-      {  yyerror (error->errmess);
-         YYERROR;
-      }
-   };
+needsatend: ID { lookup_insert(needsatends, $1, NULL); };
 
 const_decl: CONST const_defn_LIST;
 
 const_defn:
    ID EQUALS type COLON const DESCRIPTION_OPTION
-   {  os_error *error;
+   {
       def_c c = qalloc (sizeof *c);
       def_t t = qalloc (def_sizeof_TYPE ($3.tag));
 
@@ -232,25 +217,22 @@ const_defn:
       c->value = $5;
       c->description = *$6 ? NULL: qstrdup ($6);
 
-      if ((error = lookup_insert (consts, $1, c)) != NULL)
-      {  yyerror (error->errmess);
-         YYERROR;
-      }
+      lookup_insert(consts, $1, c);
    };
 
 const:
    NUM |
    ID
-   {  os_error *error;
+   {
       def_c c;
 
-      if ((error = lookup (consts, $1, (void **) &c)) != NULL)
-      {  yyerror (error->errmess);
+      if (!lookup(consts, $1, (void **)&c)) {
+         yyerror("duplicate");
          YYERROR;
       }
 
       if (c == NULL)
-      {  char errmess [os_ERROR_LIMIT];
+      {  char errmess [256];
 
          sprintf (errmess, "const \"%s\" undefined", $1);
          yyerror (errmess);
@@ -264,7 +246,7 @@ type_decl: TYPE type_defn_LIST;
 
 type_defn:
    ID DESCRIPTION_OPTION
-   {  os_error *error;
+   {
       def_t t = qalloc (def_sizeof_TYPE (def_TYPE_ABSTRACT));
 
       t->tag = def_TYPE_ABSTRACT;
@@ -272,40 +254,30 @@ type_defn:
       t->value = def_VALUE_REGISTER;
       t->description = *$2 ? NULL: qstrdup ($2);
 
-      if ((error = lookup_insert (types, $1, t)) != NULL)
-      {  yyerror (error->errmess);
-         YYERROR;
-      }
+      lookup_insert(types, $1, t);
    } |
    ID EQUALS type DESCRIPTION_OPTION
-   {  os_error *error;
+   {
       def_t t = qalloc (def_sizeof_TYPE ($3.tag));
 
       memcpy (t, &$3, def_sizeof_TYPE ($3.tag));
       t->description = *$4 ? NULL: qstrdup ($4);
 
-      if ((error = lookup_insert (types, $1, t)) != NULL)
-      {  yyerror (error->errmess);
-         YYERROR;
-      }
+      lookup_insert(types, $1, t);
    };
 
 base_type:
    COLON ID
    {  /*Use it verbatim, but check the type does exist (and find out if
          it's a struct type or not).*/
-      os_error *error;
+      int found;
       def_t t;
 
-      if ((error = lookup (types, $2, (void **) &t)) != NULL &&
-            error->errnum != os_GLOBAL_NO_ANY)
-      {  yyerror (error->errmess);
-         YYERROR;
-      }
+      found = lookup(types, $2, (void **)&t);
 
       $$.tag = def_TYPE_ID;
       $$.name = NULL;
-      if (error != NULL)
+      if (!found)
       {  /*have to make an optimistic assumption*/
          $$.value = def_VALUE_VARIABLE;
          if (Verbose && !Quiet)
@@ -399,18 +371,14 @@ type:
    ID
    {  /*Use it verbatim, but check the type does exist (and find out if
          it's a register type or not).*/
-      os_error *error;
+      int found;
       def_t t;
 
-      if ((error = lookup (types, $1, (void **) &t)) != NULL &&
-            error->errnum != os_GLOBAL_NO_ANY)
-      {  yyerror (error->errmess);
-         YYERROR;
-      }
+      found = lookup(types, $1, (void **)&t);
 
       $$.tag = def_TYPE_ID;
       $$.name = NULL;
-      if (error != NULL)
+      if (!found)
       {  /*have to make an optimistic assumption*/
          $$.value = def_VALUE_REGISTER;
          if (Verbose && !Quiet)
@@ -442,15 +410,12 @@ swi_decl: SWI swi_defn_LIST;
 
 swi_defn:
    ID EQUALS swi
-   {  os_error *error;
+   {
       def_s s = qalloc (sizeof *s);
 
       *s = $3;
 
-      if ((error = lookup_insert (swis, $1, s)) != NULL)
-      {  yyerror (error->errmess);
-         YYERROR;
-      }
+      lookup_insert(swis, $1, s);
    };
 
 swi: OPEN number_part condition_part_OPTION CLOSE {$$ = Union ($2, $3);};
@@ -1043,20 +1008,18 @@ struct def_s Union (struct def_s a, struct def_s b)
 }
 
 int main (int argc, char *argv [])
-{  os_error *error;
+{
    int i;
    enum {None, Riscose_OSAPI, Riscose_Template, Riscose_Header} option = None;
    enum {APCS26, APCS32} mode = DEFAULT_TO_APCS_32 ? APCS32 : APCS26;
    char *output = NULL;
 
-   if (  (error = lookup_new (&needses, 16)) != NULL ||
-         (error = lookup_new (&needsatends, 16)) != NULL ||
-         (error = lookup_new (&consts, 16)) != NULL ||
-         (error = lookup_new (&types, 16)) != NULL ||
-         (error = lookup_new (&swis, 16)) != NULL ||
-         (error = lookup_new (&main_byte_wide, 16)) != NULL
-      )
-      goto finish;
+    lookup_new(&needses, 16);
+    lookup_new(&needsatends, 16);
+    lookup_new(&consts, 16);
+    lookup_new(&types, 16);
+    lookup_new(&swis, 16);
+    lookup_new(&main_byte_wide, 16);
 
    yydebug = 0;
 
@@ -1143,9 +1106,7 @@ int main (int argc, char *argv [])
                   else
                   {  *cc = '\0';
 
-                     if ((error = lookup_insert (main_byte_wide, buffer,
-                           (void *) 1)) != NULL)
-                        goto finish;
+                     lookup_insert(main_byte_wide, buffer, (void *)1);
 
                      cc = buffer;
                      state = Skipping;
@@ -1180,21 +1141,18 @@ int main (int argc, char *argv [])
    switch (option)
    {
       case Riscose_OSAPI:
-         if ((error = riscose_osapi_output (stdout, Title, Author, needses,
-               needsatends, consts, types, swis)) != NULL)
-            goto finish;
+        riscose_osapi_output(stdout, Title, Author, needses,
+            needsatends, consts, types, swis);
       break;
 
       case Riscose_Template:
-         if ((error = riscose_template_output (stdout, Title, Author, needses,
-               needsatends, consts, types, swis)) != NULL)
-            goto finish;
+        riscose_template_output(stdout, Title, Author, needses,
+            needsatends, consts, types, swis);
       break;
 
       case Riscose_Header:
-         if ((error = riscose_header_output (stdout, Title, Author, needses,
-               needsatends, consts, types, swis)) != NULL)
-            goto finish;
+        riscose_header_output(stdout, Title, Author, needses,
+            needsatends, consts, types, swis);
 
       break;
 
@@ -1204,12 +1162,8 @@ int main (int argc, char *argv [])
    }
 
 finish:
-   if (error == NULL)
-      exit (Parse_Error? 1: 0);
-   else
-   {  fprintf (stderr, "%s\n", error->errmess);
-      exit (1);
-}  }
+   exit(!!Parse_Error);
+}
 
 
 /* lexical analyser

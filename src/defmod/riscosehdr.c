@@ -18,7 +18,6 @@
 
 #include "types.h"
 #include "macros.h"
-#include "os.h"
 
 #include "lookup.h"
 #include "def.h"
@@ -318,7 +317,7 @@ finish:
    return rc;
 }
 /*-----------------------------------------------------------------------*/
-os_error *riscose_header_output
+void riscose_header_output
 (
    FILE     *file,
    char     *title,
@@ -330,7 +329,6 @@ os_error *riscose_header_output
    lookup_t  swis
 )
 {
-   os_error *error = NULL;
    char     *needs, *needsatend, *cnst, *type, *swi, *comment;
    def_c     c;
    def_t     t;
@@ -378,9 +376,7 @@ os_error *riscose_header_output
    context = 0;
    while (TRUE)
    {
-      if ((error = lookup_enumerate (needses, &needs, NULL, &context)) !=
-            NULL)
-         goto finish;
+      lookup_enumerate(needses, &needs, NULL, &context);
 
       if (context == 0) break;
 
@@ -400,9 +396,7 @@ os_error *riscose_header_output
    context = 0;
    while (TRUE)
    {
-      if ((error = lookup_enumerate (swis, &swi, (void **) &s, &context))
-            != NULL)
-         goto finish;
+      lookup_enumerate(swis, &swi, (void **)&s, &context);
       if (context == 0) break;
 
       if (s->starred_swi)
@@ -456,9 +450,7 @@ os_error *riscose_header_output
    context = 0;
    while (TRUE)
    {
-      if ((error = lookup_enumerate (types, &type, (void **) &t,
-            &context)) != NULL)
-         goto finish;
+      lookup_enumerate(types, &type, (void **) &t, &context);
       if (context == 0) break;
 
       if (t == NULL || t->tag == def_TYPE_STRUCT ||
@@ -534,9 +526,7 @@ os_error *riscose_header_output
    context = 0;
    while (TRUE)
    {
-      if ((error = lookup_enumerate (types, &type, (void **) &t, &context))
-            != NULL)
-         goto finish;
+      lookup_enumerate(types, &type, (void **)&t, &context);
       if (context == 0) break;
 
       if (!(t == NULL || t->tag == def_TYPE_ABSTRACT))
@@ -764,9 +754,7 @@ os_error *riscose_header_output
    context = 0;
    while (TRUE)
    {
-      if ((error = lookup_enumerate (consts, &cnst, (void **) &c,
-            &context)) != NULL)
-         goto finish;
+      lookup_enumerate(consts, &cnst, (void **)&c, &context);
       if (context == 0) break;
 
       if (start)
@@ -864,9 +852,7 @@ os_error *riscose_header_output
    {
       osbool first;
 
-      if ((error = lookup_enumerate (swis, &swi, (void **) &s, &context))
-            != NULL)
-         goto finish;
+      lookup_enumerate(swis, &swi, (void **)&s, &context);
 
       check_for_wide_version(swis, &swi, &s, &context);
 
@@ -1263,9 +1249,7 @@ os_error *riscose_header_output
    context = 0;
    while (TRUE)
    {
-      if ((error = lookup_enumerate (needsatends, &needsatend, NULL, &context)) !=
-            NULL)
-         goto finish;
+      lookup_enumerate(needsatends, &needsatend, NULL, &context);
 
       if (context == 0) break;
 
@@ -1289,5 +1273,5 @@ finish:
             strerror(errno), errno);
         exit(1);
     }
-   return error;
+   return;
 }

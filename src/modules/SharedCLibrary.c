@@ -323,9 +323,9 @@ swih_sharedclibrary_entry(WORD num)
       break;
     
     case CLIB_KERN_SDIV:
-    case CLIB_CLIB_X_DOLLAR_DIVIDE:
+    case CLIB_CLIB_XDDIVIDE:
     case CLIB_KERN_UDIV: /* 4-277 */
-    case CLIB_CLIB_X_DOLLAR_UDIVIDE:
+    case CLIB_CLIB_XDUDIVIDE:
       {
         WORD div = ARM_R1 / ARM_R0;
         WORD rem = ARM_R1 % ARM_R0;
@@ -460,8 +460,8 @@ swih_sharedclibrary_entry(WORD num)
     case CLIB_CLIB__CLIB_INITIALISE: /* 4-292 */
       return 0;
       
-    /*case CLIB_CLIB_X_DOLLAR_STACK_OVERFLOW:*/ /* 4-290 */
-    /*case CLIB_CLIB_X_DOLLAR_STACK_OVERFLOW_1:*/ /* 4-290 */
+    /*case CLIB_CLIB_XDSTACK_OVERFLOW:*/ /* 4-290 */
+    /*case CLIB_CLIB_XDSTACK_OVERFLOW_1:*/ /* 4-290 */
       /*return 0;*/
     
 /*     case CLIB_CLIB__COUNT1: 4-293

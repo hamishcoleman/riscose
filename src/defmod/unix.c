@@ -42,22 +42,6 @@ static int   Decimal_Point_Len = 1;
 
 /*------------------------------------------------------------------------*/
 
-#if TRACE
-void riscos__assert
-(
-   char *file,
-   int   line,
-   char *msg
-)
-{
-    fprintf(stderr, "assert failed in file %s at line %d: %s\n", file,
-        line, msg);
-
-    return;
-}
-/*------------------------------------------------------------------------*/
-#endif
-
 /*Calculates the length of a string in the traditional RiSC O S way.*/
 
 int riscos_strlen

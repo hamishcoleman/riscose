@@ -26,17 +26,6 @@
    #include "os.h"
 #endif
 
- /* Macro to provide an assertion facility using Wimp_ReportError.
-  */
-
-#define riscos_assert(c) \
-   (!(c)? riscos__assert (__FILE__, __LINE__, #c): (void) SKIP)
-
- /* Function to be used by |riscos_assert()| - not for external use.
-  */
-
-extern void riscos__assert (char *file, int line, char *msg);
-
  /* Trivial functions to do things "the RISC O S way" rather than "the C
   * way." This means treating strings as control-char terminated, rather
   * than 0-terminated. These can be printed using a format of

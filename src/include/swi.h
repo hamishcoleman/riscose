@@ -14,8 +14,6 @@
 #define SWI_WHERE(x) (((x)>>18)&3)
 #define SWI_X(x)     (((x)>>17)&1)
 #define SWI_NUM(x)    ((x) & 0xdffff) /* as given in PRMs */
-#define SWI_CHUNK(x)  ((x) & 0xdffc0) /* as above, minus bottom few bits */
-
 
 /* We keep registered SWIs in "buckets" to speed look-up.  Each bucket
 ** is itself a linked list, but any given bucket will only ever contain

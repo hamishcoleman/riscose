@@ -1,4 +1,4 @@
-AC_INIT(src/mkswichunk.sh)
+AC_INIT(src/monty/monty.c)
 AC_CONFIG_AUX_DIR(util)
 AM_INIT_AUTOMAKE(riscose,0.01)
 AM_CONFIG_HEADER(config.h)

@@ -3,4 +3,3 @@ Makefile
 Makefile.in
 heaptest
 riscose
-swichunk.c

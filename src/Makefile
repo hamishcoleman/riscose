@@ -24,7 +24,8 @@ include $(ARM_SELECT)/Make-defs
 
 SRCDIR  = $(CURDIR)
 CC      = gcc
-CFLAGS  = -Wall -I. -I$(SRCDIR)/include -I$(SRCDIR)/$(ARM_SELECT) $(DEFS) -g3
+CFLAGS = -O2 -g3 -Wall \
+    -I. -I$(SRCDIR)/include -I$(SRCDIR)/$(ARM_SELECT) $(DEFS)
 LDFLAGS = -lncurses -lreadline $(EXTRA_LDFLAGS)
 PREFIX  = /usr/local
 

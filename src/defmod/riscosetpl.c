@@ -27,17 +27,6 @@
 #include "riscose.h"
 #include "riscosever.h"
 
-static int strsplen
-(
-   char *s
-)
-{
-   char *p = s;
-
-   while (*p != '\0' && *p != ' ') p++;
-
-   return p - s;
-}
 /*-----------------------------------------------------------------------*/
 
 static char *Op

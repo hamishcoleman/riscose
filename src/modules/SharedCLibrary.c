@@ -1151,14 +1151,14 @@ void sharedclibrary_swi_register(void)
     swi_register(0x80683, "SharedCLibrary_LibInitAPCS_32",
         swih_sharedclibrary);
 
-    for (i = 0; i < CLIB_CLIB_JUMPPOINTS; i++) {
-        swi_register(0x301100 + i, clib_clib_names[i],
-            swih_sharedclibrary_entry);
+    for (i = 0; i < CLIB_KERN_JUMPPOINTS; i++) {
+        swi_register((0x300000 | CLIB_KERN_BASE) + i,
+	    clib_kern_names[i], swih_sharedclibrary_entry);
     }
 
-    for (i = 0; i < CLIB_KERN_JUMPPOINTS; i++) {
-        swi_register(0x301000 + i, clib_kern_names[i],
-            swih_sharedclibrary_entry);
+    for (i = 0; i < CLIB_CLIB_JUMPPOINTS; i++) {
+        swi_register((0x300000 | CLIB_CLIB_BASE) + i,
+	    clib_clib_names[i], swih_sharedclibrary_entry);
     }
 
     return;

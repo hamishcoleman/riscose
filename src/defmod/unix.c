@@ -37,9 +37,6 @@
 #include "trace.h"
 #include "x.h"
 
-static char *Decimal_Point     = ".";
-static int   Decimal_Point_Len = 1;
-
 /*------------------------------------------------------------------------*/
 
 static _kernel_oserror last_error_v;

@@ -1,0 +1,15 @@
+Make the BDT code cleverer
+Re-work the whole ALU section and its flags mechanisms [done?]
+Check the flag calculations in ALU [done?]
+Optimise and profile in general
+Write a SWP implementation
+Couple sleeve with an OS emulation
+Re-do Makefile and friends with automake & autoconf
+Make it less slow than the ARMulator
+Assume contiguous chunks in bdt [done]
+Look at bit patterns separating instruction classes and optimise if chain
+Fix carry calculation for ADC, SBC and RSC [done?]
+Cleverise BDT so that identical end patterns are folded
+Check pipelining in ALU
+Check use of PC in SDT
+Support translation mapping downgrade on fault

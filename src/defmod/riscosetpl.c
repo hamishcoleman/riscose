@@ -359,8 +359,12 @@ os_error *riscose_template_output
                  "#include \"types.h\"\n"
                  "#include \"%s.h\"\n\n", c_name);
 
-   /* Empty _swi_register_extra function */
-   fprintf(file, "void %s_swi_register_extra(void)\n{\n\n}\n\n", c_name);
+    fprintf(file,
+        "void %s_swi_register_extra(void)\n"
+        "{\n"
+        "    return;\n"
+        "}\n"
+        "\n", c_name);
 
    comment = " *";
 

@@ -48,8 +48,6 @@ extern int riscos_strlen (char *s);
 
 extern char *riscos_strcpy (char *s1, char *s);
 
-extern int riscos_strcmp (char *s0, char *s1);
-
  /* Functions to read back the items above - these return the number of
   * characters successfully read, 0 for error.
   */

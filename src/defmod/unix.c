@@ -92,35 +92,6 @@ char *riscos_strcpy
 }
 /*------------------------------------------------------------------------*/
 
-/*Compares 2 traditional RISC O S strings.*/
-
-int riscos_strcmp
-(
-   char *s0,
-   char *s1
-)
-{
-   tracef ("riscos_strcmp (\"%.*s\", \"%.*s\")\n" _
-         riscos_strlen (s0) _ s0 _ riscos_strlen (s1) _ s1);
-
-   for (;;)
-   {
-      char c0 = *s0++, c1 = *s1++;
-
-      if (c0 < ' ')
-         if (c1 < ' ')
-            return (tracef ("-> 0\n"), 0);
-         else
-            return (tracef ("-> -1\n"), -1);
-      else
-         if (c1 < ' ')
-            return (tracef ("-> 1\n"), 1);
-         else
-            if (c0 != c1) return (tracef ("-> %d\n" _ c0 - c1), c0 - c1);
-   }
-}
-/*------------------------------------------------------------------------*/
-
 static _kernel_oserror last_error_v;
 static _kernel_oserror *last_error;
 

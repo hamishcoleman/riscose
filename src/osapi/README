@@ -1,0 +1,19 @@
+The *.osl files are from the OSLib distribution.  They're brought here
+one by one and added to Makefile.am's libosapi_a_SOURCES definition.
+
+`make' produces a .c and .h for each .o.  The .c is compiled into a .o
+that ends up in libosapi.a.  Since both the .c and .h are automatically
+produced, they should *not* be edit by hand.  A `make clean' will remove
+them.
+
+The .c registers the SWIs it handles with riscose.  It contains handler
+functions for those SWIs with names like `swih_basictrans_help'.  These
+un-marshal the SWIs parameters from the emulated ARM's registers, call a
+hand-written C routine with a name of the form `xbasictrans_help', and,
+if xbasictrans_help didn't return an error, marshal its return values
+back into emulated ARM registers.
+
+The .h contains function prototypes for .c's routines along with useful
+#defines, typedefs, etc.  The .h is typically #included by the .c and
+also by the hand-written .c file containing the actual code to implement
+the SWI.

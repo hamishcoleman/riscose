@@ -1,0 +1,22 @@
+How to allow templates to be built, being careful not to clobber
+existing filled-in ones
+
+What happens if we change the riscose_template output and then want
+to re-integrate things written using the old template?
+
+Need a OS_CLI to run UnixLib-based software (remember that you can use
+-mlibscl to get working binaries, though).  How should this be done?
+Probably a similar registration system for handlers as for SWIs
+
+Do we want to put all code into swi emulation files, or generally have
+a more flexible approach that allows separate source files?
+
+Would be nice if e.g. libfileswitch.a was merged with libos.a rather
+than having to put libfileswitch.a in the main src/Makefile.am
+
+Some SWIs in wimp have different OSLib routines for the same SWI.
+Either:
+	patch the .osl file to leave only one routine
+	make the above automatic in defmod
+	leave them in there and write the despatcher to call one
+	particular version

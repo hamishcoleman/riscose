@@ -41,13 +41,31 @@ static hash *registered_swi;
 
 /* ------------------------------------------------------------------ */
 
+#define LIST \
+    X(basictrans) \
+    X(hourglass) \
+    X(os) \
+    X(osbyte) \
+    X(osfile) \
+    X(osword) \
+    X(sharedclibrary) \
+
+#define X(area) void area ## _swi_register(void);
+LIST
+#undef X
+
 void swi_init(void)
 {
     registered_swi = create_hash();
-    swi_register_all();
+
+#define X(area) area ## _swi_register();
+    LIST
+#undef X
 
     return;
 }
+
+/* ------------------------------------------------------------------ */
 
 /* Register a SWI with riscose. */
 void swi_register(WORD number, char *name, swi_handler handler)
@@ -79,8 +97,17 @@ void swi_trap(WORD num)
     }
 #endif
 
+    /* Implement SWI OS_WriteI */
+    /* FIXME --- is this the best place to be doing this? */
+    if (num >= 0x100 && num <= 0x1ff)
+    {
+      vdu(num & 0xff);
+      return;
+    }
+    
     if (SWI_OS(num) == SWI_OS_TRAP) {
         WORD r;
+
 
 #ifndef NATIVE
         if (num == SWI_MAGIC_RETURN) {
@@ -105,7 +132,15 @@ void swi_trap(WORD num)
 
     /* Look up the SWI's details and call it if found */
     r = swi_lookup(num);
-    e = r ? r->handler(num) : ERR_EM_UNHANDLEDSWI;
+    if (r == NULL)
+    {
+      char buf[64];
+      swi_number_to_name(SWI_NUM(num), buf);
+      error("Unregistered SWI %s called at %08x\n", buf, (unsigned) ARM_R15);
+    }
+      
+    /* e = r ? r->handler(num) : ERR_EM_UNHANDLEDSWI; */
+    e = r->handler(num);
 
     /* Handle errors */
     arm_clear_v();
@@ -113,11 +148,6 @@ void swi_trap(WORD num)
         if (SWI_X(num)) {
             arm_set_v();
             ARM_SET_R0(e);
-        } else if (e == ERR_EM_UNHANDLEDSWI) {
-            char buf[64];
-
-            swi_number_to_name(SWI_NUM(num), buf);
-            error("untrapped swi %s at %08x\n", buf, (unsigned)ARM_R15);
         } else {
             /* FIXME: should call OS_GenerateError. */
             error("swi returned error: %#x %s\n", *(int *)e,
@@ -136,7 +166,9 @@ static void swi_number_to_name(WORD num, char *buf)
 {
     swi_routine *r;
 
-    if (r = swi_lookup(num)) {
+    r = swi_lookup(num);
+    
+    if (r) {
         if (SWI_X(num)) {
             *buf++ = 'X';
         }

@@ -6,14 +6,15 @@ endif
 if ARM_SLEEVE
 arm = sleeve
 endif
-SUBDIRS = include monty rom $(arm) kernel modules
-DIST_SUBDIRS = include monty rom armul native sleeve kernel modules
+SUBDIRS = monty defmod include rom $(arm) osapi os oslib
+DIST_SUBDIRS = monty defmod include rom armul native sleeve osapi os \
+    oslib
 
 bin_PROGRAMS = riscose
 noinst_PROGRAMS = heaptest
 
-riscose_SOURCES = main.c heap.c mem.c swi.c swiregister.c util.c
-riscose_LDADD = modules/libmodules.a kernel/libkernel.a \
+riscose_SOURCES = main.c heap.c mem.c swi.c util.c
+riscose_LDADD = osapi/libosapi.a os/libos.a \
     @ARM@/lib@ARM@.a monty/libmonty.a \
     -lncurses -lreadline
 

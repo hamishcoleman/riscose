@@ -1,0 +1,7 @@
+These are files from OSLib that are NOT auto-generated, but which are needed
+by the SWI veneers.
+
+TODO
+
+Make defmod use these includes rather than its own private versions.
+

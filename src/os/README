@@ -1,0 +1,6 @@
+This directory contains all the code to implement RISC OS SWIs.  Nothing
+in here is auto-generated at build-time, although defmod can generate
+"first-cut" template implementation files to be filled in later.
+
+
+

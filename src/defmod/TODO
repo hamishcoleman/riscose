@@ -1,0 +1,22 @@
+TODO: defmod
+
+Error check all fprintf(file, ...)
+Fix warnings
+Fill out template functions with some debugging code
+
+Some registrations for OS give the wrong names.
+
+Do registers get filled in if there's an error?
+If not, just do return e!  I think they do judging by my bookmarked
+thread on Google.
+
+Are there os_fh problems?
+
+Do we do MEM_TOARM on returned pointers right?
+
+OS_Word causes problems because by default it is despatched based on a
+reason code in a /block/ pointed to by a register.
+
+Remove redundant source files and use oslib files from elsewhere if
+possible.
+

@@ -1,0 +1,18 @@
+defmod is part of the OSLib project, although riscose's version has
+deviated from it.  It reads a .osl file defining part of the RISC OS API
+and produces one of three outputs depending on its command line options.
+
+An OS API .h file contains #defines, typedefs, etc.  It also has the
+function prototypes of the functions that are hand-written to implement
+the SWIs.
+
+An OS API .c file #includes the OS API .h file and contains the
+hand-written functions prototyped in the .h file.  The functions are
+called by...
+
+The SWI marshalling functions in the osapi directory.  These un-marshal
+and marshal parameters from the ARM emulator's registers and call the
+hand-written functions to do the work.
+
+The OS API .c files, although hand-written, can initially be generated
+with stubs by defmod.

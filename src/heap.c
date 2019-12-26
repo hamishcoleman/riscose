@@ -76,9 +76,9 @@ do_reshuffle(heap_t* h)
   if (h->next) {
     do_reshuffle(h->next);
     if (actualaddr < h->addr)
-      ((BYTE*)h->next) -= (h->addr - actualaddr);
+      *((BYTE*)h->next) -= (h->addr - actualaddr);
     else
-      ((BYTE*)h->next) += (actualaddr - h->addr);
+      *((BYTE*)h->next) += (actualaddr - h->addr);
   }
   
   h->addr = actualaddr;

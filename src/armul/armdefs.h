@@ -21,6 +21,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #define FALSE 0
 #define TRUE 1
@@ -33,7 +34,7 @@
 typedef char * VoidStar ;
 #endif
 
-typedef unsigned long ARMword ; /* must be 32 bits wide */
+typedef uint32_t ARMword ; /* must be 32 bits wide */
 
 typedef struct ARMul_State ARMul_State ;
 

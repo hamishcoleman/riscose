@@ -172,26 +172,17 @@ void riscose_osapi_output
          fprintf(file, "WORD swih_%s(WORD n)\n{\n", c_name);
 
          /* Declare variables for the output registers that are used by this SWI */
-         start = TRUE;
          for (i = 0; i < 10; i++)
          {
            if ( (s->o & (1<<i)) != 0 )
            {
-             if (start == TRUE)
-             {
-               fprintf(file, "  int ");
-               start = FALSE;
+             char *type = "int";
+             if ( s->outputs[i]->tag == def_TYPE_REF || (s->ro & (1 << i)) ) {
+               type = "char*";
              }
-             else
-             {
-               fprintf(file, ", ");
-             }
-
-             fprintf(file, "r%d", i);
+             fprintf(file, "  %s r%d;\n", type, i);
            }
          }
-         if (start == FALSE)
-           fprintf(file, ";\n");
 
          /* Declare a PSR output variable if required */
          if (s->f_out)

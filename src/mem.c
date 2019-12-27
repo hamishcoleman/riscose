@@ -24,6 +24,7 @@
 #endif
 
 #include <monty/mem.h>
+#include <monty/monty.h>
 #include "map.h"
 #include "mem.h"
 #include "swi.h"

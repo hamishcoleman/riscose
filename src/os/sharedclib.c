@@ -324,7 +324,9 @@ typedef struct {
   WORD __file;
   WORD __pos;
   WORD __bufsiz;
-  WORD __signature;
+
+  /* Sacrifice the sanity check __signature to allow real to be 64 bits
+  WORD __signature; */
   FILE *real;
 }
 riscos_FILE;
@@ -405,6 +407,9 @@ void fill_statics(WORD addr) /* 4-252 */
   WORD riscos_stdin  = clib_file_new(stdin);
   WORD riscos_stdout = clib_file_new(stdout);
   WORD riscos_stderr = clib_file_new(stderr);
+
+  assert(CLIB_SHARED_STDIN +sizeof(riscos_FILE) == CLIB_SHARED_STDOUT);
+  assert(CLIB_SHARED_STDOUT+sizeof(riscos_FILE) == CLIB_SHARED_STDERR);
 
   memcpy(MEM_TOHOST(addr+CLIB_SHARED_STDIN), MEM_TOHOST(riscos_stdin),
          sizeof(riscos_FILE));

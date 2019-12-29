@@ -319,6 +319,8 @@ static char *clib_clib_names[] = {
 
 /* ------------------------------------------------------------------ */
 
+typedef WORD riscos_time_t;
+
 typedef union {
   FILE *file;
   char *str;
@@ -1043,8 +1045,11 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB_CTIME: /* 4-334 */
       {
-        /* FIXME: relies on host having same time_t structure as RISC OS */
-        char *ctr = ctime((time_t*) MEM_TOHOST(ARM_R0));
+        // time_t is a 32 bit word under RISC OS. This ignores endian!
+        riscos_time_t *rot = (riscos_time_t *) MEM_TOHOST(ARM_R0);
+        time_t t = *rot;
+        char *ctr = ctime(&t);
+        // FIXME leaks buffer
         BYTE *riscos_ctr = mem_rma_alloc(strlen(ctr)+1);
         ARM_SET_R0(MEM_TOARM(riscos_ctr));
         strcpy(riscos_ctr, ctr);

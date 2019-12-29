@@ -9,6 +9,10 @@
 **   tighter integration with whatever framework we decide upon for the rest
 **   of the OS.
 */
+
+// asprintf
+#define _GNU_SOURCE
+
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
@@ -315,6 +319,13 @@ static char *clib_clib_names[] = {
 
 /* ------------------------------------------------------------------ */
 
+typedef union {
+  FILE *file;
+  char *str;
+} format_output;
+
+typedef void (*formatter_t)(format_output *, const char *);
+
 typedef struct {
   WORD __ptr;
   WORD __icnt;
@@ -428,27 +439,27 @@ void fill_statics(WORD addr) /* 4-252 */
     return;
 }
 
-static
-int countpercents(char *str)
-{
-  int count=0;
-  for (; *str; str++)
-    if (*str == '%')
-      count++;
-  return count;
+static void do_fprintf(format_output *dest, const char *out) {
+  fprintf(dest->file, "%s", out);
+  return;
 }
 
-/* FIXME: this function is probably quite dependent on how a particular
-** system implements va_list, and might want rewriting.
-*/
-static char**
-prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf, WORD is_vararg)
+static void do_sprintf(format_output *dest, const char *out) {
+  strcpy(dest->str, out);
+  dest->str += strlen(out);
+  return;
+}
+
+static int
+split_format_string(char *str, WORD apcs_arg, WORD is_scanf, WORD is_vararg, formatter_t formatter, format_output *output)
 {
-  char **arm_va_list = malloc((countpercents(str)+1)*sizeof(char*));
-  int arg=0;
   int* varargs;
   int vararg_n = 0;
   int this_arg;
+  char *begin = str;
+  int length = 0;
+  char *buffer;
+  char *slice;
 
   if (is_vararg)
     varargs = (int*) MEM_TOHOST(ARM_APCS_ARG(apcs_arg)) + 6;
@@ -473,10 +484,23 @@ prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf, WORD is_vararg)
           apcs_arg++;
         }
 
+        // str should now point at the format code.
+        // XXX what if the string ends with a percent without a code?
+        slice = malloc(sizeof(char)*(str - begin + 2));
+        strncpy(slice, begin, str-begin+1);
+        slice[str-begin+1] = 0;
+
+        begin = str+1;
+
+        // TODO Handle %p for RISC OS.
         if (*str++ == 's' || is_scanf)
-          arm_va_list[arg++] = MEM_TOHOST(this_arg);
+          length += asprintf(&buffer, slice, MEM_TOHOST(this_arg));
         else
-          arm_va_list[arg++] = (char*) this_arg;
+          length += asprintf(&buffer, slice, this_arg);
+
+        free(slice);
+        formatter(output, buffer);
+        free(buffer);
 
         break;
 
@@ -484,8 +508,11 @@ prepare_arm_va_list(char *str, WORD apcs_arg, WORD is_scanf, WORD is_vararg)
         continue;
       }
 
-  arm_va_list[arg] = 0;
-  return arm_va_list;
+  length += asprintf(&buffer, begin);
+  formatter(output, buffer);
+  free(buffer);
+
+  return length;
 }
 
 #if defined(NATIVE) && defined(NATIVE_FASTCALL)
@@ -814,48 +841,52 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB__SPRINTF:
     case CLIB_CLIB_SPRINTF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0, 0);
-      ARM_SET_R0(vsprintf(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), arm_va_list));
-      free(arm_va_list);
+      {
+        format_output output;
+        output.str = MEM_TOHOST(ARM_R0);
+        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R1), 2, 0, 0, do_sprintf, &output));
+      }
       return 0;
 
-    case CLIB_CLIB_SCANF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 1, 0);
-      ARM_SET_R0(vscanf(MEM_TOHOST(ARM_R0), arm_va_list));
-      free(arm_va_list);
-      return 0;
+//    case CLIB_CLIB_SCANF:
+//      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 1, 0);
+//      ARM_SET_R0(vscanf(MEM_TOHOST(ARM_R0), arm_va_list));
+//      free(arm_va_list);
+//      return 0;
 
     case CLIB_CLIB__PRINTF:
     case CLIB_CLIB_PRINTF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 0, 0);
-      ARM_SET_R0(vprintf(MEM_TOHOST(ARM_R0), arm_va_list));
-      free(arm_va_list);
+      {
+        format_output output;
+        output.file = stdout;
+        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R0), 1, 0, 0, do_fprintf, &output));
+      }
       return 0;
 
     case CLIB_CLIB__FPRINTF:
     case CLIB_CLIB_FPRINTF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0, 0);
-      ARM_SET_R0(vfprintf(clib_file_real(ARM_R0),
-                          MEM_TOHOST(ARM_R1),
-                          arm_va_list));
-      free(arm_va_list);
+      {
+        format_output output;
+        output.file = clib_file_real(ARM_R0);
+        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R1), 2, 0, 0, do_fprintf, &output));
+      }
       return 0;
 
     case CLIB_CLIB__VPRINTF:
     case CLIB_CLIB_VPRINTF:
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R0), 1, 0, 1);
-      ARM_SET_R0(vfprintf(stdout,
-                          MEM_TOHOST(ARM_R0),
-                          arm_va_list));
-      free(arm_va_list);
+      {
+        format_output output;
+        output.file = stdout;
+        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R0), 1, 0, 1, do_fprintf, &output));
+      }
       return 0;
 
     case CLIB_CLIB_VFPRINTF: /* 4-312 */
-      arm_va_list = prepare_arm_va_list(MEM_TOHOST(ARM_R1), 2, 0, 1);
-      ARM_SET_R0(vfprintf(clib_file_real(ARM_R0),
-                     MEM_TOHOST(ARM_R1),
-                     arm_va_list));
-      free(arm_va_list);
+      {
+        format_output output;
+        output.file = clib_file_real(ARM_R0);
+        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R1), 2, 0, 1, do_fprintf, &output));
+      }
       return 0;
 
     case CLIB_CLIB_FPUTC: /* FIXME: 4-31? */

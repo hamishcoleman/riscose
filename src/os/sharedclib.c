@@ -319,6 +319,8 @@ static char *clib_clib_names[] = {
 
 /* ------------------------------------------------------------------ */
 
+const WORD FILE_magic = 0x23432432;
+
 typedef WORD riscos_time_t;
 
 typedef union {
@@ -336,7 +338,7 @@ typedef struct {
   WORD __base;
   WORD __file;
   WORD __pos;
-  WORD __bufsiz;
+  WORD __bufsiz; // Stolen as a signature
 
   /* Sacrifice the sanity check __signature to allow real to be 64 bits
   WORD __signature; */
@@ -347,6 +349,7 @@ riscos_FILE;
 static void clib_file_sync(WORD arm_addr)
 {
   riscos_FILE* rof = (riscos_FILE*) MEM_TOHOST(arm_addr);
+  assert(rof->__bufsiz == FILE_magic);
   FILE *real = rof->real;
 
   rof->__pos  = ftell(real);
@@ -359,6 +362,7 @@ static void clib_file_sync(WORD arm_addr)
 static void clib_file_mark_eof(WORD arm_addr)
 {
   riscos_FILE* rof = (riscos_FILE*) MEM_TOHOST(arm_addr);
+  assert(rof->__bufsiz == FILE_magic);
 
   rof->__flag |= 0x40;
 }
@@ -370,7 +374,7 @@ static WORD clib_file_new(FILE *real)
 
   rof->real   = real;
   rof->__base = MEM_TOARM(mem_rma_alloc(1));
-  rof->__bufsiz = 0;
+  rof->__bufsiz = FILE_magic;
   clib_file_sync(rof_arm);
 
   return rof_arm;
@@ -379,6 +383,7 @@ static WORD clib_file_new(FILE *real)
 static FILE* clib_file_real(WORD arm_addr)
 {
   riscos_FILE* rof = (riscos_FILE*) MEM_TOHOST(arm_addr);
+  assert(rof->__bufsiz == FILE_magic);
 
   clib_file_sync(arm_addr);
   return rof->real;
@@ -387,6 +392,7 @@ static FILE* clib_file_real(WORD arm_addr)
 static void clib_file_dispose(WORD arm_addr)
 {
   riscos_FILE* rof = (riscos_FILE*) MEM_TOHOST(arm_addr);
+  assert(rof->__bufsiz == FILE_magic);
 
   mem_free(MEM_TOHOST(rof->__base));
   mem_free(rof);

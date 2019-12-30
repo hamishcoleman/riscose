@@ -14,6 +14,7 @@
 #include "types.h"
 #include "osbyte.h"
 #include "vdu.h"
+#include "arm.h"
 
 void osbyte_swi_register_extra(void)
 {

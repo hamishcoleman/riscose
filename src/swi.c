@@ -11,6 +11,7 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "config.h"
 #include "monty/monty.h"
@@ -22,6 +23,7 @@
 #include "arm.h"
 #include "rom/rom.h"
 #include "swi.h"
+#include "vdu.h"
 
 /* FIXME: should be in a header file. */
 WORD swih_sharedclibrary_entry(WORD num);

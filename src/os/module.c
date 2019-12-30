@@ -10,6 +10,7 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "riscostypes.h"
 #include "arm.h"

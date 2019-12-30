@@ -211,14 +211,23 @@ os_error *xos_read_line (char *buffer,
 
   /* FIXME: not quite right! */
   l = readline(NULL);
-  strncpy(buffer, l, size);
 
-  len = strlen(l);
-  if (len < size)
-    buffer[len] = '\r';
+  if (l==NULL) {
+    buffer[0] = '\r';
+    *used = 0;
+  }
+  else {
+    fprintf(stderr, "%p, %p\n", buffer, l);
+    fprintf(stderr, "%s\n", l);
+    strncpy(buffer, l, size-1);
 
-  *used = len;
-  free(l);
+    len = strlen(l);
+    if (len < size)
+      buffer[len] = '\r';
+
+    *used = len;
+    free(l);
+   }
 
   if (psr)
     *psr = 0;

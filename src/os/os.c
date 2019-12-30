@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <monty/monty.h>
+#include <readline/readline.h>
 #include "types.h"
 #include "os.h"
 
@@ -19,6 +20,7 @@
 #include "map.h"
 #include "mem.h"
 #include "arm.h"
+#include "swi.h"
 
 WORD os_call_a_swi(WORD n)
 {

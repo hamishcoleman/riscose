@@ -825,8 +825,13 @@ swih_sharedclibrary_entry(WORD num)
       {
         FILE *fh = freopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), clib_file_real(ARM_R2));
 	/*fprintf(stderr, "reopened file %p `%s' to %p\n", MEM_TOHOST(ARM_R2), MEM_TOHOST(ARM_R0), fh);*/
-	clib_file_dispose(ARM_R2);
-        ARM_SET_R0(fh == NULL ? 0 : clib_file_new(fh));
+        if (fh == clib_file_real(ARM_R2)) {
+          ARM_SET_R0(ARM_R2);
+        }
+        else {
+          clib_file_dispose(ARM_R2);
+          ARM_SET_R0(fh == NULL ? 0 : clib_file_new(fh));
+        }
         return 0;
       }
 

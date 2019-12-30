@@ -169,7 +169,7 @@ void riscose_osapi_output
          ** SWI emulation code has been moved over to be OSLib-style.
          */
          def_as_extern(c_name, swi);
-         fprintf(file, "WORD swih_%s(WORD n)\n{\n", c_name);
+         fprintf(file, "os_error* swih_%s(WORD n)\n{\n", c_name);
 
          /* Declare variables for the output registers that are used by this SWI */
          for (i = 0; i < 10; i++)
@@ -189,7 +189,7 @@ void riscose_osapi_output
            fprintf(file, "  bits psr_out;\n");
 
          /* Variable for the error return */
-         fprintf(file, "  WORD e;\n\n");
+         fprintf(file, "  os_error *e;\n\n");
 
          /* Write some debugging messages; the routine name and the
           * input registers */
@@ -204,7 +204,7 @@ void riscose_osapi_output
          fprintf(file, "\n");
 
          /* Begin the call to the actual function */
-         fprintf(file, "  e = (WORD) x%s(", c_name);
+         fprintf(file, "  e = x%s(", c_name);
 
          /* Input parameters */
          start = TRUE;
@@ -390,9 +390,9 @@ void riscose_osapi_output
              */
 
              def_as_extern(c_name, title);
-             fprintf(file, "\n\nWORD swih_%X(WORD n)\n"
+             fprintf(file, "\n\nos_error* swih_%X(WORD n)\n"
                            "{\n"
-                           "  WORD e = 0;\n\n", s_a->swi);
+                           "  os_error* e = NULL;\n\n", s_a->swi);
 
              /* Write a check for the routine `s_a' */
              if (number_of_conditions(s_a) > 0)

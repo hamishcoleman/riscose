@@ -24,6 +24,7 @@
 #include "rom/rom.h"
 #include "swi.h"
 #include "vdu.h"
+#include "mem.h"
 
 /* FIXME: should be in a header file. */
 WORD swih_sharedclibrary_entry(WORD num);
@@ -83,7 +84,7 @@ void swi_register(WORD number, char *name, swi_handler handler)
 
 void swi_trap(WORD num)
 {
-    WORD e;
+    riscos_error *e;
     swi_routine *r;
 
 #ifdef CONFIG_TRACE_SWIS
@@ -140,7 +141,7 @@ void swi_trap(WORD num)
     }
       
     DEBUG(SWI, ("swi %s\n", r->name));
-    e = r->handler(num);
+    e = (riscos_error*) r->handler(num);
 
     arm_clear_v();
     if (e) {
@@ -149,8 +150,8 @@ void swi_trap(WORD num)
             ARM_SET_R0(e);
         } else {
             /* FIXME: should call OS_GenerateError. */
-            error("swi returned error: %#x %s\n", *(int *)e,
-                (char *)e + 4);
+            error("swi returned error: %#x %s\n", e->errnum,
+                MEM_TOHOST(&(e->errmess)));
         }
     }
 

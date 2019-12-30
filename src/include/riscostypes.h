@@ -16,9 +16,10 @@ typedef int32_t  WORD_signed;
 typedef uint32_t WORD;
 typedef unsigned char BYTE;
 
+/* Matches os_error in oslib */
 typedef struct {
-  WORD  num;
-  BYTE *msg;
+  int errnum;
+  char errmess[252];
 }
 riscos_error;
 

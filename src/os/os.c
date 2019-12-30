@@ -388,7 +388,7 @@ os_error *xos_get_env (char **command,
   ** fails because the address is outside the wimp slot.
   */
   *ram_limit = MEM_TOHOST(0x8000 + mem_get_wimpslot() - 1);
-  *start = MEM_TOHOST(MMAP_USRSTACK_BASE + 256);
+  *start = (os_date_and_time *) MEM_TOHOST(MMAP_USRSTACK_BASE + 256);
 
   return 0;
 }

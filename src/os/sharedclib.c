@@ -639,7 +639,7 @@ swih_sharedclibrary_entry(WORD num)
              return SWIH_EXIT_HANDLED; /* BODGE! */
             }
           c += language_description[c]>>2;
-          printf("%li\n", c);
+          printf("%d\n", c);
          }
       }
       break;
@@ -688,7 +688,7 @@ swih_sharedclibrary_entry(WORD num)
 #endif
 
     case CLIB_CLIB_ATEXIT:
-      printf("atexit(%#lx) called, nothing will be done.\n", ARM_R0);
+      printf("atexit(%#x) called, nothing will be done.\n", ARM_R0);
       break;
 
     case CLIB_CLIB_EXIT: /* 4-322 */

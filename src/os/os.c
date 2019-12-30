@@ -1278,7 +1278,7 @@ os_error *xos_change_environment (os_handler_type handler_type,
       byte **old_buffer)
 {
 
-  fprintf(stderr, "FIXME --- OS_ChangeEnvironment unimplemented\n");
+  fprintf(stderr, "FIXME --- OS_ChangeEnvironment %d unimplemented\n", handler_type);
 
   *old_handler = 0;
   *old_handle  = 0;

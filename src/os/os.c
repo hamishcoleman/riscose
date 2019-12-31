@@ -217,8 +217,6 @@ os_error *xos_read_line (char *buffer,
     *used = 0;
   }
   else {
-    fprintf(stderr, "%p, %p\n", buffer, l);
-    fprintf(stderr, "%s\n", l);
     strncpy(buffer, l, size-1);
 
     len = strlen(l);

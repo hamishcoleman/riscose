@@ -151,7 +151,7 @@ void swi_trap(WORD num)
         } else {
             /* FIXME: should call OS_GenerateError. */
             error("swi returned error: %#x %s\n", e->errnum,
-                MEM_TOHOST(&(e->errmess)));
+                e->errmess);
         }
     }
 

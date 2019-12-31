@@ -1115,7 +1115,12 @@ os_error *xos_swi_number_to_string (int swi,
 os_error *xos_swi_number_from_string (char *swi_name,
       int *swi)
 {
-  error("*** SWI unimplemented\n");
+  if (strcmp("OS_Write0", swi_name)==0) {
+    *swi = 0x02;
+  }
+  else {
+    error("*** SWI unimplemented\n");
+  }
   return 0;
 }
 

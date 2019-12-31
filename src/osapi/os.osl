@@ -2158,7 +2158,19 @@ SWI
    OS_SynchroniseCodeAreas = //RO3.7+
    (  NUMBER 0x6E "Informs the O S that code has been newly generated or modified
          in memory - RISC O S 3.7+",
-      ENTRY (R0 = .Bits: flags, R1 -> .Asm: start, R2 -> .Asm: end)
+      ABSENT
+   );
+
+SWI
+   OSSynchroniseCodeAreas_All = //RO3.7+
+   (  NUMBER 0x6E,
+      ENTRY (R0 # 0 "Synchronises all memory" )
+   );
+
+SWI
+   OSSynchroniseCodeAreas_GivenCodeRange = //RO3.7+
+   (  NUMBER 0x6E,
+      ENTRY (R0 # 1 "Synchronises given code range", R1 -> .Asm: start, R2 -> .Asm: end)
    );
 
 SWI OS_CallASWI = //RO3.7+

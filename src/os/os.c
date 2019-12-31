@@ -2589,7 +2589,7 @@ os_error *xosplatformfeatures_get_features (os_platform_feature_flags *flags,
 }
 
 /* ------------------------------------------------------------------------
- * Function:      os_synchronise_code_areas()
+ * Function:      xossynchronisecodeareas_given_code_range()
  *
  * Description:   Informs the O S that code has been newly generated or
  *                modified in memory - RISC O S 3.7+
@@ -2601,9 +2601,25 @@ os_error *xosplatformfeatures_get_features (os_platform_feature_flags *flags,
  * Other notes:   Emulation of SWI 0x6E.
  */
 
-os_error *xos_synchronise_code_areas (bits flags,
+os_error *xossynchronisecodeareas_given_code_range (
       void *start,
       void *end)
+{
+
+  /* FIXME --- I don't think we need to do anything here */
+  return 0;
+}
+
+/* ------------------------------------------------------------------------
+ * Function:      xos_synchronisecodeareas_all()
+ *
+ * Description:   Informs the O S that code has been newly generated or
+ *                modified in memory - RISC O S 3.7+
+ *
+ * Other notes:   Emulation of SWI 0x6E.
+ */
+
+os_error *xossynchronisecodeareas_all ()
 {
 
   /* FIXME --- I don't think we need to do anything here */

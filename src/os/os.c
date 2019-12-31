@@ -382,10 +382,10 @@ os_error *xos_get_env (char **command,
 {
   *command = MEM_TOHOST(MMAP_USRSTACK_BASE);
   /* FIXME --- this is a hack which is probably wrong.
-  ** Without the - 1 on the next line, the conversion back to ARM space
+  ** Without the - 4 on the next line, the conversion back to ARM space
   ** fails because the address is outside the wimp slot.
   */
-  *ram_limit = MEM_TOHOST(0x8000 + mem_get_wimpslot() - 1);
+  *ram_limit = MEM_TOHOST(0x8000 + mem_get_wimpslot() - 4);
   *start = (os_date_and_time *) MEM_TOHOST(MMAP_USRSTACK_BASE + 256);
 
   return 0;

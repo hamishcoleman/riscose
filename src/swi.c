@@ -148,7 +148,7 @@ void swi_trap(WORD num)
     if (e) {
         if (SWI_X(num)) {
             arm_set_v();
-            ARM_SET_R0(e);
+            ARM_SET_R0(MEM_TOARM(e));
         } else {
             /* FIXME: should call OS_GenerateError. */
             error("swi returned error: %#x %s\n", e->errnum,

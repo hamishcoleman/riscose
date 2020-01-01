@@ -453,9 +453,10 @@ mem_load_file_at(const char * file, WORD arm_addr)
   if (f == -1)
     return ERR_MEM_BADFILE;
   
-  read(f, MEM_TOHOST(arm_addr), s.st_size);
+  size_t bytes_read = read(f, MEM_TOHOST(arm_addr), s.st_size);
   
   close(f);
+  if (bytes_read != s.st_size) return ERR_MEM_BADFILE;
   
   return 0;
 }

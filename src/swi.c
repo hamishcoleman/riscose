@@ -50,7 +50,8 @@ static hash *registered_swi;
     X(osfile) \
     X(osword) \
     X(sharedclibrary) \
-    X(taskwindow)
+    X(taskwindow) \
+    X(wimpreadsysinfo)
 
 #define X(area) void area ## _swi_register(void);
 LIST

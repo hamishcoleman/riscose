@@ -17,6 +17,7 @@ libos_a_SOURCES = \
     sharedclib.c \
     taskwindow.c \
     utilitymod.c \
+    wimpreadsysinfo.c \
     vdu.c
 
 EXTRA_DIST = .cvsignore

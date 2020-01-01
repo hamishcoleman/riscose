@@ -1,0 +1,256 @@
+TITLE WimpReadSysInfo;
+AUTHOR "Jonathan Coxhead, jonathan@doves.demon.co.uk, 23 May 1995";
+
+NEEDS OS, Wimp, Font, OSSpriteOp;
+
+TYPE WimpReadSysInfo_State = .Int;
+CONST
+   WimpReadSysInfo_StateCommands  = WimpReadSysInfo_State: 0,
+   WimpReadSysInfo_StateDesktop   = WimpReadSysInfo_State: 1;
+
+TYPE WimpReadSysInfo_Direction = .Int;
+CONST
+   WimpReadSysInfo_DirLeftToRight = WimpReadSysInfo_Direction: 0,
+   WimpReadSysInfo_DirRightToLeft = WimpReadSysInfo_Direction: 1;
+
+TYPE WimpReadSysInfoTextSelection_Flags = .Bits;
+CONST
+   WimpReadSysInfoTextSelectionFlags_Enabled       = WimpReadSysInfoTextSelection_Flags: 0x01,
+
+   WimpReadSysInfoTextSelectionFlags_InsertOpMask  = WimpReadSysInfoTextSelection_Flags: 0x06,
+   WimpReadSysInfoTextSelectionFlags_InsertOpNOP   = WimpReadSysInfoTextSelection_Flags: 0x00,
+   WimpReadSysInfoTextSelectionFlags_InsertOpDel   = WimpReadSysInfoTextSelection_Flags: 0x02,
+   WimpReadSysInfoTextSelectionFlags_InsertOpClear = WimpReadSysInfoTextSelection_Flags: 0x04,
+   WimpReadSysInfoTextSelectionFlags_InsertOpCut   = WimpReadSysInfoTextSelection_Flags: 0x06,
+
+   WimpReadSysInfoTextSelectionFlags_DelOpMask     = WimpReadSysInfoTextSelection_Flags: 0x18,
+   WimpReadSysInfoTextSelectionFlags_DelOpNOP      = WimpReadSysInfoTextSelection_Flags: 0x00,
+   WimpReadSysInfoTextSelectionFlags_DelOpDel      = WimpReadSysInfoTextSelection_Flags: 0x08,
+   WimpReadSysInfoTextSelectionFlags_DelOpClear    = WimpReadSysInfoTextSelection_Flags: 0x10,
+   WimpReadSysInfoTextSelectionFlags_DelOpCut      = WimpReadSysInfoTextSelection_Flags: 0x18,
+
+   WimpReadSysInfoTextSelectionFlags_MoveOpMask    = WimpReadSysInfoTextSelection_Flags: 0x60,
+   WimpReadSysInfoTextSelectionFlags_MoveOpNOP     = WimpReadSysInfoTextSelection_Flags: 0x00,
+   WimpReadSysInfoTextSelectionFlags_MoveOpDel     = WimpReadSysInfoTextSelection_Flags: 0x20,
+   WimpReadSysInfoTextSelectionFlags_MoveOpClear   = WimpReadSysInfoTextSelection_Flags: 0x40,
+   WimpReadSysInfoTextSelectionFlags_MoveOpCut     = WimpReadSysInfoTextSelection_Flags: 0x60,
+
+   WimpReadSysInfoTextSelectionFlags_AutoSelect    = WimpReadSysInfoTextSelection_Flags: 0x80;
+
+SWI Wimp_ReadSysInfo =
+   (  NUMBER 0x400F2 "Reads system information from the Wimp - see individual
+                      reason codes",
+      ABSENT
+   );
+
+SWI WimpReadSysInfo_TaskCount =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 0 "Reads the number of active tasks"
+      ),
+      EXIT
+      (  R0! = .Int: task_count
+   )  ),
+
+   WimpReadSysInfo_WimpMode = //not RISC OS 2
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 1 "Reads the current Wimp mode"
+      ),
+      EXIT
+      (  R0! = OS_Mode: mode
+   )  ),
+
+   WimpReadSysInfo_SpriteSuffix = //not RISC OS 2
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 2 "Reads the *IconSprites file name suffix for the configured
+                 mode"
+      ),
+      EXIT
+      (  R0! -> .String: suffix
+   )  ),
+
+   WimpReadSysInfo_DesktopState = //not RISC OS 2
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 3 "Reads the Wimp state"
+      ),
+      EXIT
+      (  R0! = WimpReadSysInfo_State: state
+   )  ),
+
+   WimpReadSysInfo_WriteDir = //not RISC OS 2
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 4 "Reads the current writing direction"
+      ),
+      EXIT
+      (  R0! = WimpReadSysInfo_Direction: write_dir
+   )  ),
+
+   WimpReadSysInfo_Task = //not RISC OS 2
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 5 "Reads the current task handle"
+      ),
+      EXIT
+      (  R0! = Wimp_T: task,
+         R1 = Wimp_VersionNo: version
+   )  ),
+
+   WimpReadSysInfo_Version = //not RISC OS 2
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 7 "Reads the Wimp version"
+      ),
+      EXIT
+      (  R0! = Wimp_VersionNo: version
+   )  ),
+
+   WimpReadSysInfo_Font =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 8 "Reads the desktop and symbol font handles"
+      ),
+      EXIT
+      (  R0! = Font_F: font,
+         R1 = Font_F: symbol_font
+   )  ),
+
+   WimpReadSysInfo_ToolSprites =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 9 "Reads the toolsprite control block pointer"
+      ),
+      EXIT
+      (  R0! -> OSSpriteOp_Area: toolsprites
+   )  ),
+
+   WimpReadSysInfo_ApplicationLimit =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 11 "Reads the maximum size of application space"
+      ),
+      EXIT
+      (  R0! = .Int: size_limit
+   )  ),
+
+   WimpReadSysInfo_SpritePools =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 16 "Reads both the WIMP sprite pools' control block pointers,
+                  see WimpReadSysInfo_SpritePoolsExtended as well - RISC OS 4+"
+      ),
+      EXIT
+      (  R0 -> OSSpriteOp_Area: low_priority,
+         R1 -> OSSpriteOp_Area: high_priority
+   )  ),
+
+   WimpReadSysInfo_AutoScrollPauseDelay =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 17 "Reads the configured auto-scroll pause delay, measured in
+                  centiseconds - RISC OS 4+"
+      ),
+      EXIT
+      (  R0! = .Int: delay
+   )  ),
+
+   WimpReadSysInfo_SpritePoolsExtended =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 19 "Reads the WIMP sprite pools' control block pointers -
+                  RISC OS Select"
+      ),
+      EXIT
+      (  R0 -> OSSpriteOp_Area: priority,
+         R1 -> OSSpriteOp_Area: high_priority,
+         R2 -> OSSpriteOp_Area: low_priority
+   )  ),
+
+   WimpReadSysInfo_SpecialHighlightingColours =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 20 "Reads the 'special' highlighting colours defined with
+                  *WimpVisualFlags - RISC OS Select"
+      ),
+      EXIT
+      (  R0 = Wimp_Colour: bg,
+         R1 = Wimp_Colour: fg
+   )  ),
+
+   WimpReadSysInfo_TextSelection =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 21 "Reads the text selection colours and flags - RISC OS 4.36+",
+         R2 # 1
+      ),
+      EXIT
+      (  R0 = Wimp_Colour: bg,
+         R1 = Wimp_Colour: fg,
+         R2 = WimpReadSysInfoTextSelection_Flags: flags
+   )  ),
+
+   WimpReadSysInfo_CaretColour =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 22 "Read the default caret colour - RISC OS 6"
+      ),
+      EXIT
+      (  R0 = Wimp_Colour: def,
+         R1 = Wimp_Colour: actual
+   )  ),
+
+   WimpReadSysInfo_DragSettings =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 23 "Read the settings used to detect a drag - RISC OS 6"
+      ),
+      EXIT
+      (  R0 = .Int: os_units_move,
+         R1 = .Int: delay
+   )  ),
+
+   WimpReadSysInfo_DblClickSettings =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 24 "Read the settings used to detect a double click - RISC OS 6"
+      ),
+      EXIT
+      (  R0 = .Int: os_units_move,
+         R1 = .Int: delay
+   )  ),
+
+   WimpReadSysInfo_SubMenuOpenSettings =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 25 "Read the settings used to detect whether a submenu entry
+                  should be opened automatically - RISC OS 6"
+      ),
+      EXIT
+      (  R0 = .Int: delay_for_open,
+         R1 = .Int: delay_mouse_ignore
+   )  ),
+
+   WimpReadSysInfo_IconBarScrollSettings =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 26 "Read the settings used to scroll the iconbar when the mouse
+                  is at its edge - RISC OS 6"
+      ),
+      EXIT
+      (  R0 = .Int: speed,
+         R1 = .Int: acceleration
+   )  ),
+
+   WimpReadSysInfo_EdgeSettings =
+   (  NUMBER 0x400F2,
+      ENTRY
+      (  R0 # 27 "Read the settings used to notify applications that the mouse
+                  has idled at the edge of the screen - RISC OS 6"
+      ),
+      EXIT
+      (  R0 = .Int: delay
+   )  )
+

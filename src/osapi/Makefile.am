@@ -33,6 +33,7 @@ BUILT_SOURCES = \
     osmodule.c osmodule.h osmodule.e \
     osspriteop.c osspriteop.h osspriteop.e \
     osword.c osword.h osword.e \
+    taskwindow.c taskwindow.h taskwindow.e \
     wimp.c wimp.h wimp.e
 libosapi_a_SOURCES = $(BUILT_SOURCES)
 $(BUILT_SOURCES): ../defmod/defmod

@@ -15,6 +15,7 @@ libos_a_SOURCES = \
     osfile.c \
     osword.c \
     sharedclib.c \
+    taskwindow.c \
     utilitymod.c \
     vdu.c
 

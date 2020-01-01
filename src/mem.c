@@ -314,6 +314,7 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
        mem->tasks[c].app      = emalloc(wimpslot);
 #  endif
 #endif
+       assert(wimpslot+MMAP_APP_BASE < (MMAP_SVCSTACK_BASE));
        if (image_filename != NULL)
          {
           WORD t = mem_task_which();

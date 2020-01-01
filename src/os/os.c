@@ -1683,7 +1683,9 @@ os_error *xos_exit_and_die (os_error *e,
 os_error *xos_read_mem_map_info (int *page_size,
       int *page_count)
 {
-  error("*** SWI unimplemented\n");
+  *page_size = 4096; // Pretend we are a RISC PC
+  *page_count = mem_get_wimpslot() / *page_size;
+
   return 0;
 }
 

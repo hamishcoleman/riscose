@@ -44,6 +44,7 @@ static hash *registered_swi;
 
 #define LIST \
     X(basictrans) \
+    X(fpemulator) \
     X(hourglass) \
     X(os) \
     X(osbyte) \

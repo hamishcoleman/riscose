@@ -1,0 +1,136 @@
+TITLE FPEmulator;
+
+AUTHOR "Jonathan Coxhead, jonathan@doves.demon.co.uk, 29 Apr 1994";
+
+NEEDS OS;
+
+TYPE
+   FPEmulator_Context;
+
+CONST
+   FPEmulator_NoContext      = FPEmulator_Context: 0 "FPEmulator 4.12+",
+   FPEmulator_DefaultContext = FPEmulator_Context: -1 "FPEmulator 4.12+",
+   FPEmulator_CurrentContext = FPEmulator_Context: -2 "FPEmulator 4.12+";
+
+TYPE
+   FPEmulator_FPSR = .Bits;
+
+CONST
+   FPEmulator_FPSRCumulativeIVO = FPEmulator_FPSR: 0x1 "Invalid operation cumulative exception flag",
+   FPEmulator_FPSRCumulativeDVZ = FPEmulator_FPSR: 0x2 "Division by zero cumulative exception flag",
+   FPEmulator_FPSRCumulativeOFL = FPemulator_FPSR: 0x4 "Overflow cumulative exception flag",
+   FPEmulator_FPSRCumulativeUFL = FPEmulator_FPSR: 0x8 "Underflow cumulative exception flag",
+   FPEmulator_FPSRCumulativeINX = FPEmulator_FPSR: 0x10 "Inexact cumulative exception flag",
+   FPEmulator_FPSRControlND = FPEmulator_FPSR: 0x100 "No denormalised numbers",
+   FPEmulator_FPSRControlNE = FPEmulator_FPSR: 0x200 "NaN exception",
+   FPEmulator_FPSRControlSO = FPEmulator_FPSR: 0x400 "Select synchronous operation of FPA",
+   FPEmulator_FPSRControlEP = FPEmulator_FPSR: 0x800 "Use expanded packed decimal format",
+   FPEmulator_FPSRControlAC = FPEmulator_FPSR: 0x1000 "Use alternative definition for C flag on compare operations",
+   FPEmulator_FPSREnableIVO = FPEmulator_FPSR: 0x10000 "Invalid operation trap enable",
+   FPEmulator_FPSREnableDVZ = FPEmulator_FPSR: 0x20000 "Division by zero trap enable",
+   FPEmulator_FPSREnableOFL = FPEmulator_FPSR: 0x40000 "Overflow trap enable",
+   FPEmulator_FPSREnableUFL = FPEmulator_FPSR: 0x80000 "Underflow trap enable",
+   FPEmulator_FPSREnableINX = FPEmulator_FPSR: 0x100000 "Inexact trap enable",
+   FPEmulator_FPSRSystemID = FPEmulator_FPSR: 0xff000000 "System ID mask",
+   FPEmulator_FPSRSystemIDShift = .Int: 24 "System ID shift",
+   FPEmulator_FPSRSystemClass = FPEmulator_FPSR: 0x80000000 "System class",
+   FPEmulator_FPSRSystemClassShift = .Int: 31 "System class shift";
+
+CONST
+  FPEmulator_SystemOldFPE = .Int: 0x00 "Old Floating Point Emulator",
+  FPEmulator_SystemFPE400 = .Int: 0x01 "New Floating Point Emulator",
+  FPEmulator_SystemFPPC   = .Int: 0x80 "Floating Point Protocol Convertor with WE32206",
+  FPEmulator_SystemFPA    = .Int: 0x81 "ARM Floating Point Accelerator";
+
+CONST
+  FPEmulator_ClassSoftware = .Int: 0,
+  FPEmulator_ClassHardware = .Int: 1;
+
+TYPE
+   FPEmulator_RegisterDump =
+   .Struct
+   (  FPEmulator_FPSR: fpsr,
+      [12] .Byte: f0,
+      [12] .Byte: f1,
+      [12] .Byte: f2,
+      [12] .Byte: f3,
+      [12] .Byte: f4,
+      [12] .Byte: f5,
+      [12] .Byte: f6,
+      [12] .Byte: f7
+   );
+
+SWI
+   FPEmulator_Version =
+   (  NUMBER 0x40480 "Returns the version number of the Floating Point Emulator",
+      EXIT
+      (  R0! = .Int: version
+   )  ),
+
+   FPEmulator_DeactivateContext =
+   (  NUMBER 0x40481 "Deactivates the the current floating point context - FPEmulator 4.12+",
+      EXIT
+      (  R0! = FPEmulator_Context: old_context
+   )  ),
+
+   FPEmulator_ActivateContext =
+   (  NUMBER 0x40482 "Activates a floating point context - FPEmulator 4.12+",
+      ENTRY
+      (  R0 = FPEmulator_Context: new_context
+   )  ),
+
+   FPEmulator_ChangedContext =
+   (  NUMBER 0x40483 "Change the currrent floating point context - FPEmulator 4.12+",
+      ENTRY
+      (  R0 = FPEmulator_Context: new_context
+      ),
+      EXIT
+      (  R0! = FPEmulator_Context: old_context
+   )  ),
+
+   FPEmulator_ContextLength =
+   (  NUMBER 0x40484 "Returns the size of a floating point context - FPEmulator 4.12+",
+      EXIT
+      (  R0! = .Int: context_length
+   )  ),
+
+   FPEmulator_InitContext =
+   (  NUMBER 0x40485 "Initialises a floating point context - FPEmulator 4.12+",
+      ENTRY
+      (  R0 = FPEmulator_Context: context
+   )  ),
+
+   FPEmulator_ExceptionDump =
+   (  NUMBER 0x40486 "Returns the address of the floating point register dump - FPEmulator 4.12+",
+      EXIT
+      (  R0! = .Ref FPEmulator_RegisterDump: register_dump
+   )  ),
+
+   FPEmulator_Abort =
+   (  NUMBER 0x40487 "Aborts any incomplete floating point processing - FPEmulator 4.12+",
+      ENTRY
+      (  R0 = FPEmulator_Context: context,
+         R1 = .Int: r12_value,
+         R2 = .Int: pc_value
+      ),
+      EXIT
+      (  R0! = .Ref .Data: frame
+   )  ),
+
+   FPEmulator_LoadContext =
+   (  NUMBER 0x40488 "Loads a floating point context - FPEmulator 4.12+",
+      ENTRY
+      (  R0 = FPEmulator_Context: context,
+         R1 -> FPEmulator_RegisterDump: register_dump
+   )  ),
+
+   FPEmulator_SaveContext =
+   (  NUMBER 0x40489 "Saves the contents of a floating point context - FPEmulator 4.12+",
+      ENTRY
+      (  R0 = FPEmulator_Context: context,
+         R1 = .Ref FPEmulator_RegisterDump: register_dump,
+         R2 = .Int: pc_value
+      ),
+      EXIT
+      (  R0! = .Bool: has_exception
+   )  )

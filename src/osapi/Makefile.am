@@ -25,6 +25,7 @@ BUILT_SOURCES = \
     basictrans.c basictrans.h basictrans.e \
     fileswitch.c fileswitch.h fileswitch.e \
     font.c font.h font.e \
+    fpemulator.c fpemulator.h fpemulator.e \
     hourglass.c hourglass.h hourglass.e \
     messagetrans.c messagetrans.h messagetrans.e \
     osbyte.c osbyte.h osbyte.e \

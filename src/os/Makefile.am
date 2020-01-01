@@ -6,6 +6,7 @@ INCLUDES = -I$(srcdir)/../oslib -I$(srcdir)/../include -I.. \
 libos_a_SOURCES = \
     basictrans.c \
     fileswitch.c \
+    fpemulator.c \
     hourglass.c \
     messagetrans.c \
     misc.c \

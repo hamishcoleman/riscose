@@ -470,7 +470,6 @@ os_error *xos_set_env (void *exit_handler,
 
 os_error *xos_int_on (void)
 {
-  error("*** SWI unimplemented\n");
   return 0;
 }
 
@@ -484,7 +483,6 @@ os_error *xos_int_on (void)
 
 os_error *xos_int_off (void)
 {
-  error("*** SWI unimplemented\n");
   return 0;
 }
 
@@ -1876,7 +1874,12 @@ os_error *xos_read_dynamic_area (os_dynamic_area_no area,
       int *size,
       int *size_limit)
 {
-  error("*** SWI unimplemented\n");
+  *area_start = 0;
+  *size       = 0;
+  if (area & 0x80) {
+      *size_limit = 0;
+  }
+
   return 0;
 }
 

@@ -177,7 +177,7 @@ os_error *xos_readc (char *c,
 os_error *xos_cli (char *command)
 {
   if (!strcmp(command, "RMEnsure SharedUnixLibrary 1.07 RMLoad System:Modules.SharedULib") || !strcmp(command, "RMEnsure SharedUnixLibrary 1.07 RMLoad UnixLib:Modules.SharedULib") || !strcmp(command, "RMEnsure SharedUnixLibrary 1.07 Error XYZ")) {
-      fprintf("*%s ignored", command);
+      fprintf(stderr, "*%s ignored", command);
       return 0;
   }
   error("*** '*%s' unimplemented\n", command);

@@ -176,7 +176,11 @@ os_error *xos_readc (char *c,
 
 os_error *xos_cli (char *command)
 {
-  error("*** SWI unimplemented\n");
+  if (!strcmp(command, "RMEnsure SharedUnixLibrary 1.07 RMLoad System:Modules.SharedULib") || !strcmp(command, "RMEnsure SharedUnixLibrary 1.07 RMLoad UnixLib:Modules.SharedULib") || !strcmp(command, "RMEnsure SharedUnixLibrary 1.07 Error XYZ")) {
+      fprintf("*%s ignored", command);
+      return 0;
+  }
+  error("*** '*%s' unimplemented\n", command);
   return 0;
 }
 

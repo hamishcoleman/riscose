@@ -51,6 +51,7 @@ static hash *registered_swi;
     X(osfile) \
     X(osword) \
     X(sharedclibrary) \
+    X(sharedunixlibrary) \
     X(taskwindow) \
     X(wimpreadsysinfo)
 

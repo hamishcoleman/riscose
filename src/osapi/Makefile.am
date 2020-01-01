@@ -34,6 +34,7 @@ BUILT_SOURCES = \
     osmodule.c osmodule.h osmodule.e \
     osspriteop.c osspriteop.h osspriteop.e \
     osword.c osword.h osword.e \
+    sharedunixlibrary.c sharedunixlibrary.h sharedunixlibrary.e \
     taskwindow.c taskwindow.h taskwindow.e \
     wimp.c wimp.h wimp.e \
     wimpreadsysinfo.c wimpreadsysinfo.h wimpreadsysinfo.e

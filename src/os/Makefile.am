@@ -16,6 +16,7 @@ libos_a_SOURCES = \
     osfile.c \
     osword.c \
     sharedclib.c \
+    sharedunixlibrary.c \
     taskwindow.c \
     utilitymod.c \
     wimpreadsysinfo.c \

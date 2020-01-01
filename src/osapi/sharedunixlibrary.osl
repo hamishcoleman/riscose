@@ -1,0 +1,35 @@
+TITLE SharedUnixLibrary;
+AUTHOR "Dave Lambley, dave@lambley.me.uk";
+
+// Data from https://git.sysadninjas.net/riscos/gccsdk-conversion/blob/73edffdf3aa453a02aa53247877ad5d7388cb107/gcc/unixlib/source/clib/unixlib/asm_dec.s
+
+NEEDS OS;
+
+CONST
+   Error_SharedUnixLibraryUnknownSWI = .Bits: &81a400,
+   Error_SharedUnixLibraryUnknownKey = .Bits: &81a401,
+   Error_SharedUnixLibraryStillActive = .Bits: &81a402,
+   Error_SharedUnixLibraryTooOld = .Bits: &81a403,
+
+   Error_SharedUnixLibraryFatalError = .Bits: &81a43b,
+   Error_SharedUnixLibrary_NoFPE = .Bits: &81a3c,
+   Error_SharedUnixLibraryNotRecentEnough = .Bits: &81a43d,
+   Error_SharedUnixLibraryNotEnoughMem = .Bits: &81a43e,
+   Error_SharedUnixLibraryNoCallASWI = .Bits: &81a43f;
+
+SWI SharedUnixLibrary_RegisterUpCall = ( NUMBER &55c80 );
+SWI SharedUnixLibrary_DeRegisterUpCall = ( NUMBER &55c81 );
+SWI SharedUnixLibrary_SetValue = ( NUMBER &55c82 );
+SWI SharedUnixLibrary_Count = ( NUMBER &55c83 );
+
+SWI SharedUnixLibrary_Initialise = ( NUMBER &55c84,
+   ENTRY (
+      R0 = .Int: version_required
+   ),
+   EXIT (
+      R0 = .Int: proc,
+      R1 -> .Asm: upcall_handler_addr,
+      R2 = .Ref .Data: upcall_handler_r12
+   )
+)
+

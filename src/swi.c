@@ -53,6 +53,7 @@ static hash *registered_swi;
     X(sharedclibrary) \
     X(sharedunixlibrary) \
     X(taskwindow) \
+    X(territory) \
     X(wimpreadsysinfo)
 
 #define X(area) void area ## _swi_register(void);

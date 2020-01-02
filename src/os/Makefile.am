@@ -18,6 +18,7 @@ libos_a_SOURCES = \
     sharedclib.c \
     sharedunixlibrary.c \
     taskwindow.c \
+    territory.c \
     utilitymod.c \
     wimpreadsysinfo.c \
     vdu.c

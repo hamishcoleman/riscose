@@ -36,6 +36,7 @@ BUILT_SOURCES = \
     osword.c osword.h osword.e \
     sharedunixlibrary.c sharedunixlibrary.h sharedunixlibrary.e \
     taskwindow.c taskwindow.h taskwindow.e \
+    territory.c territory.h territory.e \
     wimp.c wimp.h wimp.e \
     wimpreadsysinfo.c wimpreadsysinfo.h wimpreadsysinfo.e
 libosapi_a_SOURCES = $(BUILT_SOURCES)

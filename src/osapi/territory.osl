@@ -442,39 +442,6 @@ SWI Territory_ReadSymbols =
       ABSENT
    );
 
-SWI Territory_ReadBooleanSymbols =
-   (  NUMBER 0x4305E "Returns various boolean information telling you how to
-            format numbers",
-      ENTRY
-      (  R0 = Territory_T: territory,
-         R1 = Territory_SymbolNo: symbol_no
-      ),
-      EXIT
-      (  R0! = .Bool: symbol
-   )  );
-
-SWI Territory_ReadIntegerSymbols =
-   (  NUMBER 0x4305E "Returns various integer information telling you how to
-            format numbers",
-      ENTRY
-      (  R0 = Territory_T: territory,
-         R1 = Territory_SymbolNo: symbol_no
-      ),
-      EXIT
-      (  R0! = .Int: symbol
-   )  );
-
-SWI Territory_ReadStringSymbols =
-   (  NUMBER 0x4305E "Returns various string information telling you how to
-            format numbers",
-      ENTRY
-      (  R0 = Territory_T: territory,
-         R1 = Territory_SymbolNo: symbol_no
-      ),
-      EXIT
-      (  R0! -> .String: symbol
-   )  );
-
 SWI Territory_ReadCalendarInformation =
    (  NUMBER 0x4305F "Returns various information about the given
             territory's calendar",

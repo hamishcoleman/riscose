@@ -67,8 +67,8 @@ CONST
    Error_TerritoryUnknownAlphabet  = .Bits: &191,
    Error_NoTerritory               = .Bits: &192;
 
-TYPE
-   Territory_Data = .Struct ([43] .Asm: e);
+//TYPE
+//   Territory_Data = .Struct ([43] .Asm: e);
 
 TYPE
    Territory_Ordinals =
@@ -115,7 +115,7 @@ SWI Territory_Register =
             territories",
       ENTRY
       (  R0 = Territory_T: territory,
-         R1 -> Territory_Data: entries,
+         R1 -> .Data: entries,
          R2 = .Ref Void: workspace
    )  );
 

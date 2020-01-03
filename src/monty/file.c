@@ -64,7 +64,7 @@ char *temp_file(char *use)
         if ((dir = getenv("TMPDIR")) == NULL) {
             dir = "/tmp";
         }
-        sprintf(pid, "%0*d", DIM(pid) - 1, getpid());
+        sprintf(pid, "%06d", getpid());
     }
 
     tmp = mstrprintf("%s/%s.%s.%s", dir, progname, pid, use);

@@ -6,10 +6,14 @@
  * Created by defmod, riscose version 1.01. */
 
 #include <stdio.h>
+#include <assert.h>
+#include <ctype.h>
 
 #include "monty/monty.h"
 #include "types.h"
 #include "territory.h"
+#include "mem.h"
+
 
 /* ---- territory_swi_register_extra -------------------------------- */
 
@@ -262,7 +266,59 @@ os_error *xterritory_character_property_table(territory_t territory,
     territory_character_property property,
     territory_property_table **table)
 {
-    error("swi XTerritory_CharacterPropertyTable unimplemented.\n");
+    static territory_property_table *map[10];
+
+    if (property < 0 || property > 10) {
+        error("Bad character property\n");
+        return NULL;
+    }
+    if (!map[property]) {
+        map[property] = (territory_property_table *) mem_rma_alloc(sizeof(territory_property_table));
+
+        for (int c=0; c<256; c++) {
+            int out;
+            switch (property) {
+                case 0:
+                    out = iscntrl(c);
+                    break;
+                case 1:
+                    out = isupper(c);
+                    break;
+                case 2:
+                    out = islower(c);
+                    break;
+                case 3:
+                    out = isalpha(c);
+                    break;
+                case 4:
+                    out = ispunct(c);
+                    break;
+                case 5:
+                    out = isspace(c);
+                    break;
+                case 6:
+                    out = isdigit(c);
+                    break;
+                case 7:
+                    out = isxdigit(c);
+                    break;
+                case 8:
+                    out = isalpha(c) && (c > 127);
+                    break;
+                case 9:
+                    out = 1;
+                    break;
+                case 10:
+                    out = 0;
+                    break;
+                default:
+                    assert(1==0);
+                    break;
+            }
+            map[property]->p[c] = out ? 0xff : 0x00;
+        }
+    }
+    *table = map[property];
 
     return NULL;
 }
@@ -272,17 +328,32 @@ os_error *xterritory_character_property_table(territory_t territory,
 os_error *xterritory_lower_case_table(territory_t territory,
     char **table)
 {
-    error("swi XTerritory_LowerCaseTable unimplemented.\n");
+    static char *lower_case_table = NULL;
+    if (!lower_case_table) {
+        lower_case_table = mem_rma_alloc(sizeof(char)*256);
+        for (int c=0; c<256; c++) {
+            lower_case_table[c] = tolower(c);
+        }
+    }
+    *table = lower_case_table;
 
     return NULL;
 }
 
 /* ---- xterritory_upper_case_table --------------------------------- */
 
+
 os_error *xterritory_upper_case_table(territory_t territory,
     char **table)
 {
-    error("swi XTerritory_UpperCaseTable unimplemented.\n");
+    static char *upper_case_table = NULL;
+    if (!upper_case_table) {
+        upper_case_table = mem_rma_alloc(sizeof(char)*256);
+        for (int c=0; c<256; c++) {
+            upper_case_table[c] = toupper(c);
+        }
+    }
+    *table = upper_case_table;
 
     return NULL;
 }

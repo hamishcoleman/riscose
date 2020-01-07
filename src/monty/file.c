@@ -129,10 +129,10 @@ FILE *fopenrz(char *path, int *ispipe)
         char *zcat;
     } compressor;
     static compressor catter[] = {
-        ".Z", "compress -dc",
-        ".gz", "GZIP= gzip -dc",
-        ".bz2", "bzip2 -dc",
-        ".lzo", "lzop -dc",
+        {".Z", "compress -dc"},
+        {".gz", "GZIP= gzip -dc"},
+        {".bz2", "bzip2 -dc"},
+        {".lzo", "lzop -dc"},
     };
     char *end;
     compressor *cat;

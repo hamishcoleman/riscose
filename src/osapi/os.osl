@@ -15,7 +15,7 @@ TYPE
                               this symbol for binary compatibility. To revert to legacy bahaviour,
                               #define OSLIB_F8 during compilation.",
    OS_FW       	     = .Bits "Wide (32-bit) File handle",
-   OS_Mode             "Mode number",
+   OS_Mode           = .Int  "Mode number",
    OS_GCOL           = .Byte "Graphical colour, 6 or 8 bits",
    OS_Tint           = .Byte "Graphical tint",
    OS_Action         = .Byte "Graphical action",

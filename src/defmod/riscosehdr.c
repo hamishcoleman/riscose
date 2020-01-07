@@ -82,9 +82,8 @@ void riscose_header_output
    def_t     t;
    def_s     s;
    char      c_name [def_ID_LIMIT + 1];
-   void     *context;
+   int       context;
    int       i, rc = 0;
-   time_t    now;
    osbool    start;
 
    file = stdout;
@@ -394,7 +393,7 @@ void riscose_header_output
                {
                   if ((rc = fprintf (file,
                         "#define %.*s_SIZEOF%s(N) \\\n   (",
-                        suffix - macro_name, macro_name, suffix)) < 0)
+                        (int) (suffix - macro_name), macro_name, suffix)) < 0)
                      goto finish;
                }
                else

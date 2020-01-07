@@ -24,7 +24,7 @@ void vstrprintf(str *s, char *fmt, va_list args)
 
     f = fmt;
     array_pop(s);
-    while (c = *f++) {
+    while ((c = *f++)) {
         if (c != '%') {
             array_push(s, c);
             continue;

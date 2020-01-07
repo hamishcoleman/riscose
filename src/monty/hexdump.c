@@ -8,7 +8,7 @@
 #include "monty.h"
 #include "hexdump.h"
 
-int hexdump(FILE *fp, void *p, int len, int base)
+int hexdump(FILE *fp, void *p, size_t len, void *base)
 {
     static char line[] =
         "00000000  xx xx xx xx  xx xx xx xx  "
@@ -18,6 +18,7 @@ int hexdump(FILE *fp, void *p, int len, int base)
     int thistime;
     char *l;
     int col;
+    size_t place = 0;
 
     /*
 0         1         2         3         4         5         6         7
@@ -25,9 +26,9 @@ int hexdump(FILE *fp, void *p, int len, int base)
 xxxxxxxx  xx xx xx xx  xx xx xx xx  xx xx xx xx  xx xx xx xx  ........ ........
      */
 
-    base -= (int)p;
+    place = base - p;
     for (s = p; len; len -= thistime) {
-        sprintf(line, "%08x", (unsigned int)(s + base));
+        sprintf(line, "%08zx", (size_t)(s + place));
         line[8] = ' ';
         thistime = len > 16 ? 16 : len;
 

@@ -42,7 +42,7 @@ void riscose_template_output(char *title, char *author,
     char *swi;
     def_s s;
     char c_name[def_ID_LIMIT + 1];
-    void *context;
+    int context;
     int i;
 
     def_as_extern(c_name, title);

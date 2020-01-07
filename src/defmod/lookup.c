@@ -197,34 +197,34 @@ void lookup_insert(lookup_t t, char *s, void *ptr)
    strcpy(e->token, s); /*case may have changed*/
    e->ptr = ptr;
 
-finish:
+//finish:
 //   if (error != NULL)
 //      tracef ("ERROR: %s (error 0x%X)\n" _ error->errmess _ error->errnum);
    return;
 }
 /*------------------------------------------------------------------------*/
 
-void *lookup_enumerate
+int lookup_enumerate
 (
    lookup_t   t,
    char     **token,
    void     **ptr,
-   void     **context
+   int       *context
 )
 {
 //   tracef ("lookup_enumerate\n");
 
-   if ((int) *context < t->count &&
-         t->entries [(int) *context].token != NULL)
+   if (*context < t->count &&
+         t->entries [*context].token != NULL)
    {
-      if (token != NULL) *token = t->entries [(int) *context].token;
-      if (ptr   != NULL) *ptr   = t->entries [(int) *context].ptr;
+      if (token != NULL) *token = t->entries [*context].token;
+      if (ptr   != NULL) *ptr   = t->entries [*context].ptr;
 
-      *context = (void *) ((int) *context + 1);
+      *context = ( *context + 1);
    }
    else
       /*Not found.*/
-      *context = NULL;
+      *context = 0;
 
    return *context;
 }

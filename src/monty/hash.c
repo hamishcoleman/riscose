@@ -73,7 +73,7 @@ hash_elem *hash_add(hash *hash, char *key, int keylen, void *datum)
 
     if (DEBUG_HASH) {
         debug("hash_add(%x, %x, %d, %x)\n", hash, key, keylen, datum);
-        hexdump(debugf, key, keylen, (int)key);
+        hexdump(debugf, key, keylen, key);
     }
 
     if (hash->numelem >= hash->numbucket * 2) {
@@ -81,7 +81,7 @@ hash_elem *hash_add(hash *hash, char *key, int keylen, void *datum)
     }
 
     keyhash = key_to_hash(key, keylen);
-    bucket = hash->bucket + (keyhash & hash->numbucket - 1);
+    bucket = hash->bucket + (keyhash & (hash->numbucket - 1));
     SEARCH_CHAIN(*bucket);
     if (e) {
         error("hash_add: key already present in hash\n");
@@ -179,10 +179,10 @@ hash_elem *hash_lookup(hash *hash, char *key, int keylen)
     hash_elem *e;
 
     if (DEBUG_HASH) {
-        hexdump(debugf, key, keylen, (int)key);
+        hexdump(debugf, key, keylen, key);
     }
     keyhash = key_to_hash(key, keylen);
-    SEARCH_CHAIN(hash->bucket[keyhash & hash->numbucket - 1]);
+    SEARCH_CHAIN(hash->bucket[keyhash & (hash->numbucket - 1)]);
     DEBUG(HASH, ("hash_lookup returns %x\n", e));
 
     return e;
@@ -228,11 +228,11 @@ int walk_hash(hash *hash, int (*visit)(hash_elem *elem, void *closure),
 {
     int bucket;
     hash_elem *e;
-    int i;
 
     for (bucket = 0; bucket < hash->numbucket; bucket++) {
         for (e = hash->bucket[bucket]; e; e = e->next) {
-            if (i = (*visit)(e, closure)) {
+            int i = (*visit)(e, closure);
+            if (i) {
                 return i;
             }
         }
@@ -258,7 +258,7 @@ static void dump_hash(hash *hash)
             debug("        e: %x\n", e);
             debug("        key: %x keylen: %d hash: %x datum: %x\n",
                 e->key, e->keylen, e->hash, e->datum);
-            hexdump(debugf, e->key, e->keylen, (int)e->key);
+            hexdump(debugf, e->key, e->keylen, e->key);
             found++;
         }
     }

@@ -24,7 +24,7 @@ void riscose_errors_output(char *title, char *author, lookup_t needses,
     lookup_t needsatends, lookup_t consts, lookup_t types,
     lookup_t swis)
 {
-    void *context;
+    int context;
     char *cnst;
     def_c c;
     char c_name[def_ID_LIMIT + 1];

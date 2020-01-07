@@ -27,7 +27,7 @@ extern osbool is_swi(char* s);
 ** look at the wide version rather than the non-wide one.  Otherwise leave
 ** everything unchanged.
 */
-extern void check_for_wide_version(lookup_t swis, char** swi, def_s* s, void** context);
+extern void check_for_wide_version(lookup_t swis, char** swi, def_s* s, int* context);
 
 void print_start_of_file_comment(int warn);
 

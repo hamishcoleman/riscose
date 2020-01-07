@@ -2,7 +2,7 @@
 
 /* hexdump len bytes at p to fp with addressing column starting at
  * base. */
-int hexdump(FILE *fp, void *p, int len, int base);
+int hexdump(FILE *fp, void *p, size_t len, void *base);
 
 /* print each of len bytes at p to fp as two hex digits. */
 int hexstring(FILE *fp, void *p, int len);

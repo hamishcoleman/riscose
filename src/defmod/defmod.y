@@ -42,6 +42,7 @@ TV    20000503    |bool| replaced by |osbool|
 #include "monty/monty.h"
 #include "monty/mem.h"
 #include "monty/file.h"
+#include "monty/hexdump.h"
 
    /*From OSLib*/
    #include "types.h"
@@ -213,7 +214,7 @@ const:
       }
 
       if (c == NULL)
-      {  char errmess [256];
+      {  char errmess [274];
 
          sprintf (errmess, "const \"%s\" undefined", $1);
          yyerror (errmess);
@@ -821,7 +822,7 @@ ws_item_SEQUENCE_OPTION: ws_item_SEQUENCE {} | EMPTY {};
 
 /*sequence*/
 bit_SEQUENCE: bit {$$ = $1 - '0';} |
-      bit_SEQUENCE bit {$$ = $1 << 1 | $2 - '0';};
+      bit_SEQUENCE bit {$$ = ($1 << 1) | ($2 - '0');};
 commentchar_SEQUENCE: commentchar {} | commentchar_SEQUENCE commentchar {};
 digit_SEQUENCE: digit {$$ = $1 - '0';} |
       digit_SEQUENCE digit {$$ = 10*$1 + $2 - '0';};

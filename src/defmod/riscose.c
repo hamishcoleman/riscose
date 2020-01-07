@@ -55,9 +55,9 @@ osbool is_swi(char* s)
 ** look at the wide version rather than the non-wide one.  Otherwise leave
 ** everything unchanged.
 */
-void check_for_wide_version(lookup_t swis, char** swi, def_s* s, void** context)
+void check_for_wide_version(lookup_t swis, char** swi, def_s* s, int* context)
 {
-  void* this_context = *context;
+  int this_context = *context;
   char* this_swi;
   def_s this_s;
   int n;
@@ -110,7 +110,7 @@ void print_title_comment(char *s)
     static char d[] =
         "------------------------------------------------------------";
 
-    printf("/* ---- %s %.*s */\n\n", s, 60 - strlen(s), d);
+    printf("/* ---- %s %.*s */\n\n", s, (int) (60 - strlen(s)), d);
 
     return;
 }
@@ -120,7 +120,7 @@ void print_title_comment(char *s)
 /*Prints a declaration of |v| as an object of type |t|, using |tag| as the
    structure tag.  */
 
-#define INDENT 4 * (nest + 1), ""
+#define sINDENT 4 * (nest + 1), ""
 
 int Print_Decl(def_t t, char *tag, char *v, int macro,
     int nest)
@@ -190,14 +190,14 @@ int Print_Decl(def_t t, char *tag, char *v, int macro,
             if (tag) {
                 fprintf(file, " %s", tag);
             }
-            fprintf(file, "%s\n%*s{  ", lineend, INDENT);
+            fprintf(file, "%s\n%*s{  ", lineend, sINDENT);
 
             /* variable-size data structure ending in ellipsis. */
             if (t->tag == def_TYPE_STRUCT && t->data.list.base) {
                 char base[def_ID_LIMIT + 1];
                 def_as_macro(base, t->data.list.base->data.id);
                 fprintf(file, "%s_MEMBERS%s\n%*s   ", base, lineend,
-                    INDENT);
+                    sINDENT);
             }
             for (i = 0; i < t->data.list.count; i++) {
                 if (i == t->data.list.count - 1 &&
@@ -217,7 +217,7 @@ int Print_Decl(def_t t, char *tag, char *v, int macro,
                         t->data.list.members[i]->name, macro, nest + 1);
                 }
 
-                fprintf(file, ";%s\n%*s", lineend, INDENT);
+                fprintf(file, ";%s\n%*s", lineend, sINDENT);
 
                 if (i != t->data.list.count - 1) {
                     fprintf(file, "    ");
@@ -225,7 +225,7 @@ int Print_Decl(def_t t, char *tag, char *v, int macro,
             }
 
             if (v) {
-                fprintf(file, "}%s\n%*s%s", lineend, INDENT, v);
+                fprintf(file, "}%s\n%*s%s", lineend, sINDENT, v);
             } else {
                 fprintf(file, "}");
             }

@@ -115,25 +115,19 @@ void riscose_osapi_output
    def_s     s_a;
    def_s     s_b;
    char      c_name [def_ID_LIMIT + 1];
-   void     *context;
-   void     *context_a;
-   void     *context_b;
+   int       context;
+   int       context_a;
+   int       context_b;
    int       i, rc = 0;
    osbool    start;
    osbool    to_host;
-   int       first_swi = -1;
-   osbool    reason = FALSE;
-   osbool    start_a;
-   time_t    now;
    osbool    first;
    char     *pending_swi;
-   osbool    r;
    osbool    if_written;
    osbool    found;
    int*      done;
    int       done_size;
    int       done_n;
-   osbool    have_done;
    int       n;
 
    file = stdout;
@@ -469,7 +463,6 @@ void riscose_osapi_output
 
    context_a = 0;
     while (lookup_enumerate(swis, &swi_a, (void **) &s_a, &context_a)) {
-     void *dbg;
 
      check_for_wide_version(swis, &swi_a, &s_a, &context_a);
 

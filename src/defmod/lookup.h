@@ -57,10 +57,10 @@ void lookup_insert(lookup_t, /* table */
                               );
 
 /* sequentially retrieve all tokens in the table */
-void *lookup_enumerate(lookup_t, /* table */
+int lookup_enumerate(lookup_t, /* table */
                                     char **,  /* destination for pointer to token */
                                     void **,  /* destination for pointer to data item */
-                                    void **   /* context pointer; start with 0;
+                                    int   *   /* context pointer; start with 0;
                                               ** updated to for each iteration
                                               ** 0 if no more found
                                               */

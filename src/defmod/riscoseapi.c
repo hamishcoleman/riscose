@@ -75,7 +75,7 @@ void condition(FILE* f, char* swi, def_s s)
             fprintf(f, "(ARM_R%d & 0x%X)", i, s->constants[i]);
             break;
           case def_OP_ADDS:
-            fprintf(f, "(*((int *) ARM_R%d) == 0x%X)", i, s->constants[i]);
+            fprintf(f, "(*MEM_TOHOST(ARM_R%d) == 0x%X)", i, s->constants[i]);
             break;
           case def_OP_EXCLUSIVELY_DISJOINS:
             /* FIXME --- don't know what to do with this */

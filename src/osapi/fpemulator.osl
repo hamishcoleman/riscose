@@ -5,7 +5,7 @@ AUTHOR "Jonathan Coxhead, jonathan@doves.demon.co.uk, 29 Apr 1994";
 NEEDS OS;
 
 TYPE
-   FPEmulator_Context;
+   FPEmulator_Context = .Bits;
 
 CONST
    FPEmulator_NoContext      = FPEmulator_Context: 0 "FPEmulator 4.12+",

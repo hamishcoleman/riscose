@@ -148,7 +148,10 @@ void riscose_osapi_output
         "#include \"arm.h\"\n"
         "#include \"mem.h\"\n"
         "#include \"%s.h\"\n"
-        "\n", c_name);
+        "\n"
+        "extern void %s_swi_register_extra(void);\n"
+        "void %s_swi_register(void);\n"
+        "\n", c_name, c_name, c_name);
 
    /* Write a marshalling SWI handler for each SWI */
    context = 0;

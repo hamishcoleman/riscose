@@ -179,7 +179,7 @@ static void swi_number_to_name(WORD num, char *buf)
         }
         strcpy(buf, r->name);
     } else {
-        sprintf(buf, "&%lx", num);
+        sprintf(buf, "&%x", num);
     }
 
     return;

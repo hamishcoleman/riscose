@@ -255,7 +255,7 @@ void ARMul_Abort(ARMul_State *state, ARMword vector)
        SETABORT(IBIT,state->prog32Sig?UNDEF32MODE:SVC26MODE) ;
        ARMul_CPSRAltered(state) ;
        state->Reg[14] = temp - 4 ;
-       fprintf(stderr,"DAG: In ARMul_Abort: Taking undefined instruction trap R[14] being set to: 0x%08lu\n",
+       fprintf(stderr,"DAG: In ARMul_Abort: Taking undefined instruction trap R[14] being set to: 0x%08u\n",
                state->Reg[14]);
        break ;
     case ARMul_SWIV : /* Software Interrupt */

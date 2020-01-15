@@ -166,7 +166,7 @@ ARMul_Emulate26 (register ARMul_State * state)
 	    }
 	  if (state->Debug)
 	    {
-	      fprintf (stderr, "At %08lx Instr %08lx Mode %02lx\n", pc, instr, state->Mode);
+	      fprintf (stderr, "At %08x Instr %08x Mode %02x\n", pc, instr, state->Mode);
 	      (void) fgetc (stdin);
 	    }
 	}

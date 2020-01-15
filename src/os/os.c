@@ -22,19 +22,19 @@
 #include "arm.h"
 #include "swi.h"
 
-WORD os_call_a_swi(WORD n)
+os_error* os_call_a_swi(WORD n)
 {
   swi_trap(ARM_R10);
   return 0;
 }
 
-WORD os_call_a_swi_r12(WORD n)
+os_error* os_call_a_swi_r12(WORD n)
 {
   swi_trap(ARM_R12);
   return 0;
 }
 
-WORD os_write_s(WORD n)
+os_error* os_write_s(WORD n)
 {
   WORD pc = ARM_R15 & 0x02fffffc;
   char* p = (char *)MEM_TOHOST(pc);

@@ -42,14 +42,14 @@ int
 main(int argc, char **argv)
 {
     static struct option long_options[] = {
-        "help", no_argument, NULL, 'h',
-        "version", no_argument, NULL, 'V',
-        "verbose", no_argument, NULL, 'v',
-        "debug", required_argument, NULL, 'D',
-        "module", no_argument, NULL, 'm',
-        "utility", no_argument, NULL, 'u',
-        "wimpslot", required_argument, NULL, 'w',
-        0
+        {"help", no_argument, NULL, 'h'},
+        {"version", no_argument, NULL, 'V'},
+        {"verbose", no_argument, NULL, 'v'},
+        {"debug", required_argument, NULL, 'D'},
+        {"module", no_argument, NULL, 'm'},
+        {"utility", no_argument, NULL, 'u'},
+        {"wimpslot", required_argument, NULL, 'w'},
+        {0}
     };
   int module=0, c;
   int utility=0;

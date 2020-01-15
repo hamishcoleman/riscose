@@ -132,6 +132,32 @@ static char *basictrans_errors[] = {
   "No room for library"
 };
 
+// https://www.riscosopen.org/wiki/documentation/show/BASICTrans%20message%20numbers
+static char *basictrans_messages[] = {
+    "Warning: unmatched ()",
+    "Warning: line number too big",
+    "Warning: unmatched \"",
+    "Attempt to use badly nested error handler (or corrupt R13)",
+    "Out of range value assigned to PAGE",
+    "Out of range value assigned to LOMEM",
+    "Out of range value assigned to HIMEM",
+    "Program renumbered",
+    "Bad program",
+    "Not enough room to convert this program to text",
+    "Static Integer variables:@% = \"",
+    "Dynamic variables:",
+    "Procedures:",
+    "Functions:",
+    "Libraries:",
+    "Installed libraries:",
+    "Current Overlay (from \"",
+    "BASIC -help activated (use HELP at the > prompt for more help):",
+    "BASIC64 -help activated (use HELP at the > prompt for more help):",
+    "Unknown keyword.",
+    "BASIC [-chain] <filename> to run a file (text/tokenised).\nBASIC -quit <filename> to run a file (text/tokenised) and quit when done.\nBASIC -load <filename> to start with a file (text/tokenised).\nBASIC @xxxxxxxx,xxxxxxxx to start with in-core text/tokenised program.\nBASIC -chain @xxxxxxxx,xxxxxxxx to run in-core text/tokenised program.",
+    "BASIC64 [-chain] <filename> to run a file (text/tokenised).\nBASIC64 -quit <filename> to run a file (text/tokenised) and quit when done.\nBASIC64 -load <filename> to start with a file (text/tokenised).\nBASIC64 @xxxxxxxx,xxxxxxxx to start with in-core text/tokenised program.\nBASIC64 -chain @xxxxxxxx,xxxxxxxx to run in-core text/tokenised program.",
+};
+
 void basictrans_swi_register_extra(void)
 {
 
@@ -208,5 +234,26 @@ os_error *xbasictrans_message (int message_no,
       int arg1,
       int arg2)
 {
-    return ERR_BASICTRANS_UNKNOWN_OPERATION();
+    if (message_no > 0 && message_no < DIM(basictrans_messages)) {
+        printf("%s\n", basictrans_messages[message_no]);
+        return 0;
+    }
+
+    switch (message_no) {
+        case 22:
+            printf("Starting with %d bytes free\n", arg0);
+            return 0;
+        case 23:
+            printf("Failed with %s on line %d\n", (char *) MEM_TOHOST(arg0), arg1);
+            return 0;
+        case 24:
+            printf("%s at line %d\n", (char *) MEM_TOHOST(arg1), arg0);
+            return 0;
+        case 25:
+            printf("The program size is %d bytes, the variables use %d bytes. There are %d bytes of memory remaining.\n", arg0, arg1, arg2);
+            return 0;
+        default:
+            fprintf(stderr, "Unknown message %d\n", message_no);
+            return ERR_BASICTRANS_UNKNOWN_OPERATION();
+    }
 }

@@ -199,7 +199,6 @@ RISCOSE_DEBUG_HELP
 static void utility_run(char *file, mem_private *priv)
 {
   void *base;
-  WORD len;
   WORD workspace;
 
   /* A utility starts executing with (I think):
@@ -213,7 +212,6 @@ static void utility_run(char *file, mem_private *priv)
     error("utility load of `%s' failed\n", file);
 
   base = mem_rma_alloc(file_size(file));
-  len  = file_size(file);
   if (base == NULL)
     error("no room in RMA for utility '%s'\n", file);
   file_loadat(file, base);

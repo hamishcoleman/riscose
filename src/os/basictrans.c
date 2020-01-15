@@ -9,6 +9,7 @@
 */
 
 #include <stdio.h>
+#include <string.h>
 #include <monty/monty.h>
 #include <monty/mem.h>
 #include "types.h"

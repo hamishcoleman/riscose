@@ -100,7 +100,7 @@ heap_dump(heap_t *h)
 {
   fprintf(stderr, "\nheap_t     Magic    Address    Size     Gap      Limit     Next\n");
   while (h) {
-    fprintf(stderr, "%8p %8lu %8p %8lu %8d %8p %8p\n",
+    fprintf(stderr, "%8p %8lu %8p %8lu %8zd %8p %8p\n",
                     h, h->magic, h->addr, h->size, GAP_SIZE(h), h->limit, h->next);
     h = h->next;
   }

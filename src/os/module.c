@@ -64,8 +64,6 @@ int
 module_load(char *name)
 {
   void *base;
-  WORD len;
-    WORD init;
   
   if (!file_isfile(name))
     return -1;
@@ -73,7 +71,6 @@ module_load(char *name)
 
   fprintf(stderr, "Loading module %s at host address %p\n", name, base);
 
-  len  = file_size(name);
   if (base == NULL) {
     fprintf(stderr, "FIXME: No handler for errors in module_load\n");
     return -1;
@@ -82,7 +79,7 @@ module_load(char *name)
 
   module_bases[modules] = MEM_TOARM(base);
 
-    init = MODULE_INIT(module_bases[modules]);
+    WORD init = MODULE_INIT(module_bases[modules]);
     if (init) {
         ARM_SET_R12(module_privates + modules * 4);
         arm_run_routine(init);

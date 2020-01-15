@@ -54,7 +54,7 @@ module_lookup(char *name)
   for (i=0; i!=modules; i++) {
     BYTE *base = MEM_TOHOST(module_bases[i]);
     base += ((WORD*)base)[4];
-    if (strcmp(base, name) == 0)
+    if (strcmp((char *) base, name) == 0)
       return i;
   }
   return -1;

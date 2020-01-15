@@ -226,7 +226,7 @@ static void utility_run(char *file, mem_private *priv)
   if (ARM_V_SET) {
     char *error = (char *)MEM_TOHOST(arm_get_reg(0));
 
-    printf("Utility returned an error (%ld):\n%s\n",
+    printf("Utility returned an error (%d):\n%s\n",
 	  ((WORD *) error)[0], error + 4);
   }
 }

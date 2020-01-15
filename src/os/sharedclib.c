@@ -821,7 +821,7 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB_FREOPEN:
       {
-        FILE *fh = freopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), clib_file_real(ARM_R2));
+        FILE *fh = freopen((char *) MEM_TOHOST(ARM_R0), (char *) MEM_TOHOST(ARM_R1), clib_file_real(ARM_R2));
 	/*fprintf(stderr, "reopened file %p `%s' to %p\n", MEM_TOHOST(ARM_R2), MEM_TOHOST(ARM_R0), fh);*/
         if (fh == clib_file_real(ARM_R2)) {
           ARM_SET_R0(ARM_R2);
@@ -835,7 +835,7 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB_FOPEN: /* 4-306 */
       {
-        FILE *fh = fopen(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
+        FILE *fh = fopen((char *) MEM_TOHOST(ARM_R0), (char *) MEM_TOHOST(ARM_R1));
 	/*fprintf(stderr, "opening file `%s' = %p\n", MEM_TOHOST(ARM_R0), fh);*/
         ARM_SET_R0(fh == NULL ? 0 : clib_file_new(fh));
         return 0;
@@ -854,8 +854,8 @@ swih_sharedclibrary_entry(WORD num)
     case CLIB_CLIB_SPRINTF:
       {
         format_output output;
-        output.str = MEM_TOHOST(ARM_R0);
-        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R1), 2, 0, 0, do_sprintf, &output));
+        output.str = (char *) MEM_TOHOST(ARM_R0);
+        ARM_SET_R0(split_format_string((char *) MEM_TOHOST(ARM_R1), 2, 0, 0, do_sprintf, &output));
       }
       return 0;
 
@@ -873,7 +873,7 @@ swih_sharedclibrary_entry(WORD num)
       {
         format_output output;
         output.file = stdout;
-        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R0), 1, 0, 0, do_fprintf, &output));
+        ARM_SET_R0(split_format_string((char *) MEM_TOHOST(ARM_R0), 1, 0, 0, do_fprintf, &output));
       }
       return 0;
 
@@ -882,7 +882,7 @@ swih_sharedclibrary_entry(WORD num)
       {
         format_output output;
         output.file = clib_file_real(ARM_R0);
-        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R1), 2, 0, 0, do_fprintf, &output));
+        ARM_SET_R0(split_format_string((char *) MEM_TOHOST(ARM_R1), 2, 0, 0, do_fprintf, &output));
       }
       return 0;
 
@@ -891,7 +891,7 @@ swih_sharedclibrary_entry(WORD num)
       {
         format_output output;
         output.file = stdout;
-        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R0), 1, 0, 1, do_fprintf, &output));
+        ARM_SET_R0(split_format_string((char *) MEM_TOHOST(ARM_R0), 1, 0, 1, do_fprintf, &output));
       }
       return 0;
 
@@ -899,7 +899,7 @@ swih_sharedclibrary_entry(WORD num)
       {
         format_output output;
         output.file = clib_file_real(ARM_R0);
-        ARM_SET_R0(split_format_string(MEM_TOHOST(ARM_R1), 2, 0, 1, do_fprintf, &output));
+        ARM_SET_R0(split_format_string((char *) MEM_TOHOST(ARM_R1), 2, 0, 1, do_fprintf, &output));
       }
       return 0;
 
@@ -908,7 +908,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
 
     case CLIB_CLIB_FPUTS: /* FIXME: 4-31? */
-      ARM_SET_R0(fputs(MEM_TOHOST(ARM_R0),
+      ARM_SET_R0(fputs((char *) MEM_TOHOST(ARM_R0),
                  clib_file_real(ARM_R1)));
       return 0;
 
@@ -968,7 +968,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
 
     case CLIB_CLIB_STRNCPY: /* 4-328 */
-      strncpy(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), ARM_R2);
+      strncpy((char *) MEM_TOHOST(ARM_R0), (char *) MEM_TOHOST(ARM_R1), ARM_R2);
       return 0;
 
     case CLIB_CLIB_MEMCPY: /* 4-328 */
@@ -980,20 +980,20 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
 
     case CLIB_CLIB_STRCPY: /* 4-328 */
-      strcpy(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
+      strcpy((char *) MEM_TOHOST(ARM_R0), (char *) MEM_TOHOST(ARM_R1));
       return 0;
 
     case CLIB_CLIB_STRCAT: /* 4-329 */
-      strcat(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));
+      strcat((char *) MEM_TOHOST(ARM_R0), (char *) MEM_TOHOST(ARM_R1));
       return 0;
 
     case CLIB_CLIB_STRCMP: /* 4-329 */
       /*printf("comparing `%s' with `%s'\n", MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1));*/
-      ARM_SET_R0(strcmp(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1)));
+      ARM_SET_R0(strcmp((char *) MEM_TOHOST(ARM_R0), (char *) MEM_TOHOST(ARM_R1)));
       return 0;
 
     case CLIB_CLIB_STRNCMP: /* 4-329 ? */
-      ARM_SET_R0(strncmp(MEM_TOHOST(ARM_R0), MEM_TOHOST(ARM_R1), ARM_R2));
+      ARM_SET_R0(strncmp((char *) MEM_TOHOST(ARM_R0), (char *) MEM_TOHOST(ARM_R1), ARM_R2));
       return 0;
 
     case CLIB_CLIB_MEMCHR: /* 4-330 */
@@ -1008,8 +1008,8 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB_STRPBRK: /* 4-330 ? */
       {
-       char *start = MEM_TOHOST(ARM_R0);
-       char *c = strpbrk(start, MEM_TOHOST(ARM_R1));
+       char *start = (char *) MEM_TOHOST(ARM_R0);
+       char *c = strpbrk(start, (char *) MEM_TOHOST(ARM_R1));
        if (c == NULL)
          { ARM_SET_R0(0); return 0; }
        ARM_SET_R0(ARM_R0+(c-start));
@@ -1019,7 +1019,7 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB_STRCHR: /* 4-330 ? */
       {
-       char *start = MEM_TOHOST(ARM_R0);
+       char *start = (char *) MEM_TOHOST(ARM_R0);
        char *c = strchr(start, ARM_R1);
        if (c == NULL)
          { ARM_SET_R0(0); return 0; }
@@ -1030,7 +1030,7 @@ swih_sharedclibrary_entry(WORD num)
 
     case CLIB_CLIB_STRRCHR: /* 4-330 */
       {
-       char *start = MEM_TOHOST(ARM_R0);
+       char *start = (char *) MEM_TOHOST(ARM_R0);
        char *c = strrchr(start, ARM_R1);
        if (c == NULL)
          { ARM_SET_R0(0); return 0; }
@@ -1046,7 +1046,7 @@ swih_sharedclibrary_entry(WORD num)
       {
         WORD armr0 = ARM_R0;
         BYTE *str = MEM_TOHOST(armr0);
-        WORD x = strlen(str);
+        WORD x = strlen((char *) str);
         ARM_SET_R0(x);
       }
       return 0;
@@ -1062,7 +1062,7 @@ swih_sharedclibrary_entry(WORD num)
         time_t t = *rot;
         char *ctr = ctime(&t);
         // FIXME leaks buffer
-        BYTE *riscos_ctr = mem_rma_alloc(strlen(ctr)+1);
+        char *riscos_ctr = mem_rma_alloc(strlen(ctr)+1);
         ARM_SET_R0(MEM_TOARM(riscos_ctr));
         strcpy(riscos_ctr, ctr);
       }
@@ -1075,7 +1075,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
 
     case CLIB_CLIB_TMPNAM:
-      ARM_SET_R0(MEM_TOARM(tmpnam(MEM_TOHOST(ARM_R0))));
+      ARM_SET_R0(MEM_TOARM(tmpnam((char *) MEM_TOHOST(ARM_R0))));
       return 0;
 
     case CLIB_CLIB_SWI:

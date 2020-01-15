@@ -146,7 +146,7 @@ void filehandles_init(void)
 static int
 allocNewFS(char *name, char *startup)
 {
-  if (fsRegistered == MAXFILESYSTEMS);
+  if (fsRegistered == MAXFILESYSTEMS)
     return -1;
 	
   NEW0(fileSystem[fsRegistered]);

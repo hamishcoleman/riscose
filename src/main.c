@@ -159,18 +159,18 @@ RISCOSE_DEBUG_HELP
   priv = (mem_private*) mem_get_private();
   priv->argc = argc-o+1;
     
-  sprintf(priv->cli, "%s ", file);
-  strcpy(priv->cli_split, file);
+  sprintf((char *) priv->cli, "%s ", file);
+  strcpy((char *) priv->cli_split, file);
   priv->argv[count++] = MMAP_USRSTACK_BASE+268;
   while (o != argc)
     {
-     priv->argv[count++] = MMAP_USRSTACK_BASE+268+strlen(priv->cli);
-     strcpy(priv->cli_split + strlen(priv->cli), argv[o]);
-     strcat(priv->cli, argv[o]);
-     strcat(priv->cli, " ");
+     priv->argv[count++] = MMAP_USRSTACK_BASE+268+strlen((char *) priv->cli);
+     strcpy((char *) priv->cli_split + strlen((char *) priv->cli), argv[o]);
+     strcat((char *) priv->cli, argv[o]);
+     strcat((char *) priv->cli, " ");
      o++;
     }
-  priv->cli[strlen(priv->cli)-1] = 0;
+  priv->cli[strlen((char *) priv->cli)-1] = 0;
   
   /* Run the code */
 

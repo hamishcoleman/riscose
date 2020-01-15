@@ -14,6 +14,7 @@
 #include <monty/mem.h>
 #include "types.h"
 #include "basictrans.h"
+#include "rom/rom.h"
 
 static char *basictrans_errors[] = {
   "Unknown setting of exception control",
@@ -207,9 +208,5 @@ os_error *xbasictrans_message (int message_no,
       int arg1,
       int arg2)
 {
-    static os_error unknown = {
-        0x1e6, "Unknown BASICTrans operation"
-    };
-
-    return &unknown;
+    return ERR_BASICTRANS_UNKNOWN_OPERATION();
 }

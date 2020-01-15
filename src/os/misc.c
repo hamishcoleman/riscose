@@ -459,7 +459,7 @@ void osfile(void)
       return;
       
     default:
-      printf("Unemulated OS_File %ld\n", reason);
+      printf("Unemulated OS_File %d\n", reason);
       exit(1);
     }
 }

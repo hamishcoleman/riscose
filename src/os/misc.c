@@ -439,10 +439,10 @@ void osfile(void)
     case 14:
     case 16:
     case 255: /* Load file into memory */
-      if (file_objecttype(MEM_TOHOST(ARM_R1)) == OBJECT_NOTFOUND)
+      if (file_objecttype((char *) MEM_TOHOST(ARM_R1)) == OBJECT_NOTFOUND)
         { printf("fixme: OS_File error handling\n"); exit(1); }
-      file_loadat(MEM_TOHOST(ARM_R1), MEM_TOHOST(ARM_R2));
-      ARM_SET_R0(file_objecttype(MEM_TOHOST(ARM_R1)));
+      file_loadat((char *) MEM_TOHOST(ARM_R1), (char *) MEM_TOHOST(ARM_R2));
+      ARM_SET_R0(file_objecttype((char *) MEM_TOHOST(ARM_R1)));
       printf("loaded object size %d\n", (unsigned)ARM_R4);
       /* FIXME: access bits */
       return;
@@ -452,9 +452,9 @@ void osfile(void)
     case 15:
     case 17: /* FIXME: implement various path options */
       fprintf(stderr, "FIXME: OS_File: Path options unimplemented\n");
-      ARM_SET_R0(file_objecttype(MEM_TOHOST(ARM_R1)));
+      ARM_SET_R0(file_objecttype((char *) MEM_TOHOST(ARM_R1)));
       if (ARM_R0 != OBJECT_NOTFOUND)
-        ARM_SET_R4(file_size(MEM_TOHOST(ARM_R1)));
+        ARM_SET_R4(file_size((char *) MEM_TOHOST(ARM_R1)));
       printf("`%s' size %d\n", MEM_TOHOST(ARM_R1), (unsigned)ARM_R4);
       return;
       
@@ -485,7 +485,7 @@ void osfind(void)
             case 0xC0 : flags = "w+b"; break;
         }
         
-        fh = fopen(MEM_TOHOST(ARM_R1), flags);
+        fh = fopen((char *) MEM_TOHOST(ARM_R1), flags);
         if (fh == NULL || !(riscos_fh = osfind_allocate_fh(fh)))
         {
             if (reason & 8)

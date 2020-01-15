@@ -217,7 +217,7 @@ compact_blocks(heap_t* h)
 BYTE*
 heap_block_alloc(heap_t* h, ULONG size)
 {
-  ULONG   total_space;
+  ULONG   total_space = 0;
   heap_t *cur;
   
   /*

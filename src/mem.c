@@ -68,9 +68,9 @@ typedef struct {
 static mem_state *mem;
 
 static int backtrace_in_progress=0;
-static
+inline static
 void
-arm_backtrace(void);
+arm_backtrace(void) __attribute__ ((unused));
 
 static
 int

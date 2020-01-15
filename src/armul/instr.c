@@ -222,7 +222,8 @@ instr_disassemble(word instr, address addr, pDisOptions opts) {
       /* multiply */
       if (instr&(1<<23)) {
         /* long multiply */
-        mnemonic = "UMULL\0UMLAL\0SMULL\0SMLAL" + 6*((instr>>21)&3);
+        mnemonic = "UMULL\0UMLAL\0SMULL\0SMLAL";
+        mnemonic += 6*((instr>>21)&3);
         format = "3,4,0,2";
       }
       else {
@@ -281,7 +282,8 @@ lMaybeLDRHetc:
         /* Might well be LDRH or similar. */
         if ((instr&(Wbit+Pbit))==Wbit) goto lUndefined;	/* "class E", case 1 */
         if ((instr&(Lbit+(1<<6)))==(1<<6)) goto lUndefined;	/* STRSH etc */
-        mnemonic = "STR\0LDR" + ((instr&Lbit) >> 18);
+        mnemonic = "STR\0LDR";
+        mnemonic += ((instr&Lbit) >> 18);
         if (instr&(1<<6)) *flagp++='S';
         *flagp++ = (instr&(1<<5)) ? 'B' : 'H';
         format = "3,/";
@@ -304,8 +306,8 @@ lMaybeLDRHetc:
           break;
         }
         mnemonic = "AND\0EOR\0SUB\0RSB\0ADD\0ADC\0SBC\0RSC\0"
-                   "TST\0TEQ\0CMP\0CMN\0ORR\0MOV\0BIC\0MVN" /* \0 */
-                   + (op21 >> 19);
+                   "TST\0TEQ\0CMP\0CMN\0ORR\0MOV\0BIC\0MVN"; /* \0 */
+        mnemonic += (op21 >> 19);
         /* Rd needed for all but TST,TEQ,CMP,CMN (8..11) */
         /* Rn needed for all but MOV,MVN (13,15) */
              if (op21 < ( 8<<21)) format = "3,4,*";
@@ -332,7 +334,8 @@ lMaybeLDRHetc:
     case 7:
       /* undefined or STR/LDR */
       if ((instr&Ibit) && (instr&(1<<4))) goto lUndefined;	/* "class A" */
-      mnemonic = "STR\0LDR"  + ((instr&Lbit) >> 18);
+      mnemonic = "STR\0LDR";
+      mnemonic += ((instr&Lbit) >> 18);
       format   = "3,/";
       if (instr&Bbit) *flagp++='B';
       if ((instr&(Wbit+Pbit))==Wbit) *flagp++='T';
@@ -341,12 +344,14 @@ lMaybeLDRHetc:
     case 8:
     case 9:
       /* STM/LDM */
-      mnemonic = "STM\0LDM" + ((instr&Lbit) >> 18);
+      mnemonic = "STM\0LDM";
+      mnemonic += ((instr&Lbit) >> 18);
       if (RN_is(13)) {
         /* r13, so treat as stack */
         word x = (instr&(3<<23)) >> 22;
         if (instr&Lbit) x^=6;
-        { const char * foo = "EDEAFDFA"+x;
+        { const char * foo = "EDEAFDFA";
+          foo += x;
           *flagp++ = *foo++;
           *flagp++ = *foo;
         }
@@ -361,7 +366,8 @@ lMaybeLDRHetc:
     case 10:
     case 11:
       /* B or BL */
-      mnemonic = "B\0BL"+((instr&(1<<24))>>23);
+      mnemonic = "B\0BL";
+      mnemonic += ((instr&(1<<24))>>23);
       format   = "&";
       break;
     case 12:
@@ -369,14 +375,16 @@ lMaybeLDRHetc:
       /* STC or LDC */
       if (CP_is(1)) {
         /* copro 1: FPU. This is STF or LDF. */
-        mnemonic = "STF\0LDF" + ((instr&Lbit) >> 18);
+        mnemonic = "STF\0LDF";
+        mnemonic += ((instr&Lbit) >> 18);
         format   = "8,/";
         *flagp++ = "SDEP"[fpn];
         poss_tt = (eTargetType)(target_FloatS+fpn);
       }
       else if (CP_is(2)) {
         /* copro 2: this is LFM or SFM. */
-        mnemonic = "SFM\0LFM" + ((instr&Lbit) >> 18);
+        mnemonic = "SFM\0LFM";
+        mnemonic += ((instr&Lbit) >> 18);
         if (!fpn) fpn=4;
         if (RN_is(13) && BitsDiffer(23,24)) {
           if ((instr&255)!=fpn) goto lNonStackLFM;
@@ -400,7 +408,8 @@ lNonStackLFM:
       }
       else {
         /* some other copro number: STC or LDC. */
-        mnemonic = "STC\0LDC" + ((instr&Lbit) >> 18);
+        mnemonic = "STC\0LDC";
+        mnemonic += ((instr&Lbit) >> 18);
         format   = ";,\004,/";
         if (instr&(1<<22)) *flagp++ = 'L';
         poss_tt = target_Unknown;
@@ -415,7 +424,8 @@ lNonStackLFM:
           if ((instr&Lbit) && RD_is(15)) {
             /* MCR in FPU with Rd=r15: comparison (ugh) */
             if (!(instr&(1<<23))) goto lUndefined;	/* unused operation */
-            mnemonic = "CMF\0\0CNF\0\0CMFE\0CNFE" + (5*(instr&(3<<21)) >> 21);
+            mnemonic = "CMF\0\0CNF\0\0CMFE\0CNFE";
+            mnemonic += (5*(instr&(3<<21)) >> 21);
             format   = "9,+";
             if (instr&((1<<19)+(7<<5)))
               result.badbits=1;	/* size,rmode reseved */
@@ -424,7 +434,8 @@ lNonStackLFM:
             /* normal FPU MCR/MRC */
             word op20 = instr&(15<<20);
             if (op20>=6<<20) goto lUndefined;
-            mnemonic = "FLT\0FIX\0WFS\0RFS\0WFC\0RFC" + (op20>>18);
+            mnemonic = "FLT\0FIX\0WFS\0RFS\0WFC\0RFC";
+            mnemonic += (op20>>18);
             if (op20==0) {
               /* FLT instruction */
               format = "9,3";
@@ -477,9 +488,9 @@ lNonStackLFM:
                      "MVF\0MNF\0ABS\0RND\0"
                      "SQT\0LOG\0LGN\0EXP\0"
                      "SIN\0COS\0TAN\0ASN\0"
-                     "ACS\0ATN\0URD\0NRM\0"
-                     + ((instr&(15<<20)) >> 18)	/* opcode   -> bits 5432 */
-                     + ((instr&(1<<15)) >> 9);	/* monadicP -> bit 6 */
+                     "ACS\0ATN\0URD\0NRM\0";
+          mnemonic += ((instr&(15<<20)) >> 18);	/* opcode   -> bits 5432 */
+          mnemonic += ((instr&(1<<15)) >> 9);	/* monadicP -> bit 6 */
           format = (instr&(1<<15)) ? "8,+" : "8,9,+";
           *flagp++ = "SDE*"[((instr>>7)&1) + ((instr>>18)&2)];
           *flagp++ = "\0PMZ"[(instr&(3<<5))>>5];
@@ -521,7 +532,8 @@ lUndefined:
 
     { word cond = instr>>28;
       if (cond!=14) {
-        const char * ip = "EQNECSCCMIPLVSVCHILSGELTGTLEALNV"+2*cond;
+        const char * ip = "EQNECSCCMIPLVSVCHILSGELTGTLEALNV";
+        ip += +2*cond;
         *op++ = *ip++;
         *op++ = *ip;
       }
@@ -649,7 +661,8 @@ lPling:
             }
             else {
               /* rotated register */
-              const char * rot = "LSL\0LSR\0ASR\0ROR" + ((instr&(3<<5)) >> 3);
+              const char * rot = "LSL\0LSR\0ASR\0ROR";
+              rot += ((instr&(3<<5)) >> 3);
               op = append(op, regnames[instr&15]);
               if (instr&(1<<4)) {
                 /* register rotation */

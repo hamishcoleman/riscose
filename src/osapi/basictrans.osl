@@ -3,6 +3,8 @@ AUTHOR "Jonathan Coxhead, jonathan@doves.demon.co.uk, 29 Apr 1994";
 
 NEEDS OS;
 
+CONST Error_BASICTransUnknownOperation = .Bits: &1e6;
+
 SWI BASICTrans_HELP = (NUMBER 0x42C80 "Interpret, translate if required, and
       print HELP messages",
       ENTRY (R0 -> .String: help_text,

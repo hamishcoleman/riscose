@@ -254,6 +254,6 @@ os_error *xbasictrans_message (int message_no,
             return 0;
         default:
             fprintf(stderr, "Unknown message %d\n", message_no);
-            return ERR_BASICTRANS_UNKNOWN_OPERATION();
+            return ERR_BASIC_TRANS_UNKNOWN_OPERATION();
     }
 }

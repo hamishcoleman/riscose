@@ -972,7 +972,7 @@ int main (int argc, char *argv [])
          Quiet = TRUE;
       else if (strcmp (argv [i], "-help") == 0)
       {  fputs("DefMod " VERSION_INFO
-               ". Copyright © Jonathan Coxhead, 1994.\n"
+               ". Copyright \xa9 Jonathan Coxhead, 1994.\n"
                "DefMod comes with ABSOLUTELY NO WARRANTY.\n"
                "This is free software, and you are welcome to redistribute it "
                "under certain conditions. See the file Copying for details.\n"

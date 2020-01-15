@@ -47,7 +47,8 @@ $l=0; while (<ERRORS>)
        ! /^(WORD)\s+(\S*)\s+([0-9a-fA-F]*)\n/;
   
   if ($1 eq "ERROR") {
-    print ROMHDR sprintf("static inline os_error* ERR_%s(void) { return (os_error *) MEM_TOHOST(0x%08x); }\n", uc $2, &rom_current);
+    print ROMHDR sprintf("static os_error* ERR_%s(void)  __attribute__ ((unused));\n", uc $2, &rom_current);
+    print ROMHDR sprintf("static os_error* ERR_%s(void)  { return (os_error *) MEM_TOHOST(0x%08x); }\n", uc $2, &rom_current);
     print ROM pack("L", hex $3).$4."\0";
   } elsif ($1 eq "WORD") {
     print ROMHDR sprintf("#define WORD_%s 0x%08x\n", uc $2, &rom_current);

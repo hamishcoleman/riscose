@@ -1,4 +1,4 @@
-INCLUDES = -I$(srcdir)/include
+INCLUDES = -I$(srcdir)/osapi -I$(srcdir)/oslib -I$(srcdir)/include
 
 if ARM_ARMUL
 arm = armul

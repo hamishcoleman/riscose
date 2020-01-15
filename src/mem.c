@@ -468,6 +468,7 @@ extern WORD arm_get_reg(WORD r);
 
 #ifndef CONFIG_MEM_ONE2ONE
 static
+inline
 void
 arm_backtrace(void)
 {

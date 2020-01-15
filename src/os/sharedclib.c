@@ -516,7 +516,7 @@ split_format_string(char *str, WORD apcs_arg, WORD is_scanf, WORD is_vararg, for
         continue;
       }
 
-  length += asprintf(&buffer, begin);
+  length += asprintf(&buffer, "%s", begin);
   formatter(output, buffer);
   free(buffer);
 

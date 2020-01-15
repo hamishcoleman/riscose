@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #include "config.h"
 #include "monty/monty.h"
@@ -25,9 +26,10 @@
 #include "swi.h"
 #include "vdu.h"
 #include "mem.h"
+#include "os.h"
 
 /* FIXME: should be in a header file. */
-WORD swih_sharedclibrary_entry(WORD num);
+int swih_sharedclibrary_entry(WORD num);
 
 typedef struct {
     WORD number;
@@ -89,7 +91,7 @@ void swi_register(WORD number, char *name, swi_handler handler)
 
 void swi_trap(WORD num)
 {
-    riscos_error *e;
+    os_error *e;
     swi_routine *r;
 
 #ifdef CONFIG_TRACE_SWIS
@@ -112,9 +114,6 @@ void swi_trap(WORD num)
     }
     
     if (SWI_OS(num) == SWI_OS_TRAP) {
-        WORD r;
-
-
 #ifndef NATIVE
         if (num == SWI_MAGIC_RETURN) {
             arm_return();
@@ -122,12 +121,11 @@ void swi_trap(WORD num)
         }
 #endif
 
-        if (((r = swih_sharedclibrary_entry(num)) &
-            SWIH_EXIT_HANDLED) == 0) {
+        int i = swih_sharedclibrary_entry(num);
+        // sharedclib calls aren't really SWIs, so shouldn't return an error.
+        if (i != SWIH_EXIT_HANDLED) {
             arm_set_pc(ARM_R14);
         }
-        /* FIXME: next statement does nothing. */
-        r &= !3;
 
 #ifdef CONFIG_TRACE_SWIS
         debug("return R0 = %lx\n", ARM_R0);
@@ -146,7 +144,7 @@ void swi_trap(WORD num)
     }
       
     DEBUG(SWI, ("swi %s\n", r->name));
-    e = (riscos_error*) r->handler(num);
+    e = r->handler(num);
 
     arm_clear_v();
     if (e) {

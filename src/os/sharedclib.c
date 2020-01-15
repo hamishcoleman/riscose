@@ -615,10 +615,10 @@ swih_sharedclibrary(WORD num)
   return 0;
 }
 
-os_error*
+int
 swih_sharedclibrary_entry(WORD num)
 {
-    DEBUG(SWI, ("sharedclib swi %#x\n", num));
+    DEBUG(SWI, ("sharedclib pretend swi %#x (%#x)\n", num, SWI_NUM(num)));
 
   switch(SWI_NUM(num))
     {
@@ -640,7 +640,7 @@ swih_sharedclibrary_entry(WORD num)
             {
              arm_run_routine(language_description[c+4]);
              arm_set_pc(ARM_R0);
-             return 0;
+             return SWIH_EXIT_HANDLED;
             }
           c += language_description[c]>>2;
           printf("%d\n", c);
@@ -781,7 +781,7 @@ swih_sharedclibrary_entry(WORD num)
         ARM_SET_R0(p->argc);
         ARM_SET_R1(MMAP_USRSTACK_BASE+((BYTE*)p->argv - (BYTE*)p));
       }
-      return 0;
+      return SWIH_EXIT_HANDLED;
 
     case CLIB_CLIB__CLIB_INITIALISE: /* 4-292 */
       return 0;
@@ -795,6 +795,10 @@ swih_sharedclibrary_entry(WORD num)
       ARM_SET_R14(ARM_R14+4);
       return 0;
  */
+    case CLIB_CLIB__BACKTRACE:
+    fprintf(stderr, "backtrace req\n");
+      abort();
+      return 0;
     case CLIB_CLIB_TOUPPER: /* 4-296 */
       ARM_SET_R0(toupper(ARM_R0));
       return 0;
@@ -1194,6 +1198,10 @@ swih_sharedclibrary_entry(WORD num)
   return 0;
 }
 
+static os_error *not_real_swi(WORD num) {
+    abort();
+}
+
 void sharedclibrary_swi_register(void)
 {
     int i;
@@ -1207,14 +1215,16 @@ void sharedclibrary_swi_register(void)
     swi_register(0x80683, "SharedCLibrary_LibInitAPCS_32",
         swih_sharedclibrary);
 
+    /* We register so that names get stored for ease of debugging, but the
+       handler should never be called. */
     for (i = 0; i < CLIB_KERN_JUMPPOINTS; i++) {
         swi_register((0x300000 | CLIB_KERN_BASE) + i,
-	    clib_kern_names[i], swih_sharedclibrary_entry);
+	    clib_kern_names[i], not_real_swi);
     }
 
     for (i = 0; i < CLIB_CLIB_JUMPPOINTS; i++) {
         swi_register((0x300000 | CLIB_CLIB_BASE) + i,
-	    clib_clib_names[i], swih_sharedclibrary_entry);
+	    clib_clib_names[i], not_real_swi);
     }
 
     return;

@@ -7,9 +7,9 @@ NEEDS OS, OSSpriteOp, Font;
 NEEDSATEND Wimp32;
 
 TYPE
-   Wimp_W,
+   Wimp_W = .Bits,
    Wimp_I = .Int,
-   Wimp_T,
+   Wimp_T = .Bits,
    Wimp_Colour = .Byte;
 
 TYPE Wimp_VersionNo = .Int;
@@ -1359,7 +1359,7 @@ SWI Wimp_CreateIcon =
 SWI Wimp_DeleteWindow =
    (  NUMBER 0x400C3 "Closes a specified window if it is still open, and
             then removes its definition",
-      ENTRY (R1 -> .Struct (Wimp_W: w): delete_window),
+      ENTRY (R1 -> Wimp_W: delete_window),
             //this should be called using _BLOCK()
       EXIT (R0?)
    );
@@ -1408,7 +1408,7 @@ SWI Wimp_OpenWindowNestedWithFlags =
 
 SWI Wimp_CloseWindow =
    (  NUMBER 0x400C6 "Removes the specified window from the active list",
-      ENTRY (R1 -> .Struct (Wimp_W: w): close_window), //uses _BLOCK()
+      ENTRY (R1 -> Wimp_W: close_window), //uses _BLOCK()
       EXIT (R0?)
    );
 

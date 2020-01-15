@@ -58,8 +58,10 @@ CONST
 
 CONST OSSpriteOp_Unspecified = .Ref OSSpriteOp_Area: &100;
 
-TYPE OSSpriteOp_Id "Should be union of name and header, but that's
-      inconvenient since you can't project into unions by cast";
+TYPE OSSpriteOp_Id = .Union(
+   .Bits: number,
+   .Ref OSSpriteOp_Header: pointer
+);
 
 TYPE OSSpriteOp_SaveArea = .Struct (.Int: a ...);
 

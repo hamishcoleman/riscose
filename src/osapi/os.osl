@@ -1548,14 +1548,20 @@ SWI OS_RelinkApplication =
    );
 
 //Types of sort (pass in R2)
-TYPE OS_SortType = .Ref .Asm;
+
+TYPE OS_SortTypeId = .Bits;
+TYPE OS_SortType = .Union(
+  .Ref .Asm: routine,
+  OS_SortTypeId: id
+);
+
 CONST
-   OS_SortCardinal        = OS_SortType: 0,
-   OS_SortInteger         = OS_SortType: 1,
-   OS_SortCardinalPointer = OS_SortType: 2,
-   OS_SortIntegerPointer  = OS_SortType: 3,
-   OS_SortCIString        = OS_SortType: 4,
-   OS_SortString          = OS_SortType: 5;
+   OS_SortCardinal        = OS_SortTypeId: 0,
+   OS_SortInteger         = OS_SortTypeId: 1,
+   OS_SortCardinalPointer = OS_SortTypeId: 2,
+   OS_SortIntegerPointer  = OS_SortTypeId: 3,
+   OS_SortCIString        = OS_SortTypeId: 4,
+   OS_SortString          = OS_SortTypeId: 5;
 
 //Flags for OS_HeapSort (set in R1!)
 CONST

@@ -538,7 +538,7 @@ sharedclibrary_build_stubs(WORD first, WORD num)
 }
 #endif
 
-WORD
+os_error*
 swih_sharedclibrary(WORD num)
 {
   WORD *stub_list, c, v;
@@ -578,7 +578,7 @@ swih_sharedclibrary(WORD num)
            {
 	   case 1  : /* Kernel module */
 	     if ((stub_list[c+2] - stub_list[c+1]) < (CLIB_KERN_JUMPPOINTS*4))
-               return ERR_SHAREDCLIBRARY_VECTORTOOSMALL;
+               return ERR_SHAREDCLIBRARY_VECTORTOOSMALL();
              for (v=0; v!=CLIB_KERN_JUMPPOINTS; v++)
                MEM_WRITE_WORD(stub_list[c+1]+(v*4),
 			      CLIB_STUB(stub_list[c+1]+(v*4), CLIB_KERN_BASE + v));
@@ -587,7 +587,7 @@ swih_sharedclibrary(WORD num)
 
 	   case 2  : /* C Library module */
 	     if ((stub_list[c+2] - stub_list[c+1]) < (CLIB_CLIB_JUMPPOINTS*4))
-               return ERR_SHAREDCLIBRARY_VECTORTOOSMALL;
+               return ERR_SHAREDCLIBRARY_VECTORTOOSMALL();
              for (v=0; v!=CLIB_CLIB_JUMPPOINTS; v++)
                MEM_WRITE_WORD(stub_list[c+1]+(v*4),
 			      CLIB_STUB(stub_list[c+1]+(v*4), CLIB_CLIB_BASE + v));
@@ -599,7 +599,7 @@ swih_sharedclibrary(WORD num)
 
 	   default :
              fprintf(stderr, "%08x\n", (unsigned) stub_list[c]);
-             return ERR_SHAREDCLIBRARY_BADCHUNKID;
+             return ERR_SHAREDCLIBRARY_BADCHUNKID();
 
            }
          c += 5;
@@ -610,12 +610,12 @@ swih_sharedclibrary(WORD num)
       break;
 
     default:
-      return ERR_EM_UNHANDLEDSWI;
+      return ERR_EM_UNHANDLEDSWI();
     }
   return 0;
 }
 
-WORD
+os_error*
 swih_sharedclibrary_entry(WORD num)
 {
   char **arm_va_list;
@@ -642,7 +642,7 @@ swih_sharedclibrary_entry(WORD num)
             {
              arm_run_routine(language_description[c+4]);
              arm_set_pc(ARM_R0);
-             return SWIH_EXIT_HANDLED; /* BODGE! */
+             return 0;
             }
           c += language_description[c]>>2;
           printf("%d\n", c);
@@ -783,7 +783,7 @@ swih_sharedclibrary_entry(WORD num)
         ARM_SET_R0(p->argc);
         ARM_SET_R1(MMAP_USRSTACK_BASE+((BYTE*)p->argv - (BYTE*)p));
       }
-      return SWIH_EXIT_HANDLED;
+      return 0;
 
     case CLIB_CLIB__CLIB_INITIALISE: /* 4-292 */
       return 0;

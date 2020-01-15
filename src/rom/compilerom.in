@@ -19,6 +19,8 @@ my $l;
 open ROM, ">romimage" or die "Couldn't open romimage for output";
 open ROMHDR, ">rom.h" or die "Couldn't open rom.h for output";
 print ROMHDR "/* Automatically generated file; do not edit manually */\n\n";
+print ROMHDR "#include \"mem.h\"\n";
+print ROMHDR "#include \"os.h\"\n";
 
 sub rom_align {
   # Align next write into ROM to word boundary
@@ -45,7 +47,7 @@ $l=0; while (<ERRORS>)
        ! /^(WORD)\s+(\S*)\s+([0-9a-fA-F]*)\n/;
   
   if ($1 eq "ERROR") {
-    print ROMHDR sprintf("#define ERR_%s 0x%08x\n", uc $2, &rom_current);
+    print ROMHDR sprintf("static inline os_error* ERR_%s(void) { return (os_error *) MEM_TOHOST(0x%08x); }\n", uc $2, &rom_current);
     print ROM pack("L", hex $3).$4."\0";
   } elsif ($1 eq "WORD") {
     print ROMHDR sprintf("#define WORD_%s 0x%08x\n", uc $2, &rom_current);

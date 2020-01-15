@@ -116,6 +116,7 @@ inline BYTE *mem_f_tohost(WORD arm)
     }
     
     error("mem_f_tohost: %#x invalid address\n", arm);
+    abort();
 }
 
 inline WORD mem_f_toarm(void *host)
@@ -141,6 +142,7 @@ inline WORD mem_f_toarm(void *host)
     }
 
     error("mem_f_toarm: %p invalid address\n", host);
+    abort();
 }
 
 #endif

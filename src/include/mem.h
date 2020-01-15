@@ -56,6 +56,9 @@ WORD    mem_get_wimpslot(void);
 
 void    map_it(WORD base, WORD size);
 
+static BYTE *MEM_TOHOST(WORD arm_addr) __attribute__((unused));
+static WORD MEM_TOARM(void *ptr) __attribute__((unused));
+
 #ifdef CONFIG_MEM_ONE2ONE
 
   #define mem_get_private()  ((void*) MMAP_USRSTACK_BASE)
@@ -67,9 +70,14 @@ void    map_it(WORD base, WORD size);
   void*   mem_get_private(void);
   BYTE*   mem_f_tohost(WORD arm_addr);
   WORD    mem_f_toarm(void *ptr);
-  #define MEM_TOHOST(a) (mem_f_tohost(a))
-  #define MEM_TOARM(a) (mem_f_toarm(a))
 
+  static BYTE *MEM_TOHOST(WORD arm_addr) {
+    return mem_f_tohost(arm_addr);
+  }
+
+  static WORD MEM_TOARM(void *ptr) {
+    return mem_f_toarm(ptr);
+  }
 #endif
 
 #define MEM_READ_WORD(a) (*((WORD*)MEM_TOHOST((a))))

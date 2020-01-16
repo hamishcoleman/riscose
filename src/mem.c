@@ -94,9 +94,23 @@ mem_where(void *_ptr)
   return 0;
 }
 
-#ifndef CONFIG_MEM_ONE2ONE
+#ifdef CONFIG_MEM_ONE2ONE
 
-inline BYTE *mem_f_tohost(WORD arm)
+BYTE *mem_f_tohost(WORD arm) {
+  return (BYTE *) arm;
+}
+
+WORD mem_f_toarm(void *host) {
+  return (WORD) host;
+}
+
+void *mem_get_private(void) {
+  return (void*) MMAP_USRSTACK_BASE;
+}
+
+#else
+
+BYTE *mem_f_tohost(WORD arm)
 {
     if (arm == 0) {
         return NULL;
@@ -119,7 +133,7 @@ inline BYTE *mem_f_tohost(WORD arm)
     abort();
 }
 
-inline WORD mem_f_toarm(void *host)
+WORD mem_f_toarm(void *host)
 {
     BYTE *arm;
 
@@ -146,6 +160,31 @@ inline WORD mem_f_toarm(void *host)
 }
 
 #endif
+
+BYTE *MEM_TOHOST(WORD arm_addr) {
+  return mem_f_tohost(arm_addr);
+}
+
+WORD MEM_TOARM(void *ptr) {
+  return mem_f_toarm(ptr);
+}
+
+WORD MEM_READ_WORD(WORD a) {
+  return *((WORD*)MEM_TOHOST(a));
+}
+
+BYTE MEM_READ_BYTE(WORD a) {
+  return *((BYTE*)MEM_TOHOST(a));
+}
+
+WORD MEM_WRITE_WORD(WORD a, WORD v) {
+  return (*((WORD*)MEM_TOHOST(a))) = v;
+}
+
+BYTE MEM_WRITE_BYTE(WORD a, BYTE v) {
+  return (*((BYTE*)MEM_TOHOST(a))) = v;
+}
+
 
 static
 BYTE*

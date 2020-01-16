@@ -56,49 +56,17 @@ WORD    mem_get_wimpslot(void);
 
 void    map_it(WORD base, WORD size);
 
-static BYTE *MEM_TOHOST(WORD arm_addr) __attribute__((unused));
-static WORD MEM_TOARM(void *ptr) __attribute__((unused));
-static WORD MEM_READ_WORD(WORD a) __attribute__((unused));
-static BYTE MEM_READ_BYTE(WORD a) __attribute__((unused));
-static WORD MEM_WRITE_WORD(WORD a, WORD v) __attribute__((unused));
-static BYTE MEM_WRITE_BYTE(WORD a, BYTE v) __attribute__((unused));
+BYTE *MEM_TOHOST(WORD arm_addr);
+WORD MEM_TOARM(void *ptr);
+WORD MEM_READ_WORD(WORD a);
+BYTE MEM_READ_BYTE(WORD a);
+WORD MEM_WRITE_WORD(WORD a, WORD v);
+BYTE MEM_WRITE_BYTE(WORD a, BYTE v);
 
-#ifdef CONFIG_MEM_ONE2ONE
+BYTE*   mem_f_tohost(WORD arm_addr);
+WORD    mem_f_toarm(void *ptr);
+void*   mem_get_private(void);
 
-  #define mem_get_private()  ((void*) MMAP_USRSTACK_BASE)
-  #define MEM_TOHOST(a) ((BYTE*)(a))
-  #define MEM_TOARM(a) ((WORD)(a))
-
-#else
-
-  void*   mem_get_private(void);
-  BYTE*   mem_f_tohost(WORD arm_addr);
-  WORD    mem_f_toarm(void *ptr);
-
-  static BYTE *MEM_TOHOST(WORD arm_addr) {
-    return mem_f_tohost(arm_addr);
-  }
-
-  static WORD MEM_TOARM(void *ptr) {
-    return mem_f_toarm(ptr);
-  }
-#endif
-
-static WORD MEM_READ_WORD(WORD a) {
-  return *((WORD*)MEM_TOHOST(a));
-}
-
-static BYTE MEM_READ_BYTE(WORD a) {
-  return *((BYTE*)MEM_TOHOST(a));
-}
-
-static WORD MEM_WRITE_WORD(WORD a, WORD v) {
-  return (*((WORD*)MEM_TOHOST(a))) = v;
-}
-
-static BYTE MEM_WRITE_BYTE(WORD a, BYTE v) {
-  return (*((BYTE*)MEM_TOHOST(a))) = v;
-}
 
 #define MEM_PLACE_ENVIRONMENT 0x1000
 #define MEM_MODULE_PRIVATES   0x2000

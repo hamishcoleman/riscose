@@ -9,9 +9,18 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <assert.h>
+#include <unistd.h>
+#include <limits.h>
 #include <monty/monty.h>
 #include "types.h"
 #include "osfile.h"
+#include "rom/rom.h"
+
 
 void osfile_swi_register_extra(void)
 {
@@ -36,7 +45,14 @@ os_error *xosfile_save_stamped (char *file_name,
       byte *data,
       byte *end)
 {
-  error("*** SWI unimplemented\n");
+  int fd;
+  fd = open(file_name, O_WRONLY);
+
+  if (fd<0) {
+    return ERR_BAD_FILE_NAME();
+  }
+
+  assert(write(fd, data, end-data) == end-data);
   return 0;
 }
 
@@ -578,7 +594,44 @@ os_error *xosfile_read (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
+  struct stat statbuf;
+
+  *obj_type = 0;
+  *load_addr = 0;
+  *exec_addr = 0;
+  *size = 0;
+  *attr = 0;
+
+  if (stat(file_name, &statbuf) < 0) {
+    return 0;
+  }
+
+  switch (statbuf.st_mode) {
+    case S_IFDIR:
+      *obj_type = 2;
+    case S_IFREG:
+      *obj_type = 1;
+    default:
+      fprintf(stderr, "Pretending irregular file is a file\n");
+      *obj_type = 1;
+  }
+
+  long int mtime_ros = statbuf.st_mtim.tv_sec * 100L - 613608L*3600L;
+  mtime_ros += statbuf.st_mtim.tv_nsec / 10000L;
+
+  *load_addr = (mtime_ros >> 32) & 0x000000ff;
+  *exec_addr = mtime_ros         & 0xffffffff;
+
+  // Filetype is data
+  *load_addr |=                    0xfffffd00;
+
+  if (statbuf.st_size > INT_MAX) {
+    error("File is too big for us");
+    abort();
+  }
+
+  *size = statbuf.st_size;
+
   return 0;
 }
 

@@ -58,6 +58,10 @@ void    map_it(WORD base, WORD size);
 
 static BYTE *MEM_TOHOST(WORD arm_addr) __attribute__((unused));
 static WORD MEM_TOARM(void *ptr) __attribute__((unused));
+static WORD MEM_READ_WORD(WORD a) __attribute__((unused));
+static BYTE MEM_READ_BYTE(WORD a) __attribute__((unused));
+static WORD MEM_WRITE_WORD(WORD a, WORD v) __attribute__((unused));
+static BYTE MEM_WRITE_BYTE(WORD a, BYTE v) __attribute__((unused));
 
 #ifdef CONFIG_MEM_ONE2ONE
 
@@ -80,10 +84,21 @@ static WORD MEM_TOARM(void *ptr) __attribute__((unused));
   }
 #endif
 
-#define MEM_READ_WORD(a) (*((WORD*)MEM_TOHOST((a))))
-#define MEM_READ_BYTE(a) (*((BYTE*)MEM_TOHOST((a))))
-#define MEM_WRITE_WORD(a,v) ((*((WORD*)MEM_TOHOST((a)))) = (v))
-#define MEM_WRITE_BYTE(a,v) ((*((BYTE*)MEM_TOHOST((a)))) = (v))
+static WORD MEM_READ_WORD(WORD a) {
+  return *((WORD*)MEM_TOHOST(a));
+}
+
+static BYTE MEM_READ_BYTE(WORD a) {
+  return *((BYTE*)MEM_TOHOST(a));
+}
+
+static WORD MEM_WRITE_WORD(WORD a, WORD v) {
+  return (*((WORD*)MEM_TOHOST(a))) = v;
+}
+
+static BYTE MEM_WRITE_BYTE(WORD a, BYTE v) {
+  return (*((BYTE*)MEM_TOHOST(a))) = v;
+}
 
 #define MEM_PLACE_ENVIRONMENT 0x1000
 #define MEM_MODULE_PRIVATES   0x2000

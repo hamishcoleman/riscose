@@ -13,6 +13,7 @@
 #   resources in ROM when passing results back from SWIs.
 
 use strict;
+use warnings;
 
 my $l;
 
@@ -47,7 +48,7 @@ $l=0; while (<ERRORS>)
        ! /^(WORD)\s+(\S*)\s+([0-9a-fA-F]*)\n/;
   
   if ($1 eq "ERROR") {
-    print ROMHDR sprintf("static os_error* ERR_%s(void)  __attribute__ ((unused));\n", uc $2, &rom_current);
+    print ROMHDR sprintf("static os_error* ERR_%s(void)  __attribute__ ((unused));\n", uc $2);
     print ROMHDR sprintf("static os_error* ERR_%s(void)  { return (os_error *) MEM_TOHOST(0x%08x); }\n", uc $2, &rom_current);
     print ROM pack("L", hex $3).$4."\0";
   } elsif ($1 eq "WORD") {

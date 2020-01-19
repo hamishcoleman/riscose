@@ -58,8 +58,8 @@ SWI
       (  R0 # 10 "Calls OS_File 10 to save a block of memory as a file",
          R1 -> .String: file_name,
          R2 = .Bits: file_type,
-         R4 -> .Data: data,
-         R5 -> .Data: end
+         R4 -> .Data: data "Start of data to save (inclusive)",
+         R5 -> .Data: end  "End of data to save (exclusive)"
    )  ),
    OSFile_Write =
    (  NUMBER 8,

@@ -56,15 +56,6 @@ typedef struct {
     BYTE *rom;
 } mem_state;
 
-/* +ve IDs indicate dynamic area numbers */
-#define MEM_ID_PRIVATE     -1
-#define MEM_ID_RMA         -2
-#define MEM_ID_READONLY    -3
-#define MEM_ID_TASKHEAP    -4
-#define MEM_ID_USRSTACK    -5
-#define MEM_ID_ROM         -6
-#define MEM_ID_NEWDYNAMICAREA -99
-
 static mem_state *mem;
 
 static int backtrace_in_progress=0;
@@ -72,7 +63,6 @@ inline static
 void
 arm_backtrace(void) __attribute__ ((unused));
 
-static
 int
 mem_where(void *_ptr)
 {
@@ -153,6 +143,9 @@ WORD mem_f_toarm(void *host)
             (arm - mem->tasks[mem->task_current].stack);
     case MEM_ID_ROM:
         return MMAP_ROM_BASE + (arm - mem->rom);
+    default:
+    error("mem_f_toarm: Don't know how to map %p\n", host);
+    abort();
     }
 
     error("mem_f_toarm: %p invalid address\n", host);

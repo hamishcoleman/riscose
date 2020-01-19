@@ -13,6 +13,7 @@
 #define _RISCOSE_MEM_H
 
 #include "riscostypes.h"
+#include <limits.h>
 
 #define ERR_MEM_BADFILE 1
 #define ERR_MEM_TOOLONG 2
@@ -67,6 +68,19 @@ BYTE*   mem_f_tohost(WORD arm_addr);
 WORD    mem_f_toarm(void *ptr);
 void*   mem_get_private(void);
 
+/* +ve IDs indicate dynamic area numbers */
+typedef enum {
+  MEM_ID_USER_MAX       = INT_MAX,
+  MEM_ID_PRIVATE        = -1,
+  MEM_ID_RMA            = -2,
+  MEM_ID_READONLY       = -3,
+  MEM_ID_TASKHEAP       = -4,
+  MEM_ID_USRSTACK       = -5,
+  MEM_ID_ROM            = -6,
+  MEM_ID_NEWDYNAMICAREA = -99,
+} memory_area_t;
+
+memory_area_t mem_where(void *_ptr);
 
 #define MEM_PLACE_ENVIRONMENT 0x1000
 #define MEM_MODULE_PRIVATES   0x2000

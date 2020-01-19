@@ -60,8 +60,8 @@ static void stat_to_regs(struct stat *statbuf,
     *obj_type = 1;
   }
 
-  long int mtime_ros = statbuf->st_mtim.tv_sec * 100L - 613608L*3600L;
-  mtime_ros += statbuf->st_mtim.tv_nsec / 10000L;
+  long int mtime_ros = statbuf->st_mtim.tv_sec * 100L + 613608L*3600L*100L;
+  mtime_ros += statbuf->st_mtim.tv_nsec / 1000L * 1000L * 10L;
 
   *load_addr = (mtime_ros >> 32) & 0x000000ff;
   *exec_addr = mtime_ros         & 0xffffffff;

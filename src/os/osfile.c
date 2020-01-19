@@ -16,11 +16,68 @@
 #include <assert.h>
 #include <unistd.h>
 #include <limits.h>
+#include <string.h>
 #include <monty/monty.h>
 #include "types.h"
 #include "osfile.h"
 #include "rom/rom.h"
+#include "mem.h"
 
+static char *ro_string(const char *rostr) {
+  const char *end = rostr;
+  char *out;
+
+  while (*end > 31) end++;
+
+  out = malloc(sizeof(char) * (end-rostr+1));
+  strncpy(out, rostr, end-rostr);
+  out[end-rostr] = '\0';
+  return out;
+}
+
+static void stat_to_regs(struct stat *statbuf,
+      fileswitch_object_type *obj_type,
+      bits *load_addr,
+      bits *exec_addr,
+      int *size,
+      fileswitch_attr *attr)
+{
+  *obj_type = 0;
+  *load_addr = 0;
+  *exec_addr = 0;
+  *size = 0;
+  *attr = 3;
+
+  if (S_ISDIR(statbuf->st_mode)) {
+    *obj_type |= 2;
+  }
+  if (S_ISREG(statbuf->st_mode)) {
+    *obj_type |= 1;
+  }
+
+  if (*obj_type == 0) {
+    fprintf(stderr, "Pretending irregular file with mode %x is a file\n", statbuf->st_mode);
+    *obj_type = 1;
+  }
+
+  long int mtime_ros = statbuf->st_mtim.tv_sec * 100L - 613608L*3600L;
+  mtime_ros += statbuf->st_mtim.tv_nsec / 10000L;
+
+  *load_addr = (mtime_ros >> 32) & 0x000000ff;
+  *exec_addr = mtime_ros         & 0xffffffff;
+
+  // Filetype is data
+  *load_addr |=                    0xfffffd00;
+
+  if (statbuf->st_size > INT_MAX) {
+    error("File is too big for us");
+    abort();
+  }
+
+  *size = statbuf->st_size;
+
+  return;
+}
 
 void osfile_swi_register_extra(void)
 {
@@ -46,13 +103,40 @@ os_error *xosfile_save_stamped (char *file_name,
       byte *end)
 {
   int fd;
-  fd = open(file_name, O_WRONLY);
+  char *fn;
+  ssize_t written;
+  memory_area_t start_where;
+
+  if (data == 0 || end < data) {
+    return ERR_BAD_ADDRESS();
+  }
+
+  start_where = mem_where(data);
+  if (data != end) {
+    // If data==end, we write a blank file.
+    // If data!=end, we check that end-1 is in the same memory area as data.
+    memory_area_t end_where = mem_where(end-1);
+    assert(start_where == end_where);
+  }
+
+  fn = ro_string(file_name);
+
+  fd = open(fn, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
+  free(fn);
 
   if (fd<0) {
     return ERR_BAD_FILE_NAME();
   }
 
-  assert(write(fd, data, end-data) == end-data);
+  written = write(fd, data, end-data);
+
+  if (written == 0) {
+    perror("could not store file");
+    return ERR_BAD_FILE_NAME(); // XXX Seems like a poor fit.
+  }
+
+  assert(written >= 0);
+  assert(written == (end-data));
   return 0;
 }
 
@@ -267,7 +351,46 @@ os_error *xosfile_load_stamped (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
+  int fd;
+  struct stat statbuf;
+  memory_area_t start_where;
+  char *fn;
+
+  *obj_type = 0;
+  *load_addr = 0;
+  *exec_addr = 0;
+  *size = 0;
+  *attr = 0;
+
+  fn = ro_string(file_name);
+
+  fd = open(fn, O_RDONLY);
+  free(fn);
+  if (fd<0) {
+    return ERR_BAD_FILE_NAME();
+  }
+  if (fstat(fd, &statbuf)<0) {
+    error("stat failed!");
+    abort();
+  }
+  stat_to_regs(&statbuf, obj_type, load_addr, exec_addr, size, attr);
+
+  start_where = mem_where(addr);
+
+  if (*size > 0) {
+    memory_area_t end_where = mem_where(addr + *size - 1);
+
+    if (start_where != end_where) {
+      return ERR_FS_FILE_TOO_BIG();
+    }
+    if (*size > INT_MAX) {
+      return ERR_FS_FILE_TOO_BIG();
+    }
+  }
+
+  *size = read(fd, addr, *size);
+  close(fd);
+
   return 0;
 }
 
@@ -595,42 +718,21 @@ os_error *xosfile_read (char *file_name,
       fileswitch_attr *attr)
 {
   struct stat statbuf;
-
+  char *fn;
   *obj_type = 0;
   *load_addr = 0;
   *exec_addr = 0;
   *size = 0;
   *attr = 0;
 
-  if (stat(file_name, &statbuf) < 0) {
+  fn = ro_string(file_name);
+
+  if (stat(fn, &statbuf)<0) {
+    free(fn);
     return 0;
   }
-
-  switch (statbuf.st_mode) {
-    case S_IFDIR:
-      *obj_type = 2;
-    case S_IFREG:
-      *obj_type = 1;
-    default:
-      fprintf(stderr, "Pretending irregular file is a file\n");
-      *obj_type = 1;
-  }
-
-  long int mtime_ros = statbuf.st_mtim.tv_sec * 100L - 613608L*3600L;
-  mtime_ros += statbuf.st_mtim.tv_nsec / 10000L;
-
-  *load_addr = (mtime_ros >> 32) & 0x000000ff;
-  *exec_addr = mtime_ros         & 0xffffffff;
-
-  // Filetype is data
-  *load_addr |=                    0xfffffd00;
-
-  if (statbuf.st_size > INT_MAX) {
-    error("File is too big for us");
-    abort();
-  }
-
-  *size = statbuf.st_size;
+  free(fn);
+  stat_to_regs(&statbuf, obj_type, load_addr, exec_addr, size, attr);
 
   return 0;
 }

@@ -60,14 +60,14 @@ static void stat_to_regs(struct stat *statbuf,
     *obj_type = 1;
   }
 
-  long int mtime_ros = statbuf->st_mtim.tv_sec * 100L + 613608L*3600L*100L;
-  mtime_ros += statbuf->st_mtim.tv_nsec / 1000L * 1000L * 10L;
+  unsigned long int mtime_ros = statbuf->st_mtim.tv_sec * 100UL + 613608L*3600L*100L;
+  mtime_ros += statbuf->st_mtim.tv_nsec / 1000UL * 1000UL * 10UL;
 
-  *load_addr = (mtime_ros >> 32) & 0x000000ff;
-  *exec_addr = mtime_ros         & 0xffffffff;
+  *load_addr = (mtime_ros >> 32) & 0x000000ffUL;
+  *exec_addr = mtime_ros         & 0xffffffffUL;
 
   // Filetype is data
-  *load_addr |=                    0xfffffd00;
+  *load_addr |=                    0xfffffd00UL;
 
   if (statbuf->st_size > INT_MAX) {
     error("File is too big for us");

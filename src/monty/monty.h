@@ -69,11 +69,11 @@ EXTERN monty_options montyopt;
 
 /* printf's to the debug output file.  only call if montyopt.debug is
  * non-zero. */
-void debug(char *fmt, ...);
+void debug(char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 /* printf's to the verbose output file.  only call if montyopt.verbose
  * is true.  output is prefixed with `progname: '. */
-void verbose(char *fmt, ...);
+void verbose(char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 #define VERBOSE(a) \
     if (montyopt.verbose) { \
         verbose a; \
@@ -81,13 +81,13 @@ void verbose(char *fmt, ...);
 
 /* printf's a warning to stderr.  output is prefixed with `progname:
  * warn: '. */
-void warn(char *fmt, ...);
+void warn(char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 /* printf's an error to stderr.  output is prefixed with `progname:
  * error: '.  exit(1) is then called. */
-void error(char *fmt, ...);
+void error(char *fmt, ...) __attribute__ ((format (printf, 1, 2), noreturn));
 
 /* printf's an error to stderr.  output is prefixed with `progname: '.
  * abort is then called to produce a core dump (unless something is
  * catching SIGABRT). */
-void dump_core(char *fmt, ...);
+void dump_core(char *fmt, ...) __attribute__ ((format (printf, 1, 2)));

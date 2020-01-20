@@ -38,7 +38,7 @@ char *search_path(char **path, char *file)
 {
     char *try;
 
-    DEBUG(FILE, ("search_path(%x, \"%s\")\n", path, file));
+    DEBUG(FILE, ("search_path(%p, \"%s\")\n", path, file));
 
     while (*path) {
         try = mstrprintf("%s/%s", **path ? *path : ".", file);
@@ -115,7 +115,7 @@ char *file_read(char *path, int *len)
     }
     efclose(fp);
 
-    DEBUG(FILE, ("file_read(\"%s\", %u) returns %#x\n", path, *len, buf));
+    DEBUG(FILE, ("file_read(\"%s\", %u) returns %p\n", path, *len, buf));
 
     return buf;
 }
@@ -146,7 +146,7 @@ FILE *fopenrz(char *path, int *ispipe)
             command = mstrprintf("%s '%s'", cat->zcat, path);
             fp = popen(command, "r");
             DEBUG(FILE, ("fopenrz(\"%s\") -> popen(\"%s\") returns "
-                "%#x\n", path, command, fp));
+                "%p\n", path, command, fp));
             efree(command);
 
             return fp;
@@ -155,7 +155,7 @@ FILE *fopenrz(char *path, int *ispipe)
 
     *ispipe = FALSE;
     fp = fopen(path, "r");
-    DEBUG(FILE, ("fopenrz(\"%s\") -> fopen() returns %#x\n",
+    DEBUG(FILE, ("fopenrz(\"%s\") -> fopen() returns %p\n",
         path, fp));
 
     return fp;

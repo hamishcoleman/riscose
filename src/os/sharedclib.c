@@ -1193,7 +1193,7 @@ swih_sharedclibrary_entry(WORD num)
       return 0;
 
     default:
-        error("unhandled clib swi %#08lx\n", SWI_NUM(num));
+        error("unhandled clib swi %#08x\n", SWI_NUM(num));
     }
   return 0;
 }

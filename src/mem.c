@@ -19,6 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <string.h>
 #ifdef CONFIG_MEM_ONE2ONE
   #include <sys/mman.h>
 #endif
@@ -357,6 +358,7 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
 #  endif
 #endif
        assert(wimpslot+MMAP_APP_BASE < (MMAP_SVCSTACK_BASE));
+       bzero(mem->tasks[c].app, wimpslot);
        if (image_filename != NULL)
          {
           WORD t = mem_task_which();

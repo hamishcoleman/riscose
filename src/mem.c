@@ -63,21 +63,28 @@ inline static
 void
 arm_backtrace(void) __attribute__ ((unused));
 
+static mem_wimp_task* ctask() {
+    assert(mem->task_current == -1 || mem->task_current < MAX_TASKS);
+    if (mem->task_current == -1) {
+        return NULL;
+    }
+    else {
+        return &mem->tasks[mem->task_current];
+    }
+}
+
 int
 mem_where(void *_ptr)
 {
   BYTE *ptr = (BYTE*) _ptr;
-  mem_wimp_task *ctask = &mem->tasks[mem->task_current];
 
-  /*printf("%p, %p (%p) %p %p %p\n", ptr, mem->rma, mem->rma_size, mem->tasks[mem->task_current].app, mem->tasks[mem->task_current].stack, mem->rom);*/
-  
   if (ptr >= mem->rma && ptr < mem->rma + mem->rma_size)
     return MEM_ID_RMA;
-  if (ptr >= ctask->app && ptr < ctask->app + ctask->wimpslot)
+  if (ctask() && (ptr >= ctask()->app && ptr < ctask()->app + ctask()->wimpslot))
     return MEM_ID_TASKHEAP;
   if (ptr >= mem->rom && ptr < mem->rom+MMAP_ROM_SIZE)
     return MEM_ID_ROM;
-  if (ptr >= ctask->stack && ptr < ctask->stack + MMAP_USRSTACK_SIZE)
+  if (ctask() && (ptr >= ctask()->stack && ptr < ctask()->stack + MMAP_USRSTACK_SIZE))
     return MEM_ID_USRSTACK;
   fprintf(stderr, "*** Don't know which memory area %p belongs to\n", ptr);
   abort();
@@ -105,15 +112,15 @@ BYTE *mem_f_tohost(WORD arm)
     if (arm == 0) {
         return NULL;
     }
-    if (arm >= MMAP_APP_BASE && arm < MMAP_APP_BASE + MMAP_APP_SIZE) {
-        return mem->tasks[mem->task_current].app + (arm - MMAP_APP_BASE);
+    if (ctask() && (arm >= MMAP_APP_BASE && arm < MMAP_APP_BASE + ctask()->wimpslot)) {
+        return ctask()->app + (arm - MMAP_APP_BASE);
     }
     if (arm >= MMAP_RMA_BASE && arm < MMAP_RMA_BASE + MMAP_RMA_SIZE) {
         return mem->rma + (arm - MMAP_RMA_BASE);
     }
-    if (arm >= MMAP_USRSTACK_BASE &&
-        arm < MMAP_USRSTACK_BASE + MMAP_USRSTACK_SIZE) {
-        return mem->tasks[mem->task_current].stack + (arm - MMAP_USRSTACK_BASE);
+    if (ctask() && (arm >= MMAP_USRSTACK_BASE &&
+        arm < MMAP_USRSTACK_BASE + MMAP_USRSTACK_SIZE)) {
+        return ctask()->stack + (arm - MMAP_USRSTACK_BASE);
     }
     if (arm >= MMAP_ROM_BASE && arm < MMAP_ROM_BASE + MMAP_ROM_SIZE) {
         return mem->rom + (arm - MMAP_ROM_BASE);
@@ -137,10 +144,10 @@ WORD mem_f_toarm(void *host)
         return MMAP_RMA_BASE + (arm - mem->rma);
     case MEM_ID_TASKHEAP:
         return MMAP_APP_BASE +
-            (arm - mem->tasks[mem->task_current].app);
+            (arm - ctask()->app);
     case MEM_ID_USRSTACK:
         return MMAP_USRSTACK_BASE +
-            (arm - mem->tasks[mem->task_current].stack);
+            (arm - ctask()->stack);
     case MEM_ID_ROM:
         return MMAP_ROM_BASE + (arm - mem->rom);
     default:
@@ -271,14 +278,14 @@ mem_final(void)
 WORD
 mem_get_wimpslot(void)
 {
-  return(mem->tasks[mem->task_current].wimpslot);
+  return(ctask()->wimpslot);
 }
 
 #ifndef CONFIG_MEM_ONE2ONE
 void*
 mem_get_private(void)
 {
-  return(mem->tasks[mem->task_current].stack);
+  return(ctask()->stack);
 }
 #endif
 
@@ -334,6 +341,7 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
   for (c=0; c!=MAX_TASKS; c++)
     if (mem->tasks[c].wimpslot == 0)
       {
+       assert(wimpslot < MMAP_APP_SIZE);
        mem->tasks[c].wimpslot = wimpslot;
        mem->tasks[c].info     = info;
        mem->tasks[c].stack    = emalloc(MMAP_USRSTACK_SIZE);

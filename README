@@ -34,7 +34,7 @@ and get hacking.
 If you've acquired riscose from CVS then you need to have maintainer
 tools available.
 
-    aclocal && autoheader && automake && autoconf
+    aclocal && autoheader && automake --add-missing && autoconf
 
 -- 
 Matthew

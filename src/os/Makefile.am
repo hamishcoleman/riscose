@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libos.a
 
-INCLUDES = -I$(srcdir)/../oslib -I$(srcdir)/../include -I.. \
+AM_CPPFLAGS = -I$(srcdir)/../oslib -I$(srcdir)/../include -I.. \
     -I$(srcdir)/.. -I$(srcdir)/../osapi -I$(srcdir)/../@ARM@
 
 libos_a_SOURCES = \

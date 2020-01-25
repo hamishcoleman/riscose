@@ -1,6 +1,7 @@
-AC_INIT(src/monty/monty.c)
+AC_INIT([riscose], [0.01])
+AC_CONFIG_SRCDIR([src/monty/monty.c])
 AC_CONFIG_AUX_DIR(util)
-AM_INIT_AUTOMAKE(riscose,0.01)
+AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
 CFLAGS+="-Wall -Werror"

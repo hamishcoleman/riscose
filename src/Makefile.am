@@ -1,4 +1,4 @@
-INCLUDES = -I$(srcdir)/osapi -I$(srcdir)/oslib -I$(srcdir)/include
+AM_CPPFLAGS = -I$(srcdir)/osapi -I$(srcdir)/oslib -I$(srcdir)/include
 
 if ARM_ARMUL
 arm = armul

@@ -5,7 +5,7 @@ defmod_SOURCES = \
     riscoseapi.c riscoseapi.h riscose.c \
     riscose.h riscosehdr.c riscosehdr.h riscosetpl.c riscosetpl.h \
     riscoseerr.c riscoseerr.h types.h
-INCLUDES = -I$(srcdir)/..
+AM_CPPFLAGS = -I$(srcdir)/..
 defmod_LDADD = ../monty/libmonty.a
 
 # FIXME:  why doesn't automake get rid of this anyway?  is it an

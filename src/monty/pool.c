@@ -18,7 +18,7 @@ pool *pool_create(size_t size, int maxfree)
     p->avail = 0;
     p->head = NULL;
 
-    DEBUG(POOL, ("pool_create(%u, %d) returns %x\n", size, maxfree, p));
+    DEBUG(POOL, ("pool_create(%zd, %d) returns %p\n", size, maxfree, p));
 
     return p;
 }
@@ -31,14 +31,14 @@ void *pool_alloc(pool *p)
         b = p->head;
         p->head = b->next;
         p->avail--;
-        DEBUG(POOL, ("pool_alloc(%x) returns head %x, %d left\n",
+        DEBUG(POOL, ("pool_alloc(%p) returns head %p, %d left\n",
             p, b, p->avail));
 
         return b;
     }
 
     b = emalloc(p->size);
-    DEBUG(POOL, ("pool_alloc(%x) returns malloc %x\n", p, b));
+    DEBUG(POOL, ("pool_alloc(%p) returns malloc %p\n", p, b));
 
     return b;
 }
@@ -49,14 +49,14 @@ void pool_free(pool *p, void *block)
 
     if (p->avail == p->maxfree) {
         efree(block);
-        DEBUG(POOL, ("pool_free(%x, %x) frees\n", p, block));
+        DEBUG(POOL, ("pool_free(%p, %p) frees\n", p, block));
         return;
     }
 
     (b = block)->next = p->head;
     p->head = b;
     p->avail++;
-    DEBUG(POOL, ("pool_free(%x, %x) pushes, %d now avail\n",
+    DEBUG(POOL, ("pool_free(%p, %p) pushes, %d now avail\n",
         p, block, p->avail));
 
     return;
@@ -74,7 +74,7 @@ void pool_destroy(pool *p)
 
     efree(p);
 
-    DEBUG(POOL, ("pool_destroy(%x)\n", p));
+    DEBUG(POOL, ("pool_destroy(%p)\n", p));
 
     return;
 }

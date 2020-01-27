@@ -64,19 +64,19 @@ int main(int argc, char *argv[])
     }
 
     h = emalloc(HEAP_SIZE);
-    D("heap %#p, size %d\n", h, HEAP_SIZE);
+    D("heap %p, size %d\n", h, HEAP_SIZE);
     heap_init(h, HEAP_SIZE);
 
     do {
         b = block + rand() % DIM(block);
         size = ((rand() % (HEAP_SIZE / 8)) + 3) & ~3;
 
-        D("block %2d, size %3d", b - block, size);
+        D("block %zd, size %3d", b - block, size);
 
         if (b->data) {
             for (p = b->data; p < b->data + b->size; p++) {
                 if (*p != b->content) {
-                    error("content wrong: block +%x byte +%x was "
+                    error("content wrong: block +%zx byte +%zx was "
                         "%ud not %ud\n", O(b->data), O(p), *p, b->content);
                 }
             }
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
                 break;
             case 1:
                 if ((new = heap_block_resize(h, b->data, size))) {
-                    D(", resized +%d\n", O(new));
+                    D(", resized +%zd\n", O(new));
                     assert(CHECK_PTR(new));
                     assert(CHECK_PTR((char *)new + size - 1));
 
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
             }
         } else {
             if ((new = heap_block_alloc(h, size))) {
-                D(", allocated +%d\n", O(new));
+                D(", allocated +%zd\n", O(new));
                 assert(CHECK_PTR(new));
                 assert(CHECK_PTR((char *)new + size - 1));
 

@@ -11,6 +11,6 @@ BUILT_SOURCES = bdt.c
 bdt.c: genbdt
 	./genbdt >bdt.c
 
-INCLUDES = -I$(srcdir)/../include -I$(srcdir)/.. -I..
+AM_CPPFLAGS = -I$(srcdir)/../include -I$(srcdir)/.. -I..
 
 EXTRA_DIST = .cvsignore

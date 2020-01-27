@@ -40,7 +40,7 @@ hash *create_hash(void)
     h->numelem = 0;
     h->numbucket = INITIAL_NUM_BUCKETS;
     h->bucket = ecalloc(sizeof *h->bucket * h->numbucket);
-    DEBUG(HASH, ("create_hash returns %x\n", h));
+    DEBUG(HASH, ("create_hash returns %p\n", h));
 
     return h;
 }
@@ -51,7 +51,7 @@ void delete_hash(hash *hash)
     hash_elem *e;
     hash_elem *next;
 
-    DEBUG(HASH, ("delete_hash(%x)\n", hash));
+    DEBUG(HASH, ("delete_hash(%p)\n", hash));
 
     for (bucket = 0; bucket < hash->numbucket; bucket++) {
         for (e = hash->bucket[bucket]; e; e = next) {
@@ -72,7 +72,7 @@ hash_elem *hash_add(hash *hash, char *key, int keylen, void *datum)
     hash_elem **bucket;
 
     if (DEBUG_HASH) {
-        debug("hash_add(%x, %x, %d, %x)\n", hash, key, keylen, datum);
+        debug("hash_add(%p, %p, %d, %p)\n", hash, key, keylen, datum);
         hexdump(debugf, key, keylen, key);
     }
 
@@ -96,7 +96,7 @@ hash_elem *hash_add(hash *hash, char *key, int keylen, void *datum)
     *bucket = e;
     hash->numelem++;
 
-    DEBUG(HASH, ("hash_add added %x\n", e));
+    DEBUG(HASH, ("hash_add added %p\n", e));
 
     return e;
 }
@@ -112,7 +112,7 @@ static unsigned int key_to_hash(char *key, int keylen)
     }
     h += h >> 5;
 
-    DEBUG(HASH, ("key_to_hash(%x, %d) returns %d\n", key, keylen, h));
+    DEBUG(HASH, ("key_to_hash(%p, %d) returns %d\n", key, keylen, h));
 
     return h;
 }
@@ -130,7 +130,7 @@ static void enlarge_hash(hash *hash)
     hash_elem *e;
 
     if (DEBUG_HASH) {
-        debug("enlarge_hash(%x)\nbefore:\n", hash);
+        debug("enlarge_hash(%p)\nbefore:\n", hash);
         dump_hash(hash);
     }
 
@@ -168,7 +168,7 @@ static void enlarge_hash(hash *hash)
 
 hash_elem *hash_adds(hash *hash, char *key, void *datum)
 {
-    DEBUG(HASH, ("hash_adds(%x, \"%s\", %x)\n", hash, key, datum));
+    DEBUG(HASH, ("hash_adds(%p, \"%s\", %p)\n", hash, key, datum));
 
     return hash_add(hash, key, strlen(key) + 1, datum);
 }
@@ -183,14 +183,14 @@ hash_elem *hash_lookup(hash *hash, char *key, int keylen)
     }
     keyhash = key_to_hash(key, keylen);
     SEARCH_CHAIN(hash->bucket[keyhash & (hash->numbucket - 1)]);
-    DEBUG(HASH, ("hash_lookup returns %x\n", e));
+    DEBUG(HASH, ("hash_lookup returns %p\n", e));
 
     return e;
 }
 
 hash_elem *hash_lookups(hash *hash, char *key)
 {
-    DEBUG(HASH, ("hash_lookups(%x, \"%s\")\n", hash, key));
+    DEBUG(HASH, ("hash_lookups(%p, \"%s\")\n", hash, key));
 
     return hash_lookup(hash, key, strlen(key) + 1);
 }
@@ -203,7 +203,7 @@ void *hash_lookup_get_datum(hash *hash, char *key, int keylen)
     e = hash_lookup(hash, key, keylen);
     datum = e ? e->datum : NULL;
 
-    DEBUG(HASH, ("hash_lookup_get_datum(%x, %x, %d) returns %x\n",
+    DEBUG(HASH, ("hash_lookup_get_datum(%p, %p, %d) returns %p\n",
         hash, key, keylen, datum));
 
     return datum;
@@ -217,7 +217,7 @@ void *hash_lookups_get_datum(hash *hash, char *key)
     e = hash_lookups(hash, key);
     datum = e ? e->datum : NULL;
 
-    DEBUG(HASH, ("hash_lookups_get_datum(%x, \"%s\") returns %x\n",
+    DEBUG(HASH, ("hash_lookups_get_datum(%p, \"%s\") returns %p\n",
         hash, key, datum));
 
     return datum;
@@ -247,16 +247,16 @@ static void dump_hash(hash *hash)
     int bucket;
     hash_elem *e;
 
-    debug("dump_hash(%x)\n", hash);
-    debug("    numelem: %d numbucket: %d bucket: %x\n", hash->numelem,
+    debug("dump_hash(%p)\n", hash);
+    debug("    numelem: %d numbucket: %d bucket: %p\n", hash->numelem,
         hash->numbucket, hash->bucket);
 
     found = 0;
     for (bucket = 0; bucket < hash->numbucket; bucket++) {
         debug("    bucket: %d\n", bucket);
         for (e = hash->bucket[bucket]; e; e = e->next) {
-            debug("        e: %x\n", e);
-            debug("        key: %x keylen: %d hash: %x datum: %x\n",
+            debug("        e: %p\n", e);
+            debug("        key: %p keylen: %d hash: %x datum: %p\n",
                 e->key, e->keylen, e->hash, e->datum);
             hexdump(debugf, e->key, e->keylen, e->key);
             found++;

@@ -24,7 +24,7 @@ void *(emalloc)(int size)
     if ((p = malloc(size)) == NULL) {
         error("malloc failed, %d bytes requested" LOCS "\n", size LOCP);
     }
-    DEBUG(MEM, ("emalloc(%d) returns %x" LOCS "\n", size, p LOCP));
+    DEBUG(MEM, ("emalloc(%d) returns %p" LOCS "\n", size, p LOCP));
 
     return p;
 }
@@ -34,7 +34,7 @@ void *(ecalloc)(int size)
     void *p;
 
     p = memset((emalloc)(size), 0, size);
-    DEBUG(MEM, ("ecalloc(%d) returns %x" LOCS "\n", size, p LOCP));
+    DEBUG(MEM, ("ecalloc(%d) returns %p" LOCS "\n", size, p LOCP));
 
     return p;
 }
@@ -46,7 +46,7 @@ void *(erealloc)(void *mem, int size)
     if ((p = realloc(mem, size)) == NULL) {
         error("realloc failed, %d bytes requested" LOCS "\n", size LOCP);
     }
-    DEBUG(MEM, ("erealloc(%x, %d) returns %x" LOCS "\n", mem, size, p LOCP));
+    DEBUG(MEM, ("erealloc(%p, %d) returns %p" LOCS "\n", mem, size, p LOCP));
 
     return p;
 }
@@ -61,14 +61,14 @@ void *(ememdup)(void *m, int len)
     void *n;
 
     memcpy(n = (emalloc)(len), m, len);
-    DEBUG(MEM, ("ememdup(%x, %d) returns %x" LOCS "\n", m, len, n LOCP));
+    DEBUG(MEM, ("ememdup(%p, %d) returns %p" LOCS "\n", m, len, n LOCP));
 
     return n;
 }
 
 void (efree)(void *p)
 {
-    DEBUG(MEM, ("efree(%x)" LOCS "\n", p LOCP));
+    DEBUG(MEM, ("efree(%p)" LOCS "\n", p LOCP));
     free(p);
 
     return;

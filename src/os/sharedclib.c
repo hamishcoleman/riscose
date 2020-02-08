@@ -907,6 +907,13 @@ swih_sharedclibrary_entry(WORD num)
       }
       return 0;
 
+    case CLIB_CLIB_VSPRINTF:
+      {
+        format_output output;
+        output.str = (char *) MEM_TOHOST(ARM_R0);
+        ARM_SET_R0(split_format_string((char *) MEM_TOHOST(ARM_R1), 2, 0, 1, do_sprintf, &output));
+      }
+      return 0;
     case CLIB_CLIB_FPUTC: /* FIXME: 4-31? */
       ARM_SET_R0(fputc(ARM_R0, clib_file_real(ARM_R1)));
       return 0;

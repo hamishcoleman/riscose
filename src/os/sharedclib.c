@@ -478,9 +478,13 @@ split_format_string(char *str, WORD apcs_arg, WORD is_scanf, WORD is_vararg, for
     switch (*str++)
       {
       case '%':
+        // TODO: check that full spec is implemented
+        // http://riscos.com/support/developers/c/clib.html#idx-102
         if (*str == '%') { str++; continue; }
         while (strchr("#- +'", *str))      str++;
         if (*str == '-')                   str++;
+        while (strchr("0123456789", *str)) str++;
+        if (*str == '.')                   str++;
         while (strchr("0123456789", *str)) str++;
         while (strchr("hlLqjzt", *str))    str++;
 

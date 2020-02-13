@@ -33,8 +33,6 @@
 #include "map.h"
 #include "util.h"
 
-WORD wimpslot;
-
 static void utility_run(char *file, mem_private *priv);
 static int string_to_int(char *s, int *i);
 
@@ -58,6 +56,7 @@ main(int argc, char **argv)
   mem_private *priv;
   WORD  count = 0, o;
     struct stat st;
+    WORD wimpslot = 0;
   
     (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
     *argv = progname;

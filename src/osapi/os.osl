@@ -701,12 +701,17 @@ SWI OS_GetEnv =
    )  );
 
 SWI OS_Exit =
-   (  NUMBER 0x11 "Passes control to the most recent exit handler",
+   (  NUMBER 0x11 "Passes control to the most recent exit handler, returning error and return code",
       ENTRY
       (  R0 -> OS_Error: e,
-         R1 = .Int: abex,
+         R1 # 'ABEX',
          R2 = .Int: rc
    )  );
+
+SWI OSExit_NoStatus =
+   (  NUMBER 0x11 "Passes control to the most recent exit handler"
+   );
+
 
 SWI OS_SetEnv =
    (  NUMBER 0x12 "Sets environment parameters - prefer OS_ChangeEnvironment",

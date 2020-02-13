@@ -36,7 +36,7 @@ os_error* os_call_a_swi_r12(WORD n)
 
 os_error* os_write_s(WORD n)
 {
-  WORD pc = ARM_R15 & 0x02fffffc;
+  WORD pc = (ARM_R15 & 0x02fffffc) - 4;
   char* p = (char *)MEM_TOHOST(pc);
   while (*p)
   {

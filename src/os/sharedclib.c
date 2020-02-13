@@ -478,9 +478,13 @@ split_format_string(char *str, WORD apcs_arg, WORD is_scanf, WORD is_vararg, for
     switch (*str++)
       {
       case '%':
+        // TODO: check that full spec is implemented
+        // http://riscos.com/support/developers/c/clib.html#idx-102
         if (*str == '%') { str++; continue; }
         while (strchr("#- +'", *str))      str++;
         if (*str == '-')                   str++;
+        while (strchr("0123456789", *str)) str++;
+        if (*str == '.')                   str++;
         while (strchr("0123456789", *str)) str++;
         while (strchr("hlLqjzt", *str))    str++;
 
@@ -907,6 +911,13 @@ swih_sharedclibrary_entry(WORD num)
       }
       return 0;
 
+    case CLIB_CLIB_VSPRINTF:
+      {
+        format_output output;
+        output.str = (char *) MEM_TOHOST(ARM_R0);
+        ARM_SET_R0(split_format_string((char *) MEM_TOHOST(ARM_R1), 2, 0, 1, do_sprintf, &output));
+      }
+      return 0;
     case CLIB_CLIB_FPUTC: /* FIXME: 4-31? */
       ARM_SET_R0(fputc(ARM_R0, clib_file_real(ARM_R1)));
       return 0;

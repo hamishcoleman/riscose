@@ -12,6 +12,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <assert.h>
 
 #include <monty/mem.h>
 
@@ -54,7 +55,9 @@ int file_loadat(char *name, void *addr)
   FILE *fh = fopen(name, "r");
   if (fh == NULL)
     return -1;
-  fread(addr, 1, file_size(name), fh);
+  size_t s = file_size(name);
+  size_t r = fread(addr, 1, s, fh);
+  assert(s == r);
   fclose(fh);
   return 0;
 }

@@ -205,7 +205,8 @@ load_rom(char *file, BYTE *address)
   else
     rom = address;
   f = open(file, O_RDONLY);
-  read(f, rom, s.st_size);
+  size_t r = read(f, rom, s.st_size);
+  assert(r == s.st_size);
   close(f);
   
   return rom;

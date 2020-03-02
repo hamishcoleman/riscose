@@ -22,6 +22,8 @@
 #include "arm.h"
 #include "swi.h"
 
+static const int Sys$RCLimit = 256;
+
 os_error* os_call_a_swi(WORD n)
 {
   swi_trap(ARM_R10);
@@ -407,19 +409,28 @@ os_error *xos_get_env (char **command,
  */
 
 os_error *xos_exit (os_error *e,
-      int abex,
       int rc)
 {
 
     /* FIXME: what's the intended use of e?  What if an e and rc are
      * specified? */
 
-    if (abex == ('X' << 24 | 'E' << 16 | 'B' << 8 | 'A')) {
-        exit(rc > 0xff ? 0xff : rc);
+    if (rc <= Sys$RCLimit) {
+        exit(rc);
+    }
+    else {
+        error("Terminating with %s", e->errmess);
     }
 
-    exit(!!e);
+    // Should not return
+    abort();
 }
+
+os_error *xosexit_no_status ()
+{
+   return  xos_exit(NULL, 0);
+}
+
 
 /* ------------------------------------------------------------------------
  * Function:      os_set_env()

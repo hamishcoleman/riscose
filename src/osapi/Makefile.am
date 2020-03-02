@@ -23,6 +23,7 @@ SUFFIXES = .osl .c .h .e
 BUILT_SOURCES = \
     os.c os.h os.e \
     basictrans.c basictrans.h basictrans.e \
+    ddeutils.c ddeutils.h ddeutils.e \
     fileswitch.c fileswitch.h fileswitch.e \
     font.c font.h font.e \
     fpemulator.c fpemulator.h fpemulator.e \

@@ -99,6 +99,16 @@ static char *clib_kern_names[] = {
 #undef X
 };
 
+static char *kernel_entry_point_name(int num) {
+    switch (num) {
+#define X(i, n) case n: return "" #i;
+    LIST
+#undef X
+        default:
+            return "Unknown clib kernel entry point!";
+    }
+}
+
 #undef LIST
 
 /* ------------------------------------------------------------------ */
@@ -304,6 +314,19 @@ static char *clib_clib_names[] = {
     LIST
 #undef X
 };
+
+static char *entry_point_name(int num) {
+    if ((num & 0x1100) == 0) {
+        return kernel_entry_point_name(num);
+    }
+    switch (num) {
+#define X(i, n) case n: return "" #i;
+    LIST
+#undef X
+        default:
+            return "Unknown clib entry point!";
+    }
+}
 
 #undef LIST
 
@@ -622,7 +645,7 @@ swih_sharedclibrary(WORD num)
 int
 swih_sharedclibrary_entry(WORD num)
 {
-    DEBUG(SWI, ("sharedclib pretend swi %#x (%#x)\n", num, SWI_NUM(num)));
+    DEBUG(SWI, ("sharedclib pretend swi %#x (%#x / %s)\n", num, SWI_NUM(num), entry_point_name(SWI_NUM(num))));
 
   switch(SWI_NUM(num))
     {

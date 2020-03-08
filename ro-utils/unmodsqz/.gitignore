@@ -1,0 +1,4 @@
+Makefile.am
+*.o
+.deps
+unmodsqz

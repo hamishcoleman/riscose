@@ -81,6 +81,10 @@ module_load(char *name)
 
     WORD init = MODULE_INIT(module_bases[modules]);
     if (init) {
+        if (init & 0x80000000) {
+            fprintf(stderr, "Compressed modules are not currently supported.\n");
+            exit(1);
+        }
         ARM_SET_R12(module_privates + modules * 4);
         arm_run_routine(init);
     }

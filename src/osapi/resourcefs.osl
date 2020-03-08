@@ -57,6 +57,6 @@ SWI
    (  NUMBER 0x30,
       ENTRY
       (  R1 # 0x60 "ResourceFS module is reloaded or reinitialised",
-         R2 = .Asm: register_files,
+         R2 = .Ref Asm: register_files,
          R3 = .Ref Void: workspace
    )  )

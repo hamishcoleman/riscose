@@ -22,7 +22,7 @@ void resourcefs_swi_register_extra(void)
 
 os_error *xresourcefs_register_files(resourcefs_file_list *file_list)
 {
-    error("swi XResourceFS_RegisterFiles unimplemented.\n");
+    fprintf(stderr, "swi XResourceFS_RegisterFiles unimplemented.\n");
 
     return NULL;
 }

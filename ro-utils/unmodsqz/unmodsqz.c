@@ -72,7 +72,7 @@ static int wf_load(const char *filename, void *ptr, size_t size) {
 
 static int wf_save(const char *filename, void *ptr, size_t size) {
     int fd;
-    fd = open(filename, O_CREAT | O_WRONLY);
+    fd = open(filename, O_CREAT | O_WRONLY, 0666);
     if (fd<0) {
         return -1;
     }

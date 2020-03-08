@@ -57,6 +57,8 @@ AC_OUTPUT([ \
         tests/Makefile \
         tests/armas \
         util/Makefile \
+        ro-utils/Makefile \
+        ro-utils/unmodsqz/Makefile \
     ], \
     [chmod +x src/rom/compilerom tests/armas]
     )

@@ -55,7 +55,7 @@ typedef enum error_codes {
  *
  */
 extern error_code unsqueeze_module(
-  int32 *ptr,
+  int32_t *ptr,
   void **output,
   size_t *output_len);
 

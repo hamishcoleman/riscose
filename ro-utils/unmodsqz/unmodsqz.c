@@ -21,11 +21,15 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "VersionNum"
-#include "CLX/bytesex.h"
+#include <sys/stat.h>
+#include <unistd.h>
+#include <fcntl.h>
+
+#include "VersionNum.h"
+//#include "CLX/bytesex.h"
 #include "CLX/err.h"
 #include "CLX/prgname.h"
-#include "CLX/wholefls.h"
+//#include "CLX/wholefls.h"
 #include "unmodsqz.h"
 
 #ifdef __riscos
@@ -38,6 +42,49 @@
 #endif
 
 #define Program_Title "unmodsqz"
+
+static size_t wf_filesize(const char *filename) {
+    struct stat statbuf;
+    if (stat(filename, &statbuf)==0) {
+        return statbuf.st_size;
+    }
+    else {
+        fprintf(stderr, "cannot open '%s'\n", filename);
+        abort();
+    }
+}
+
+static int wf_load(const char *filename, void *ptr, size_t size) {
+    int fd;
+    fd = open(filename, O_RDONLY);
+    if (fd<0) {
+        return -1;
+    }
+    else {
+        if (read(fd, ptr, size)==size) {
+            return 0;
+        }
+        else {
+            return -1;
+        }
+    }
+}
+
+static int wf_save(const char *filename, void *ptr, size_t size) {
+    int fd;
+    fd = open(filename, O_CREAT | O_WRONLY);
+    if (fd<0) {
+        return -1;
+    }
+    else {
+        if (write(fd, ptr, size)==size) {
+            return 0;
+        }
+        else {
+            return -1;
+        }
+    }
+}
 
 static int verbose = 0;
 
@@ -70,7 +117,7 @@ static void banner(const char *prog)
    exit(EXIT_FAILURE);
 }
 
-static int32 file_length(char *filename, int32 *load, int32 *exec, int32 *attr)
+static int32_t file_length(char *filename, int32_t *load, int32_t *exec, int32_t *attr)
 {
 #ifdef TARGET_IS_RISCOS
         _kernel_oserror *e;
@@ -88,7 +135,7 @@ static int32 file_length(char *filename, int32 *load, int32 *exec, int32 *attr)
         }
         return size;
 #else
-        int32 size = wf_filesize(filename);
+        int32_t size = wf_filesize(filename);
         *load = *exec = *attr = 0;
         if (size == -1) {
           err_fail(errors[errcode_NO_LOAD], filename);
@@ -98,26 +145,16 @@ static int32 file_length(char *filename, int32 *load, int32 *exec, int32 *attr)
 }
 
 #ifdef TARGET_IS_RISCOS
-static void restamp(const char *filename, int32 load, int32 exec, int32 attr)
+static void restamp(const char *filename, int32_t load, int32_t exec, int32_t attr)
 {
         load |= 0xFFFFFA00;
         (void) _swix(OS_File, _INR(0,3)|_IN(5), 1, filename, load, exec, attr);
 }
 #endif
 
-static void unmodsqz_bytesex_init(void)
-{
-  union {
-    char b;
-    unsigned int i;
-  } b;
-  b.i = 1;
-  bytesex_reverse(b.b == 0);
-}
-
 int main(int argc, char *argv[])
 {
-  int32 load, exec, attr, size, realsize;
+  int32_t load, exec, attr, size, realsize;
   void  *realdata;
   void  *data;
   char *outfile = 0, *infile = 0;
@@ -163,7 +200,6 @@ int main(int argc, char *argv[])
   if (data == NULL) err_fail(errors[errcode_NO_MEM]);
   if (-1 == wf_load(infile, data, size)) err_fail(errors[errcode_NO_LOAD], infile);
 
-  unmodsqz_bytesex_init();
   e = unsqueeze_module((void *)data, &realdata, (size_t *) &realsize);
   if (e == errcode_NOT_SQUEEZED) {
     if (verbose && outfile != infile) {

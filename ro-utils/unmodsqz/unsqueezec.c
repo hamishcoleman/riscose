@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "CLX/bytesex.h"
+//#include "CLX/bytesex.h"
 
 #include "unmodsqz.h"
 
@@ -40,8 +40,8 @@ enum constants {
   minshort = 2 + nibslong,
   minlong = 2,
 
-  init_compressed_bit = (int32) 0x80000000,
-  final_invincible_bit = (int32) 0x80000000
+  init_compressed_bit = (int32_t) 0x80000000,
+  final_invincible_bit = (int32_t) 0x80000000
 };
 
 enum header_fields {
@@ -54,48 +54,48 @@ enum header_fields {
 };
 
 typedef struct {
-  int32 decoded_size;
-  int32 encoded_size;
-  int32 tables_size;
-  int32 nshorts;
-  int32 nlongs;
+  int32_t decoded_size;
+  int32_t encoded_size;
+  int32_t tables_size;
+  int32_t nshorts;
+  int32_t nlongs;
 } module_comp_data_table;
 
 #define absolute_address(ptr, offset) ((void *) (((char *)(ptr)) + (offset)) )
 /*
-static void *(absolute_address)(void *ptr, int32 offset)
+static void *(absolute_address)(void *ptr, int32_t offset)
 {
   return ((char *)ptr) + offset;
 }
 */
 
 error_code unsqueeze_module(
-  int32 *ptr,
+  int32_t *ptr,
   void **output,
   size_t *output_len)
 {
   error_code e = ok;
-  int32 init = bytesex_hostval(ptr[entry_init]) ^ init_compressed_bit;
+  int32_t init = le32toh(ptr[entry_init]) ^ init_compressed_bit;
 
   if (init & init_compressed_bit) {
     e = errcode_NOT_SQUEEZED;
   }
   else {
     module_comp_data_table t;
-    int32 *module;
+    int32_t *module;
     unsigned char *encoded_hwm;
     unsigned char *encoded_lwm;
     size_t dt_size = sizeof(module_comp_data_table);
     void *void_table_ptr = absolute_address(ptr, init - dt_size);
-    int32 *data_table_end = void_table_ptr;
+    int32_t *data_table_end = void_table_ptr;
     module_comp_data_table *pt = void_table_ptr;
 
     /* Take a copy of the information table at the end of the module */
-    t.decoded_size = bytesex_hostval(pt->decoded_size);
-    t.encoded_size = bytesex_hostval(pt->encoded_size);
-    t.tables_size = bytesex_hostval(pt->tables_size);
-    t.nshorts = bytesex_hostval(pt->nshorts);
-    t.nlongs = bytesex_hostval(pt->nlongs);
+    t.decoded_size = le32toh(pt->decoded_size);
+    t.encoded_size = le32toh(pt->encoded_size);
+    t.tables_size = le32toh(pt->tables_size);
+    t.nshorts = le32toh(pt->nshorts);
+    t.nlongs = le32toh(pt->nlongs);
 
     encoded_hwm = absolute_address(data_table_end, -t.tables_size);
     encoded_lwm = absolute_address(encoded_hwm, -t.encoded_size);
@@ -106,19 +106,19 @@ error_code unsqueeze_module(
       e = errcode_NO_MEM;
     }
     else {
-      int32 shortlong_size = (t.nshorts + t.nlongs) * 4;
-      int32 *exptable = malloc((size_t) shortlong_size);
+      int32_t shortlong_size = (t.nshorts + t.nlongs) * 4;
+      int32_t *exptable = malloc((size_t) shortlong_size);
 
       if (exptable == NULL) {
         e = errcode_NO_MEM;
         free(module);
       }
       else {
-        int32 *decoded_hwm = absolute_address(module, t.decoded_size);
+        int32_t *decoded_hwm = absolute_address(module, t.decoded_size);
         unsigned char *tables_lwm = encoded_hwm;
-        int32 *decoded_table = exptable;
-        int32 *decoded_shorts_table = exptable;
-        int32 *decoded_longs_table = NULL;
+        int32_t *decoded_table = exptable;
+        int32_t *decoded_shorts_table = exptable;
+        int32_t *decoded_longs_table = NULL;
         enum {
           doing_shorts,
           doing_longs,
@@ -127,11 +127,11 @@ error_code unsqueeze_module(
 
         while (decode_type == doing_shorts || decode_type == doing_longs) {
           /* this while loop represents the label decodeTab */
-          int32 nels = (decode_type == doing_shorts) ? t.nshorts : t.nlongs;
-          int32 prev_entry = -1;
+          int32_t nels = (decode_type == doing_shorts) ? t.nshorts : t.nlongs;
+          int32_t prev_entry = -1;
 
           while (--nels >= 0) {
-            int32 byte = *tables_lwm++, num;
+            int32_t byte = *tables_lwm++, num;
 
             num = byte - 10;
             if (num >= 0) {
@@ -145,7 +145,7 @@ error_code unsqueeze_module(
                 if (num >= 0) {
                   /* twoMore */
                   num = (*tables_lwm++) | (num << 16);
-                  prev_entry += num | ((int32) (*tables_lwm++) << 8);
+                  prev_entry += num | ((int32_t) (*tables_lwm++) << 8);
                   *decoded_table++ = prev_entry;
                 }
                 else {
@@ -160,10 +160,10 @@ error_code unsqueeze_module(
               if (byte == 0) {
                 /* literal */
                 num = *tables_lwm++;
-                num |= ((int32) (*tables_lwm++) << 8);
-                num |= ((int32) (*tables_lwm++) << 16);
+                num |= ((int32_t) (*tables_lwm++) << 8);
+                num |= ((int32_t) (*tables_lwm++) << 16);
                 if (decode_type == doing_shorts) {
-                  num |= ((int32) (*tables_lwm++) << 24);
+                  num |= ((int32_t) (*tables_lwm++) << 24);
                 }
                 prev_entry += num;
                 *decoded_table++ = prev_entry;
@@ -186,6 +186,9 @@ error_code unsqueeze_module(
             case doing_longs:
               decode_type = done_shorts_and_longs;
               break;
+            case done_shorts_and_longs:
+              fprintf(stderr, "loop should have terminated already\n");
+              abort();
           }
         }
 
@@ -199,9 +202,9 @@ error_code unsqueeze_module(
          */
 
         while (encoded_hwm > encoded_lwm) {
-          int32 thisbyte = *--encoded_hwm;
-          int32 byte;
-          int32 nib, w[2];
+          int32_t thisbyte = *--encoded_hwm;
+          int32_t byte;
+          int32_t nib, w[2];
           int i;
 
           for (i=0; i<2; thisbyte >>= 4, ++i) {
@@ -223,15 +226,15 @@ error_code unsqueeze_module(
             else {
               /* literalX */
               byte = *--encoded_hwm;
-              byte |= (int32) (*--encoded_hwm) << 8;
-              byte |= (int32) (*--encoded_hwm) << 16;
-              byte |= (int32) (*--encoded_hwm) << 24;
+              byte |= (int32_t) (*--encoded_hwm) << 8;
+              byte |= (int32_t) (*--encoded_hwm) << 16;
+              byte |= (int32_t) (*--encoded_hwm) << 24;
               w[i] = byte;
             }
           }
 
-          decoded_hwm[-1] = bytesex_hostval(w[1]);
-          decoded_hwm[-2] = bytesex_hostval(w[0]);
+          decoded_hwm[-1] = le32toh(w[1]);
+          decoded_hwm[-2] = le32toh(w[0]);
           decoded_hwm -= 2;
         }
 
@@ -245,8 +248,8 @@ error_code unsqueeze_module(
     }
 
     if (e == ok) {
-      const int32 final = bytesex_hostval(module[entry_final]);
-      module[entry_final] = bytesex_hostval(final & ~final_invincible_bit);
+      const int32_t final = le32toh(module[entry_final]);
+      module[entry_final] = le32toh(final & ~final_invincible_bit);
     }
   }
 

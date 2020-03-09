@@ -22,7 +22,12 @@ void resourcefs_swi_register_extra(void)
 
 os_error *xresourcefs_register_files(resourcefs_file_list *file_list)
 {
-    fprintf(stderr, "swi XResourceFS_RegisterFiles unimplemented.\n");
+    resourcefs_file *f = file_list->file;
+
+    while (f->header.data_size != 0) {
+        fprintf(stderr, "ignoring ResourceFS registration of %s\n", f->header.name);
+        f = (resourcefs_file *) ((char *)f + f->header.data_size);
+    }
 
     return NULL;
 }

@@ -53,6 +53,7 @@ static hash *registered_swi;
     X(osbyte) \
     X(osfile) \
     X(osword) \
+    X(resourcefs) \
     X(sharedclibrary) \
     X(sharedunixlibrary) \
     X(taskwindow) \

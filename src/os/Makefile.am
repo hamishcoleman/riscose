@@ -16,6 +16,7 @@ libos_a_SOURCES = \
     os.c \
     osfile.c \
     osword.c \
+    resourcefs.c \
     sharedclib.c \
     sharedunixlibrary.c \
     taskwindow.c \

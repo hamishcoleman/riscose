@@ -35,6 +35,7 @@ BUILT_SOURCES = \
     osmodule.c osmodule.h osmodule.e \
     osspriteop.c osspriteop.h osspriteop.e \
     osword.c osword.h osword.e \
+    resourcefs.c resourcefs.h resourcefs.e \
     sharedunixlibrary.c sharedunixlibrary.h sharedunixlibrary.e \
     taskwindow.c taskwindow.h taskwindow.e \
     territory.c territory.h territory.e \

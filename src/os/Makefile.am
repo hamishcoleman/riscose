@@ -15,6 +15,7 @@ libos_a_SOURCES = \
     osbyte.c \
     os.c \
     osfile.c \
+    osfind.c \
     osword.c \
     resourcefs.c \
     sharedclib.c \

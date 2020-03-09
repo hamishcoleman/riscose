@@ -52,6 +52,7 @@ static hash *registered_swi;
     X(os) \
     X(osbyte) \
     X(osfile) \
+    X(osfind) \
     X(osword) \
     X(resourcefs) \
     X(sharedclibrary) \

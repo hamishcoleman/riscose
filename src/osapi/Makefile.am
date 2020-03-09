@@ -31,6 +31,7 @@ BUILT_SOURCES = \
     messagetrans.c messagetrans.h messagetrans.e \
     osbyte.c osbyte.h osbyte.e \
     osfile.c osfile.h osfile.e \
+    osfind.c osfind.h osfind.e \
     osheap.c osheap.h osheap.e \
     osmodule.c osmodule.h osmodule.e \
     osspriteop.c osspriteop.h osspriteop.e \

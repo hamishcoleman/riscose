@@ -25,7 +25,7 @@ os_error *xosfind_openinw(osfind_flags flags,
     char *path,
     os_fw *file)
 {
-    error("swi XOSFind_OpeninW unimplemented.\n");
+    error("swi XOSFind_OpeninW '%s' unimplemented.\n", file_name);
 
     return NULL;
 }

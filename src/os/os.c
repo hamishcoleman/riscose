@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <monty/monty.h>
 #include <readline/readline.h>
 #include "types.h"
@@ -216,7 +217,9 @@ os_error *xos_read_line (char *buffer,
 
 
   /* FIXME: not quite right! */
-  l = readline(NULL);
+  printf("\r");
+  l = readline(prompt_buffer);
+  bzero(prompt_buffer, sizeof(prompt_buffer));
 
   if (l==NULL) {
     buffer[0] = '\r';

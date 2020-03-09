@@ -10,10 +10,14 @@
 
 #include <stdio.h>
 #include <curses.h>
+#include <string.h>
+#include <assert.h>
 
 #include "vdu.h"
 
 static BYTE vdubuf[32];
+
+char prompt_buffer[256];
 
 int vducmd, vduqlen = 0, vduqptr = 0, vdu_mode = -1;
 int fgcol = 1, bgcol = 0;
@@ -84,9 +88,17 @@ vdu_complete(void)
   vduqlen = 0;
 }
 
+static void emit_char(int c) {
+    if (vdu_mode == -1)
+        putchar(c);
+    else
+        addch(c | COLOR_PAIR((!(fgcol & 1)) + ((bgcol & 1) << 1)));
+}
+
 void
 vdu(BYTE c)
 {
+  int prompt_length = -1;
   if (vduqlen)
     {
       vdubuf[vduqptr++] = c;
@@ -116,6 +128,12 @@ vdu(BYTE c)
       break;
     case 7:	/* bell */
       break;
+    case '\n':
+    case '\r':
+      assert(sizeof(prompt_buffer)==256);
+      bzero(prompt_buffer, sizeof(prompt_buffer));
+      emit_char(c);
+      break;
     case 17:	/* text colour */
       vduqlen = 1;
       break;
@@ -142,10 +160,11 @@ vdu(BYTE c)
       vduqlen = 2;
       break;
     default:
-      if (vdu_mode == -1)
-	putchar(c);
-      else
-	addch(c | COLOR_PAIR((!(fgcol & 1)) + ((bgcol & 1) << 1)));
+      prompt_length = strlen(prompt_buffer);
+      if (prompt_length<254) {
+          prompt_buffer[prompt_length] = c;
+      }
+      emit_char(c);
       break;
     }
   if (vdu_mode != -1)

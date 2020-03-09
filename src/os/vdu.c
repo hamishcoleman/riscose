@@ -29,7 +29,7 @@ vdu_getch(void)
   return (c == ERR) ? -1 : c;
 }
 
-void
+static void
 start_curses(void)
 {
   initscr();
@@ -41,7 +41,7 @@ start_curses(void)
   keypad(stdscr, FALSE);
 }
 
-void
+static void
 initpalette(void)
 {
   switch (vdu_mode)
@@ -55,7 +55,7 @@ initpalette(void)
     }
 }
 
-void
+static void
 vdu_complete(void)
 {
   unsigned int i;

@@ -4,3 +4,4 @@ Makefile
 *.e
 *.h
 *.o
+libosapi.a

@@ -1,4 +1,4 @@
-Makefile.am
+Makefile.in
 *.o
 .deps
 unmodsqz

@@ -179,9 +179,9 @@ void riscose_header_output
          if (t == NULL || t->tag == def_TYPE_ABSTRACT)
          /* typedef abstract struct */
          {
-            char c_name_ [def_ID_LIMIT + 1];
+            char c_name_ [def_ID_LIMIT + 3];
 
-            sprintf (c_name_, "%s_", c_name);
+            snprintf (c_name_, sizeof(c_name_)-1, "%s_", c_name);
 
             if ((rc = fprintf (file, "typedef struct %-32s *%s;\n",
                   c_name_, c_name)) < 0)

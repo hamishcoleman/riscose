@@ -50,8 +50,10 @@ static hash *registered_swi;
     X(fpemulator) \
     X(hourglass) \
     X(os) \
+    X(osargs) \
     X(osbyte) \
     X(osfile) \
+    X(osfscontrol) \
     X(osfind) \
     X(osword) \
     X(resourcefs) \

@@ -29,9 +29,11 @@ BUILT_SOURCES = \
     fpemulator.c fpemulator.h fpemulator.e \
     hourglass.c hourglass.h hourglass.e \
     messagetrans.c messagetrans.h messagetrans.e \
+    osargs.c osargs.h osargs.e \
     osbyte.c osbyte.h osbyte.e \
     osfile.c osfile.h osfile.e \
     osfind.c osfind.h osfind.e \
+    osfscontrol.c osfscontrol.h osfscontrol.e \
     osheap.c osheap.h osheap.e \
     osmodule.c osmodule.h osmodule.e \
     osspriteop.c osspriteop.h osspriteop.e \

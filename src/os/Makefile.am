@@ -14,8 +14,10 @@ libos_a_SOURCES = \
     module.c \
     osbyte.c \
     os.c \
+    osargs.c \
     osfile.c \
     osfind.c \
+    osfscontrol.c \
     osword.c \
     resourcefs.c \
     sharedclib.c \

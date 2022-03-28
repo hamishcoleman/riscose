@@ -6,6 +6,7 @@
  * Created by defmod, riscose version 1.01. */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "monty/monty.h"
 #include "types.h"
@@ -22,7 +23,9 @@ void ddeutils_swi_register_extra(void)
 
 os_error *xddeutils_prefix(char *dir_name)
 {
-    error("swi XDDEUtils_Prefix unimplemented.\n");
+    if (dir_name && strlen(dir_name) != 0) {
+        error("swi XDDEUtils_Prefix unimplemented: %s\n", dir_name);
+    }
 
     return NULL;
 }

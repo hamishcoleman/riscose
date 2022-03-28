@@ -6,6 +6,7 @@
  * Created by defmod, riscose version 1.01. */
 
 #include <stdio.h>
+#include <string.h>
 
 #include "monty/monty.h"
 #include "types.h"
@@ -378,7 +379,9 @@ os_error *xosfscontrol_canonicalise_path(char *path_name,
     int size,
     int *spare)
 {
-    error("swi XOSFSControl_CanonicalisePath unimplemented.\n");
+    strncpy(path_name, buffer, size);
+    *spare = 0;
+    fprintf(stderr, "xosfscontrol_canonicalise_path not implemented for: %s\n", path_name);
 
     return NULL;
 }

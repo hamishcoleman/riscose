@@ -1,2 +1,8 @@
 Makefile
 Makefile.in
+
+# scripts that come from automake
+compile
+missing
+test-driver
+ylwrap

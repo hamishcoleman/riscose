@@ -240,16 +240,11 @@ remap_it(WORD base, WORD oldsize, WORD newsize)
 }
 #endif
 
-void mem_init(void)
+void mem_init(char *image)
 {
-    char *image;
-
     NEW(mem);
     mem->task_current = -1;
     mem->tasks = ecalloc(MAX_TASKS * sizeof(*mem->tasks));
-
-    /* FIXME: should look for it by installation prefix. */
-    image = "rom/romimage";
 
 #ifdef CONFIG_MEM_ONE2ONE
 #ifndef NATIVE

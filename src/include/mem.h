@@ -28,7 +28,7 @@ typedef struct {
 mem_private;
 
 /* Startup / shutdown functions to be called once */
-void	mem_init(void);
+void	mem_init(char *);
 void	mem_final(void);
 
 /* Task management */

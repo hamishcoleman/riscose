@@ -47,6 +47,7 @@ main(int argc, char **argv)
         {"module", no_argument, NULL, 'm'},
         {"utility", no_argument, NULL, 'u'},
         {"wimpslot", required_argument, NULL, 'w'},
+        {"romimage", required_argument, NULL, 'R'},
         {0}
     };
   int module=0, c;
@@ -57,6 +58,9 @@ main(int argc, char **argv)
   WORD  count = 0, o;
     struct stat st;
     WORD wimpslot = 0;
+
+    /* FIXME: should default it to installation prefix. */
+    char *romimage = "rom/romimage";
   
     (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
     *argv = progname;
@@ -64,7 +68,7 @@ main(int argc, char **argv)
 
     wimpslot = 640*1024;
 
-    while ((c = getopt_long(argc, argv, "+hVvD:muw:", long_options,
+    while ((c = getopt_long(argc, argv, "+hVvD:muw:R:", long_options,
         NULL)) != EOF) {
         switch (c) {
         case 'h':
@@ -80,6 +84,7 @@ RISCOSE_DEBUG_HELP
 "    -m, --module      binary is a module.\n"
 "    -u, --utility     binary is a utility.\n"
 "    -w, --wimpslot=K  allocates K kilobytes for execution.\n"
+"    -R, --romimage=name  location of the romimage.\n"
 "binary is the risc os executable to run.  args are its arguments.\n",
                 progname);
             return 0;
@@ -120,6 +125,9 @@ RISCOSE_DEBUG_HELP
             /* FIXME: perhaps units should be allowed. */
             wimpslot = atoi(optarg);
             break;
+        case 'R':
+            romimage = optarg;
+            break;
         default: 
             error("try `%s -h' for more information.\n", progname);
             break;
@@ -143,7 +151,7 @@ RISCOSE_DEBUG_HELP
     }
 
   filehandles_init();
-  mem_init();
+  mem_init(romimage);
   module_init();
   swi_init();
   arm_init();

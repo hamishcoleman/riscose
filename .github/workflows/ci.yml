@@ -29,3 +29,16 @@ jobs:
           ./configure
           make
 
+      - name: Quick test
+        run: |
+          wget https://riscose.sourceforge.net/grep.gz
+          gzip -d grep.gz
+          ./src/riscose --romimage=src/rom/romimage grep --version
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v2
+        with:
+          name: artifact
+          path: |
+            src/riscose
+            src/rom/romimage

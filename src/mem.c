@@ -274,7 +274,7 @@ remap_it(WORD base, WORD oldsize, WORD newsize)
 
 extern char _binary_romimage_start[];
 
-void mem_init(void)
+void mem_init(char *image)
 {
     NEW(mem);
     mem->task_current = -1;

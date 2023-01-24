@@ -48,6 +48,7 @@ main(int argc, char **argv)
         {"utility", no_argument, NULL, 'u'},
         {"wimpslot", required_argument, NULL, 'w'},
         {"gdb", no_argument, NULL, 'g'},
+        {"romimage", required_argument, NULL, 'R'},
         {0}
     };
   int module=0, c;
@@ -62,13 +63,16 @@ main(int argc, char **argv)
     char **to_rmload = malloc(sizeof(char*));
     int gdb = 0;
 
+    /* FIXME: should default it to installation prefix. */
+    char *romimage = "rom/romimage";
+  
     (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
     *argv = progname;
     debugf = verbosef = stderr;
 
     wimpslot = 640*1024;
 
-    while ((c = getopt_long(argc, argv, "+hVvD:muw:r:g", long_options,
+    while ((c = getopt_long(argc, argv, "+hVvD:muw:r:gR:", long_options,
         NULL)) != EOF) {
         switch (c) {
         case 'h':
@@ -85,6 +89,7 @@ RISCOSE_DEBUG_HELP
 "    -u, --utility     binary is a utility.\n"
 "    -w, --wimpslot=K  allocates K kilobytes for execution.\n"
 "    -r, --rmload=s    load this relocatable module.\n"
+"    -R, --romimage=name  location of the romimage.\n"
 "    -g, --gdb         provide gdb remote target on port 53415.\n"
 "binary is the risc os executable to run.  args are its arguments.\n",
                 progname);
@@ -131,9 +136,11 @@ RISCOSE_DEBUG_HELP
             to_rmload[rmload_count] = optarg;
             rmload_count++;
             break;
+        case 'R':
+            romimage = optarg;
+            break;
         case 'g':
             gdb = 1;
-            break;
         default: 
             error("try `%s -h' for more information.\n", progname);
             break;
@@ -157,7 +164,7 @@ RISCOSE_DEBUG_HELP
     }
 
   filehandles_init();
-  mem_init();
+  mem_init(romimage);
   module_init();
   swi_init();
   arm_init();

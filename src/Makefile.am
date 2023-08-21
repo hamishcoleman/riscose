@@ -18,6 +18,7 @@ noinst_PROGRAMS = heaptest
 
 riscose_SOURCES = heap.c main.c mem.c riscose.h swi.c util.c
 riscose_LDADD = osapi/libosapi.a os/libos.a \
+    rom/romimage.o \
     @ARM@/lib@ARM@.a monty/libmonty.a \
     -lncurses -lreadline
 

@@ -186,32 +186,6 @@ BYTE MEM_WRITE_BYTE(WORD a, BYTE v) {
   return (*((BYTE*)MEM_TOHOST(a))) = v;
 }
 
-
-static
-BYTE*
-load_rom(char *file, BYTE *address)
-{
-  int f;
-  struct stat s;
-  BYTE *rom;
-   
-  if (stat(file, &s) != 0)
-  {
-    fprintf(stderr, "Couldn't find rom file `%s'\n", file);
-    abort();
-  }
-  if (address == NULL)
-    rom = emalloc(s.st_size);
-  else
-    rom = address;
-  f = open(file, O_RDONLY);
-  size_t r = read(f, rom, s.st_size);
-  assert(r == s.st_size);
-  close(f);
-  
-  return rom;
-}
-
 #ifdef CONFIG_MEM_ONE2ONE
 #define MMAP_INIT_ERR(x) { printf("mmap_init: %s", (x)); exit(1); }
 void
@@ -240,16 +214,13 @@ remap_it(WORD base, WORD oldsize, WORD newsize)
 }
 #endif
 
+extern char _binary_romimage_start[];
+
 void mem_init(void)
 {
-    char *image;
-
     NEW(mem);
     mem->task_current = -1;
     mem->tasks = ecalloc(MAX_TASKS * sizeof(*mem->tasks));
-
-    /* FIXME: should look for it by installation prefix. */
-    image = "rom/romimage";
 
 #ifdef CONFIG_MEM_ONE2ONE
 #ifndef NATIVE
@@ -260,10 +231,11 @@ void mem_init(void)
     map_it(MMAP_ROM_BASE, MMAP_ROM_SIZE);
     mem->rma      = MEM_TOHOST(MMAP_RMA_BASE);
     mem->rom      = MEM_TOHOST(MMAP_ROM_BASE);
-    load_rom(image, MEM_TOHOST(MMAP_ROM_BASE));
+
+    memcpy(_binary_foo_bar_start, MEM_TOHOST(MMAP_ROM_BASE));
 #else
     mem->rma      = emalloc(RMA_START_SIZE);
-    mem->rom      = load_rom(image, 0);
+    mem->rom      = (BYTE *) _binary_romimage_start;
 #endif
     mem->rma_size = RMA_START_SIZE;
 

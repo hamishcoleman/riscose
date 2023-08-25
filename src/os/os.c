@@ -170,7 +170,7 @@ os_error *xos_readc (char *c,
   c[1] = 0;
   c[2] = 0;
   c[3] = 0;
-  if (read(1, &r, 1)==1) {
+  if (read(0, &r, 1)==1) {
     *psr = 0;
     c[0] = r;
   }

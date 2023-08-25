@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <monty/monty.h>
 #include <readline/readline.h>
 #include "types.h"
@@ -164,7 +165,18 @@ os_error *xos_new_line (void)
 os_error *xos_readc (char *c,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
+  char r;
+  c[0] = 0;
+  c[1] = 0;
+  c[2] = 0;
+  c[3] = 0;
+  if (read(1, &r, 1)==1) {
+    *psr = 0;
+    c[0] = r;
+  }
+  else {
+    *psr = ARM_C_FLAG;
+  }
   return 0;
 }
 

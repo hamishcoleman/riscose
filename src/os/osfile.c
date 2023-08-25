@@ -489,8 +489,8 @@ os_error *xosfile_load_stamped_no_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  // XXX Handle lack of path
+  return xosfile_load_stamped(file_name, addr, obj_type, load_addr, exec_addr, size, attr);
 }
 
 /* ------------------------------------------------------------------------

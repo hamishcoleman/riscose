@@ -61,3 +61,4 @@ void osbyte(void);
 void swi_init(void);
 void swi_trap(WORD num);
 void swi_register(WORD number, char *name, swi_handler handler);
+int swi_name_to_number(const char *buf);

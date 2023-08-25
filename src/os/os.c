@@ -22,6 +22,7 @@
 #include "mem.h"
 #include "arm.h"
 #include "swi.h"
+#include "rom/rom.h"
 
 static const int Sys$RCLimit = 256;
 
@@ -1131,11 +1132,9 @@ os_error *xos_swi_number_to_string (int swi,
 os_error *xos_swi_number_from_string (char *swi_name,
       int *swi)
 {
-  if (strcmp("OS_Write0", swi_name)==0) {
-    *swi = 0x02;
-  }
-  else {
-    error("*** SWI unimplemented\n");
+  *swi = swi_name_to_number(swi_name);
+  if (swi == 0) {
+      return ERR_NO_SUCH_SWI();
   }
   return 0;
 }

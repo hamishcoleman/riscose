@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #include "config.h"
 #include "monty/monty.h"
@@ -185,6 +186,35 @@ static void swi_number_to_name(WORD num, char *buf)
 
     return;
 }
+
+static int swi_name_to_number_walk(hash_elem *elem, void *q) {
+    char *quarry = (char *) q;
+    if (strcmp(((swi_routine *) elem->datum)->name, quarry)==0) {
+        return ((swi_routine *) elem->datum)->number;
+    }
+    return 0;
+}
+
+
+int swi_name_to_number(const char *buf)
+{
+    int x = 0;
+    char *s = strdup(buf);
+    if (*buf == 'X') {
+        x = 1<<17;
+        buf++;
+    }
+
+    int r = walk_hash(registered_swi, swi_name_to_number_walk, s);
+    free(s);
+    printf("Found %x from %s\n", r, buf);
+    if (r != 0) {
+        return r | x;
+    }
+
+    return -1;
+}
+
 
 /* FIXME: it's unclear from using `WORD num' when the number has
  * already passed through SWI_NUM and when it hasn't.  Some

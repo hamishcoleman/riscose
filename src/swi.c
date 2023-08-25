@@ -207,6 +207,11 @@ int swi_name_to_number(const char *buf)
 
     int r = walk_hash(registered_swi, swi_name_to_number_walk, s);
     free(s);
+
+    if (r==0 && strcmp(buf, "OS_File")==0) {
+        r = 0x08;
+    }
+
     printf("Found %x from %s\n", r, buf);
     if (r != 0) {
         return r | x;

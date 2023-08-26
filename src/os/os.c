@@ -25,6 +25,9 @@
 #include "swi.h"
 #include "rom/rom.h"
 
+// From crcany
+#include "crc16arc.h"
+
 static const int Sys$RCLimit = 256;
 
 os_error* os_call_a_swi(WORD n)
@@ -1874,7 +1877,11 @@ os_error *xos_crc (int crc_in,
       int stride,
       int *crc)
 {
-  error("*** SWI unimplemented\n");
+  if (stride != 1) {
+    error("Stride of !1 not implemented");
+  }
+  *crc = crc16arc_byte(crc_in, block, ((byte *)end-block));
+
   return 0;
 }
 

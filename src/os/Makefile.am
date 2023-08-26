@@ -24,6 +24,7 @@ libos_a_SOURCES = \
     territory.c \
     utilitymod.c \
     wimpreadsysinfo.c \
-    vdu.c
+    vdu.c \
+    crc16arc.c
 
 EXTRA_DIST = .cvsignore

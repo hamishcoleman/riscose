@@ -85,4 +85,6 @@ memory_area_t mem_where(void *_ptr);
 #define MEM_PLACE_ENVIRONMENT 0x1000
 #define MEM_MODULE_PRIVATES   0x2000
 
+#define VERY_BAD_POINTER  ((void *)0x8000000000000000);
+
 #endif

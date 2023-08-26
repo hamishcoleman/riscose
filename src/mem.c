@@ -110,6 +110,10 @@ void *mem_get_private(void) {
 
 BYTE *mem_f_tohost(WORD arm)
 {
+    if (arm == 0xffffffff) {
+        fprintf(stderr, "Making bad pointer very bad!\n");
+        return (BYTE *) VERY_BAD_POINTER;
+    }
     if (arm == 0) {
         return NULL;
     }

@@ -93,7 +93,10 @@ os_error *xos_read_var_val_size (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  error("*** SWI unimplemented\n");
+  fprintf(stderr, "Pretending environment variable %s does not exist\n", var);
+  *used = 0;
+  *context_out = 0;
+  *var_type_out = 0;
   return 0;
 }
 
@@ -758,7 +761,10 @@ os_error *xos_read_var_val (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  error("*** SWI unimplemented\n");
+  fprintf(stderr, "Pretending environment variable %s does not exist\n", var);
+  *used = 0;
+  *context_out = 0;
+  *var_type_out = 0;
   return 0;
 }
 

@@ -1,3 +1,5 @@
+/* Taken from the crcany project, under the Zlib license. */
+
 // The _bit, _byte, and _word routines return the CRC of the len
 // bytes at mem, applied to the previous CRC value, crc. If mem is
 // NULL, then the other arguments are ignored, and the initial CRC,

@@ -1,3 +1,5 @@
+/* Taken from the crcany project, under the Zlib license. */
+
 #include "crc16arc.h"
 
 uint16_t crc16arc_bit(uint16_t crc, void const *mem, size_t len) {

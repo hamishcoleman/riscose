@@ -212,7 +212,6 @@ int swi_name_to_number(const char *buf)
         r = 0x08;
     }
 
-    printf("Found %x from %s\n", r, buf);
     if (r != 0) {
         return r | x;
     }

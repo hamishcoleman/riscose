@@ -159,7 +159,7 @@ ARMul_OSException(ARMul_State *state, ARMword vector, ARMword pc)
 ARMword
 ARMul_Debug(ARMul_State *state, ARMword pc, ARMword instr)
 {
-  return 0;
+  return instr;
 }
 
 unsigned

@@ -26,7 +26,7 @@ static char *basictrans_errors[] = {
   "Stopped",
   "Invalid LISTO option",
   "Invalid TWINO option",
-  "",
+  "Corruption of stack",
   "Error control status not found on stack for RESTORE ERROR",
   "Missing incore name",
   "LIST/TWIN found line number reference",

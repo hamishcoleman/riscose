@@ -1316,12 +1316,18 @@ os_error *xos_change_environment (os_handler_type handler_type,
       byte **old_handle,
       byte **old_buffer)
 {
+  WORD arm_old_handler, arm_old_r12, arm_old_buffer;
+  mem_get_environment_handler(handler_type, &arm_old_handler, &arm_old_r12, &arm_old_buffer);
 
-  fprintf(stderr, "FIXME --- OS_ChangeEnvironment %d unimplemented\n", handler_type);
+  *old_handler = mem_f_tohost(arm_old_handler);
+  *old_handle  = mem_f_tohost(arm_old_r12);
+  *old_buffer  = mem_f_tohost(arm_old_buffer);
 
-  *old_handler = 0;
-  *old_handle  = 0;
-  *old_buffer  = 0;
+  if (handler == NULL) handler = *old_handler;
+  if (handle  == NULL) handle  = *old_handle;
+  if (buffer  == NULL) buffer = *old_buffer;
+
+  mem_set_environment_handler(handler_type, mem_f_toarm(handler), mem_f_toarm(handle), mem_f_toarm(buffer));
 
   return 0;
 }

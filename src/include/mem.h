@@ -87,4 +87,7 @@ memory_area_t mem_where(void *_ptr);
 
 #define VERY_BAD_POINTER  ((void *)0x8000000000000000);
 
+void mem_set_environment_handler(int handler, WORD routine, WORD r12, WORD buffer);
+void mem_get_environment_handler(int handler, WORD *routine, WORD *r12, WORD *buffer);
+
 #endif

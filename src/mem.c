@@ -34,12 +34,22 @@
 #define MAX_TASKS 64
 #define RMA_START_SIZE 256*1024
 
+#define SYSTEM_CONTROL_HANDLERS 17
+
+typedef struct {
+    WORD routine;
+    WORD r12;
+    WORD buffer;
+}
+mem_environment_handler;
+
 typedef struct {
   WORD wimpslot;
   BYTE *app;
   BYTE *stack;
   BYTE *env;
   void *info; /* for our WIMP to use */
+  mem_environment_handler env_handler[SYSTEM_CONTROL_HANDLERS];
 }
 mem_wimp_task;
 
@@ -512,3 +522,20 @@ arm_backtrace(void)
   backtrace_in_progress = 0;
 }
 #endif
+
+void mem_set_environment_handler(int handler, WORD routine, WORD r12, WORD buffer) {
+    assert(handler >= 0);
+    assert(handler < SYSTEM_CONTROL_HANDLERS);
+    ctask()->env_handler[handler].routine = routine;
+    ctask()->env_handler[handler].r12 = r12;
+    ctask()->env_handler[handler].buffer = buffer;
+}
+
+void mem_get_environment_handler(int handler, WORD *routine, WORD *r12, WORD *buffer) {
+    assert(handler >= 0);
+    assert(handler < SYSTEM_CONTROL_HANDLERS);
+
+    *routine = ctask()->env_handler[handler].routine;
+    *r12     = ctask()->env_handler[handler].r12;
+    *buffer  = ctask()->env_handler[handler].buffer;
+}

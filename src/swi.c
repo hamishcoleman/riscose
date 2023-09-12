@@ -157,8 +157,23 @@ void swi_trap(WORD num)
             ARM_SET_R0(MEM_TOARM(e));
         } else {
             /* FIXME: should call OS_GenerateError. */
-            error("swi returned error: %#x %s\n", e->errnum,
-                e->errmess);
+            WORD routine, r12, buffer;
+            mem_get_environment_handler(6, &routine, &r12, &buffer);
+            if (routine != 0) {
+                printf("Running custom error handler %X %X %d %s %X R12=%X\n", arm_get_reg(15), arm_get_r15_all(), e->errnum, e->errmess, routine, r12);
+                WORD *b = (WORD *) mem_f_tohost(buffer);
+                //memset(b, 0, 260);
+                b[0] = arm_get_r15_all();
+                b[1] = e->errnum;
+                strncpy(((char *) b)+8, e->errmess, 255);
+                arm_clear_v();
+                ARM_SET_R0(r12);
+                arm_set_pc(routine & ~0x3);
+            }
+            else {
+                error("swi returned error: %#x %s\n", e->errnum,
+                    e->errmess);
+            }
         }
     }
 

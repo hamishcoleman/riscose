@@ -94,7 +94,10 @@ module_load(char *name)
             exit(1);
         }
         ARM_SET_R12(module_private_word_ptr(modules));
+        WORD old_r15 = ARM_R15_ALL;
+        arm_set_reg(15, old_r15 | 0x3);
         arm_run_routine(init);
+        arm_set_reg(15, old_r15-4);
     }
 
   if (ARM_V_SET) {

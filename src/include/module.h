@@ -29,6 +29,7 @@
 void	module_init(void);
 int	module_numberofmodules(void);
 WORD    module_base(int num);
+WORD    module_private_word_ptr(int);
 int	module_lookup(char *name);
 int	module_load(char *name);
 int	module_kill(int num);

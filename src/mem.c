@@ -65,6 +65,7 @@ typedef struct {
     BYTE *rma;
     WORD rma_size;
     BYTE *rom;
+    BYTE *svc_stack;
 } mem_state;
 
 static mem_state *mem;
@@ -97,6 +98,8 @@ mem_where(void *_ptr)
     return MEM_ID_ROM;
   if (ctask() && (ptr >= ctask()->stack && ptr < ctask()->stack + MMAP_USRSTACK_SIZE))
     return MEM_ID_USRSTACK;
+  if (ptr >= mem->svc_stack && ptr < mem->svc_stack+MMAP_SVCSTACK_SIZE)
+    return MEM_ID_SVC_STACK;
   fprintf(stderr, "*** Don't know which memory area %p belongs to\n", ptr);
   abort();
   return 0;
@@ -140,7 +143,9 @@ BYTE *mem_f_tohost(WORD arm)
     if (arm >= MMAP_ROM_BASE && arm < MMAP_ROM_BASE + MMAP_ROM_SIZE) {
         return mem->rom + (arm - MMAP_ROM_BASE);
     }
-    
+    if (arm >= MMAP_SVCSTACK_BASE && arm < MMAP_SVCSTACK_BASE + MMAP_SVCSTACK_SIZE)
+        return mem->svc_stack + (arm - MMAP_SVCSTACK_BASE);
+
     error("mem_f_tohost: %#x invalid address\n", arm);
     abort();
 }
@@ -165,6 +170,8 @@ WORD mem_f_toarm(void *host)
             (arm - ctask()->stack);
     case MEM_ID_ROM:
         return MMAP_ROM_BASE + (arm - mem->rom);
+    case MEM_ID_SVC_STACK:
+        return MMAP_SVCSTACK_BASE + (arm - mem->svc_stack);
     default:
     error("mem_f_toarm: Don't know how to map %p\n", host);
     abort();
@@ -251,6 +258,7 @@ void mem_init(void)
     mem->rma      = emalloc(RMA_START_SIZE);
     mem->rom      = (BYTE *) _binary_romimage_start;
 #endif
+    mem->svc_stack = emalloc(MMAP_SVCSTACK_SIZE);
     mem->rma_size = RMA_START_SIZE;
 
     heap_init((heap_t *)MEM_TOHOST(MMAP_RMA_BASE), RMA_START_SIZE);

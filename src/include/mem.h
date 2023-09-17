@@ -77,6 +77,7 @@ typedef enum {
   MEM_ID_TASKHEAP       = -4,
   MEM_ID_USRSTACK       = -5,
   MEM_ID_ROM            = -6,
+  MEM_ID_SVC_STACK      = -7,
   MEM_ID_NEWDYNAMICAREA = -99,
 } memory_area_t;
 

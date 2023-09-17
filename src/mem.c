@@ -338,6 +338,7 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
     if (mem->tasks[c].wimpslot == 0)
       {
        assert(wimpslot < MMAP_APP_SIZE);
+       memset(&mem->tasks[c], 0, sizeof(mem->tasks[c]));
        mem->tasks[c].wimpslot = wimpslot;
        mem->tasks[c].info     = info;
        mem->tasks[c].stack    = emalloc(MMAP_USRSTACK_SIZE);

@@ -28,6 +28,8 @@
 #include "vdu.h"
 #include "mem.h"
 #include "os.h"
+#include "module.h"
+#include "map.h"
 
 /* FIXME: should be in a header file. */
 int swih_sharedclibrary_entry(WORD num);
@@ -95,8 +97,8 @@ void swi_register(WORD number, char *name, swi_handler handler)
 
 void swi_trap(WORD num)
 {
-    os_error *e;
-    swi_routine *r;
+    os_error *e = NULL;
+    swi_routine *r = NULL;
 
 #ifdef CONFIG_TRACE_SWIS
     {
@@ -138,17 +140,61 @@ void swi_trap(WORD num)
         return;
     }
 
-    /* Look up the SWI's details and call it if found */
+    /* Is SWI handled by a real module? */
+    int swi_handled_by_arm = 0;
+
     r = swi_lookup(num);
-    if (r == NULL)
-    {
-      char buf[64];
-      swi_number_to_name(SWI_NUM(num), buf);
-      error("Unregistered SWI %s called at %08x\n", buf, (unsigned) ARM_R15);
+    if (r) {
+        DEBUG(SWI, ("swi %s\n", r->name));
     }
-      
-    DEBUG(SWI, ("swi %s\n", r->name));
-    e = r->handler(num);
+    else {
+        DEBUG(SWI, ("swi %d\n", num));
+    }
+
+    for (int i=1; i<module_numberofmodules(); i++) {
+        WORD base = module_base(i);
+        WORD swi_chunk   = MEM_READ_WORD(base + 0x1c);
+
+        if ((SWI_NUM(num) & ~0x3f) == swi_chunk) {
+            swi_handled_by_arm = 1;
+
+            /* OS requires us to preserve R10-12 */
+            WORD old_r10 = ARM_R10;
+            WORD old_r11 = ARM_R11;
+            WORD old_r12 = ARM_R12;
+            WORD old_r14 = ARM_R14;
+            WORD old_r15 = ARM_R15_ALL;
+
+            arm_set_reg(11, num & 0x3f);
+            arm_set_reg(12, module_private_word_ptr(i));
+            arm_set_reg(15, old_r15 | 0x3);
+            assert(arm_get_reg(13) > MMAP_SVCSTACK_BASE);
+            arm_run_routine(MEM_READ_WORD(base+0x20)+base);
+
+            if (ARM_V_SET) {
+              e = (os_error*) MEM_TOHOST(arm_get_reg(0));
+            }
+
+            arm_set_reg(15, old_r15-4);
+            arm_set_reg(14, old_r14);
+            arm_set_reg(12, old_r12);
+            arm_set_reg(11, old_r11);
+            arm_set_reg(10, old_r10);
+
+            break;
+        }
+    }
+
+    /* Look up the SWI's details and call it if found */
+    if (!swi_handled_by_arm) {
+        if (r == NULL)
+        {
+          char buf[64];
+          swi_number_to_name(SWI_NUM(num), buf);
+          error("Unregistered SWI %s called at %08x\n", buf, (unsigned) ARM_R15);
+        }
+        e = r->handler(num);
+    }
 
     arm_clear_v();
     if (e) {
@@ -160,10 +206,9 @@ void swi_trap(WORD num)
             WORD routine, r12, buffer;
             mem_get_environment_handler(6, &routine, &r12, &buffer);
             if (routine != 0) {
-                printf("Running custom error handler %X %X %d %s %X R12=%X\n", arm_get_reg(15), arm_get_r15_all(), e->errnum, e->errmess, routine, r12);
                 WORD *b = (WORD *) mem_f_tohost(buffer);
                 //memset(b, 0, 260);
-                b[0] = arm_get_r15_all();
+                b[0] = ARM_R15_ALL;
                 b[1] = e->errnum;
                 strncpy(((char *) b)+8, e->errmess, 255);
                 arm_clear_v();

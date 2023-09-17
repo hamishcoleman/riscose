@@ -32,7 +32,7 @@
 #include "heap.h"
 
 #define MAX_TASKS 64
-#define RMA_START_SIZE 256*1024
+#define RMA_START_SIZE (256*1024)
 
 #define SYSTEM_CONTROL_HANDLERS 17
 

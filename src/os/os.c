@@ -52,7 +52,7 @@ os_error* os_write_s(WORD n)
     pc++;
   }
   pc = (pc + 3) & ~3;
-  arm_set_pc(pc);
+  arm_set_reg(15, pc | (ARM_R15_ALL & 0x3));
 
   return 0;
 }

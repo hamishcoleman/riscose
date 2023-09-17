@@ -57,14 +57,16 @@ main(int argc, char **argv)
   WORD  count = 0, o;
     struct stat st;
     WORD wimpslot = 0;
-  
+    int rmload_count = 0;
+    char **to_rmload = malloc(sizeof(char*));
+
     (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
     *argv = progname;
     debugf = verbosef = stderr;
 
     wimpslot = 640*1024;
 
-    while ((c = getopt_long(argc, argv, "+hVvD:muw:", long_options,
+    while ((c = getopt_long(argc, argv, "+hVvD:muw:r:", long_options,
         NULL)) != EOF) {
         switch (c) {
         case 'h':
@@ -80,6 +82,7 @@ RISCOSE_DEBUG_HELP
 "    -m, --module      binary is a module.\n"
 "    -u, --utility     binary is a utility.\n"
 "    -w, --wimpslot=K  allocates K kilobytes for execution.\n"
+"    -r, --rmload=s    load this relocatable module.\n"
 "binary is the risc os executable to run.  args are its arguments.\n",
                 progname);
             return 0;
@@ -119,6 +122,11 @@ RISCOSE_DEBUG_HELP
             /* FIXME: needs better error checking. */
             /* FIXME: perhaps units should be allowed. */
             wimpslot = atoi(optarg);
+            break;
+        case 'r':
+            to_rmload = reallocarray(to_rmload, rmload_count+1, sizeof(char*));
+            to_rmload[rmload_count] = optarg;
+            rmload_count++;
             break;
         default: 
             error("try `%s -h' for more information.\n", progname);
@@ -173,6 +181,11 @@ RISCOSE_DEBUG_HELP
   
   /* Run the code */
 
+    for (int i=0; i<rmload_count; i++) {
+        module_load(to_rmload[i]);
+    }
+    free(to_rmload);
+
     if (utility) {
         utility_run(file, priv);
     } else if (module) {
@@ -186,6 +199,7 @@ RISCOSE_DEBUG_HELP
         if (!start) {
             error("module `%s' doesn't have a start entry point\n", file);
         }
+        printf("Module loaded at %X\n", module_base(module));
         arm_run_routine(start);
     } else {
         arm_run_routine(0x8000);

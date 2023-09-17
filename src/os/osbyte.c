@@ -46,7 +46,7 @@ os_error *xos_byte (osbyte_op op,
 
   switch (op)
   {
-    case 126:  /* Acknowledge escape condition: 1 - 868 */
+    case osbyte_ACKNOWLEDGE_ESCAPE:  /* Acknowledge escape condition: 1 - 868 */
       /* FIXME --- probably need proper Escape condition handling */
       if (r1_out)
 	*r1_out = 0xff;
@@ -100,6 +100,9 @@ os_error *xos_byte (osbyte_op op,
 	*r1_out = 0;
       if (r2_out)
 	*r2_out = vdu_mode;
+      break;
+    case osbyte_VAR_VDU_QUEUE_LENGTH:
+      *r1_out = 0;
       break;
     default:
       fprintf(stderr, "[OS_Byte %d, %d, %d]\n", op, r1, r2);

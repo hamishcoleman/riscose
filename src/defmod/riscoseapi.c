@@ -166,7 +166,7 @@ void riscose_osapi_output
          ** SWI emulation code has been moved over to be OSLib-style.
          */
          def_as_extern(c_name, swi);
-         fprintf(file, "os_error* swih_%s(WORD n)\n{\n", c_name);
+         fprintf(file, "static os_error* swih_%s(WORD n)\n{\n", c_name);
 
          /* Declare variables for the output registers that are used by this SWI */
          for (i = 0; i < 10; i++)

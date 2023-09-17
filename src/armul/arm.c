@@ -20,6 +20,7 @@
 #include "swi.h"
 #include "arm.h"
 #include <rom/rom.h>
+#include <assert.h>
 
 static ARMul_State *arm;
 
@@ -86,7 +87,7 @@ arm_run_routine(WORD addr)
   ARMul_DoProg(arm);
   arm_run_depth--;
   ARM_SET_R14(old_r14);
-  arm_set_pc(old_pc+4);
+  arm_set_reg(15, (old_pc+4) | (arm_get_r15_all() & 0xf0000000));
   if (arm_run_depth)
     arm->Emulate = RUN;
 }
@@ -114,7 +115,13 @@ arm_get_r15_all(void)
 void
 arm_set_reg(WORD num, WORD val)
 {
-  arm->Reg[num] = val;
+  assert(num >= 0 && num <= 15);
+  if (num == 15) {
+    ARMul_SetR15(arm, val);
+  }
+  else {
+    arm->Reg[num] = val;
+  }
 }
 
 void

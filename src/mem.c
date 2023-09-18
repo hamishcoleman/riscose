@@ -92,7 +92,7 @@ mem_where(void *_ptr)
 
   if (ptr >= mem->rma && ptr < mem->rma + mem->rma_size)
     return MEM_ID_RMA;
-  if (ctask() && (ptr >= ctask()->app && ptr < ctask()->app + ctask()->wimpslot))
+  if (ctask() && (ptr >= ctask()->app && ptr < ctask()->app + ctask()->wimpslot+1))
     return MEM_ID_TASKHEAP;
   if (ptr >= mem->rom && ptr < mem->rom+MMAP_ROM_SIZE)
     return MEM_ID_ROM;
@@ -130,7 +130,8 @@ BYTE *mem_f_tohost(WORD arm)
     if (arm == 0) {
         return NULL;
     }
-    if (ctask() && (arm >= MMAP_APP_BASE && arm < MMAP_APP_BASE + ctask()->wimpslot)) {
+    // wimpslot+1 is valid so that the end of memory can be passed as an address.
+    if (ctask() && (arm >= MMAP_APP_BASE && arm < MMAP_APP_BASE + ctask()->wimpslot+1)) {
         return ctask()->app + (arm - MMAP_APP_BASE);
     }
     if (arm >= MMAP_RMA_BASE && arm < MMAP_RMA_BASE + MMAP_RMA_SIZE) {
@@ -350,11 +351,11 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
 #  ifdef CONFIG_MEM_ONE2ONE
        mem->tasks[c].app      = (void*) 0x8000; /* FIXME: Task switching won't work! */
 #  else
-       mem->tasks[c].app      = emalloc(wimpslot);
+       mem->tasks[c].app      = emalloc(wimpslot+1);
 #  endif
 #endif
        assert(wimpslot+MMAP_APP_BASE < (MMAP_SVCSTACK_BASE));
-       bzero(mem->tasks[c].app, wimpslot);
+       bzero(mem->tasks[c].app, wimpslot+1);
        if (image_filename != NULL)
          {
           WORD t = mem_task_which();

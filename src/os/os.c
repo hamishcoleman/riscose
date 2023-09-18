@@ -489,7 +489,27 @@ os_error *xos_set_env (void *exit_handler,
       void **old_data_abort_handler,
       void **old_address_exception_handler)
 {
-  error("*** SWI unimplemented\n");
+  os_error *e = NULL;
+  byte *oh = NULL, *ob = NULL;
+
+  e = xos_change_environment(0, exit_handler, NULL, NULL, old_exit_handler, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(0, (void*) ram_limit, NULL, NULL, (void **) old_ram_limit, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(1, undefined_instruction_handler, NULL, NULL, old_undefined_instruction_handler, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(2, prefetch_abort_handler, NULL, NULL, old_prefetch_abort_handler, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(3, data_abort_handler, NULL, NULL, old_data_abort_handler, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(4, address_exception_handler, NULL, NULL, old_address_exception_handler, &oh, &ob);
+  if (e) return e;
+
   return 0;
 }
 

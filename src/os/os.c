@@ -795,7 +795,10 @@ os_error *xos_set_var_val (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  error("*** SWI unimplemented\n");
+  printf("Pretending to do OS_SetVarVal\n");
+  *context_out = 0;
+  *var_type_out = var_type;
+
   return 0;
 }
 
@@ -2637,8 +2640,7 @@ os_error *xos_mmu_control (bits eor_mask,
 os_error *xosplatformfeatures_get_features (os_platform_feature_flags *flags,
       void **predisable_fn)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------

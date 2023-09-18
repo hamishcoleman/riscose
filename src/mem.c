@@ -201,6 +201,10 @@ BYTE MEM_READ_BYTE(WORD a) {
 }
 
 WORD MEM_WRITE_WORD(WORD a, WORD v) {
+  if (a == 0xfec || a==0xff0) {
+      printf("ignoring write to %x=%x\n", a, v);
+      return v;
+  }
   return (*((WORD*)MEM_TOHOST(a))) = v;
 }
 

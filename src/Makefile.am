@@ -33,7 +33,7 @@ EXTRA_DIST = .cvsignore
 # --arm=armul/sleeve/native
 # 
 # # Which traces to turn on? (debugging use only)
-# #DEFS += -DCONFIG_TRACE_INSTRUCTIONS
+DEFS += -DCONFIG_TRACE_INSTRUCTIONS
 # #DEFS += -DCONFIG_TRACE_SWIS
 # #DEFS += -DCONFIG_TRACE_BRANCHES
 # #DEFS += -DCONFIG_TRACE_HEAP

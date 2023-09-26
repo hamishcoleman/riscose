@@ -18,6 +18,7 @@ noinst_PROGRAMS = heaptest
 
 riscose_SOURCES = heap.c main.c mem.c riscose.h swi.c util.c
 riscose_LDADD = osapi/libosapi.a os/libos.a \
+    rom/romimage.o \
     @ARM@/lib@ARM@.a monty/libmonty.a \
     -lncurses -lreadline
 
@@ -32,7 +33,7 @@ EXTRA_DIST = .cvsignore
 # --arm=armul/sleeve/native
 # 
 # # Which traces to turn on? (debugging use only)
-# #DEFS += -DCONFIG_TRACE_INSTRUCTIONS
+DEFS += -DCONFIG_TRACE_INSTRUCTIONS
 # #DEFS += -DCONFIG_TRACE_SWIS
 # #DEFS += -DCONFIG_TRACE_BRANCHES
 # #DEFS += -DCONFIG_TRACE_HEAP

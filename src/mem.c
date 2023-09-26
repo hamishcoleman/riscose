@@ -32,7 +32,16 @@
 #include "heap.h"
 
 #define MAX_TASKS 64
-#define RMA_START_SIZE 256*1024
+#define RMA_START_SIZE (256*1024)
+
+#define SYSTEM_CONTROL_HANDLERS 17
+
+typedef struct {
+    WORD routine;
+    WORD r12;
+    WORD buffer;
+}
+mem_environment_handler;
 
 typedef struct {
   WORD wimpslot;
@@ -40,6 +49,7 @@ typedef struct {
   BYTE *stack;
   BYTE *env;
   void *info; /* for our WIMP to use */
+  mem_environment_handler env_handler[SYSTEM_CONTROL_HANDLERS];
 }
 mem_wimp_task;
 
@@ -55,6 +65,7 @@ typedef struct {
     BYTE *rma;
     WORD rma_size;
     BYTE *rom;
+    BYTE *svc_stack;
 } mem_state;
 
 static mem_state *mem;
@@ -81,12 +92,14 @@ mem_where(void *_ptr)
 
   if (ptr >= mem->rma && ptr < mem->rma + mem->rma_size)
     return MEM_ID_RMA;
-  if (ctask() && (ptr >= ctask()->app && ptr < ctask()->app + ctask()->wimpslot))
+  if (ctask() && (ptr >= ctask()->app && ptr < ctask()->app + ctask()->wimpslot+1))
     return MEM_ID_TASKHEAP;
   if (ptr >= mem->rom && ptr < mem->rom+MMAP_ROM_SIZE)
     return MEM_ID_ROM;
   if (ctask() && (ptr >= ctask()->stack && ptr < ctask()->stack + MMAP_USRSTACK_SIZE))
     return MEM_ID_USRSTACK;
+  if (ptr >= mem->svc_stack && ptr < mem->svc_stack+MMAP_SVCSTACK_SIZE)
+    return MEM_ID_SVC_STACK;
   fprintf(stderr, "*** Don't know which memory area %p belongs to\n", ptr);
   abort();
   return 0;
@@ -110,10 +123,15 @@ void *mem_get_private(void) {
 
 BYTE *mem_f_tohost(WORD arm)
 {
+    if (arm == 0xffffffff) {
+        fprintf(stderr, "Making bad pointer very bad!\n");
+        return (BYTE *) VERY_BAD_POINTER;
+    }
     if (arm == 0) {
         return NULL;
     }
-    if (ctask() && (arm >= MMAP_APP_BASE && arm < MMAP_APP_BASE + ctask()->wimpslot)) {
+    // wimpslot+1 is valid so that the end of memory can be passed as an address.
+    if (ctask() && (arm >= MMAP_APP_BASE && arm < MMAP_APP_BASE + ctask()->wimpslot+1)) {
         return ctask()->app + (arm - MMAP_APP_BASE);
     }
     if (arm >= MMAP_RMA_BASE && arm < MMAP_RMA_BASE + MMAP_RMA_SIZE) {
@@ -126,7 +144,9 @@ BYTE *mem_f_tohost(WORD arm)
     if (arm >= MMAP_ROM_BASE && arm < MMAP_ROM_BASE + MMAP_ROM_SIZE) {
         return mem->rom + (arm - MMAP_ROM_BASE);
     }
-    
+    if (arm >= MMAP_SVCSTACK_BASE && arm < MMAP_SVCSTACK_BASE + MMAP_SVCSTACK_SIZE)
+        return mem->svc_stack + (arm - MMAP_SVCSTACK_BASE);
+
     error("mem_f_tohost: %#x invalid address\n", arm);
     abort();
 }
@@ -151,6 +171,8 @@ WORD mem_f_toarm(void *host)
             (arm - ctask()->stack);
     case MEM_ID_ROM:
         return MMAP_ROM_BASE + (arm - mem->rom);
+    case MEM_ID_SVC_STACK:
+        return MMAP_SVCSTACK_BASE + (arm - mem->svc_stack);
     default:
     error("mem_f_toarm: Don't know how to map %p\n", host);
     abort();
@@ -179,37 +201,15 @@ BYTE MEM_READ_BYTE(WORD a) {
 }
 
 WORD MEM_WRITE_WORD(WORD a, WORD v) {
+  if (a == 0xfec || a==0xff0) {
+      printf("ignoring write to %x=%x\n", a, v);
+      return v;
+  }
   return (*((WORD*)MEM_TOHOST(a))) = v;
 }
 
 BYTE MEM_WRITE_BYTE(WORD a, BYTE v) {
   return (*((BYTE*)MEM_TOHOST(a))) = v;
-}
-
-
-static
-BYTE*
-load_rom(char *file, BYTE *address)
-{
-  int f;
-  struct stat s;
-  BYTE *rom;
-   
-  if (stat(file, &s) != 0)
-  {
-    fprintf(stderr, "Couldn't find rom file `%s'\n", file);
-    abort();
-  }
-  if (address == NULL)
-    rom = emalloc(s.st_size);
-  else
-    rom = address;
-  f = open(file, O_RDONLY);
-  size_t r = read(f, rom, s.st_size);
-  assert(r == s.st_size);
-  close(f);
-  
-  return rom;
 }
 
 #ifdef CONFIG_MEM_ONE2ONE
@@ -240,16 +240,13 @@ remap_it(WORD base, WORD oldsize, WORD newsize)
 }
 #endif
 
+extern char _binary_romimage_start[];
+
 void mem_init(void)
 {
-    char *image;
-
     NEW(mem);
     mem->task_current = -1;
     mem->tasks = ecalloc(MAX_TASKS * sizeof(*mem->tasks));
-
-    /* FIXME: should look for it by installation prefix. */
-    image = "rom/romimage";
 
 #ifdef CONFIG_MEM_ONE2ONE
 #ifndef NATIVE
@@ -260,11 +257,13 @@ void mem_init(void)
     map_it(MMAP_ROM_BASE, MMAP_ROM_SIZE);
     mem->rma      = MEM_TOHOST(MMAP_RMA_BASE);
     mem->rom      = MEM_TOHOST(MMAP_ROM_BASE);
-    load_rom(image, MEM_TOHOST(MMAP_ROM_BASE));
+
+    memcpy(_binary_foo_bar_start, MEM_TOHOST(MMAP_ROM_BASE));
 #else
     mem->rma      = emalloc(RMA_START_SIZE);
-    mem->rom      = load_rom(image, 0);
+    mem->rom      = (BYTE *) _binary_romimage_start;
 #endif
+    mem->svc_stack = emalloc(MMAP_SVCSTACK_SIZE);
     mem->rma_size = RMA_START_SIZE;
 
     heap_init((heap_t *)MEM_TOHOST(MMAP_RMA_BASE), RMA_START_SIZE);
@@ -344,7 +343,9 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
     if (mem->tasks[c].wimpslot == 0)
       {
        assert(wimpslot < MMAP_APP_SIZE);
+       memset(&mem->tasks[c], 0, sizeof(mem->tasks[c]));
        mem->tasks[c].wimpslot = wimpslot;
+       mem->tasks[c].env_handler[0].routine = wimpslot+0x8000;
        mem->tasks[c].info     = info;
        mem->tasks[c].stack    = emalloc(MMAP_USRSTACK_SIZE);
        mem->tasks[c].env      = emalloc(256);
@@ -355,11 +356,11 @@ mem_task_new(WORD wimpslot, char *image_filename, void *info)
 #  ifdef CONFIG_MEM_ONE2ONE
        mem->tasks[c].app      = (void*) 0x8000; /* FIXME: Task switching won't work! */
 #  else
-       mem->tasks[c].app      = emalloc(wimpslot);
+       mem->tasks[c].app      = emalloc(wimpslot+1);
 #  endif
 #endif
        assert(wimpslot+MMAP_APP_BASE < (MMAP_SVCSTACK_BASE));
-       bzero(mem->tasks[c].app, wimpslot);
+       bzero(mem->tasks[c].app, wimpslot+1);
        if (image_filename != NULL)
          {
           WORD t = mem_task_which();
@@ -536,3 +537,20 @@ arm_backtrace(void)
   backtrace_in_progress = 0;
 }
 #endif
+
+void mem_set_environment_handler(int handler, WORD routine, WORD r12, WORD buffer) {
+    assert(handler >= 0);
+    assert(handler < SYSTEM_CONTROL_HANDLERS);
+    ctask()->env_handler[handler].routine = routine;
+    ctask()->env_handler[handler].r12 = r12;
+    ctask()->env_handler[handler].buffer = buffer;
+}
+
+void mem_get_environment_handler(int handler, WORD *routine, WORD *r12, WORD *buffer) {
+    assert(handler >= 0);
+    assert(handler < SYSTEM_CONTROL_HANDLERS);
+
+    *routine = ctask()->env_handler[handler].routine;
+    *r12     = ctask()->env_handler[handler].r12;
+    *buffer  = ctask()->env_handler[handler].buffer;
+}

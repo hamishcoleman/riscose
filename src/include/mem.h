@@ -77,6 +77,7 @@ typedef enum {
   MEM_ID_TASKHEAP       = -4,
   MEM_ID_USRSTACK       = -5,
   MEM_ID_ROM            = -6,
+  MEM_ID_SVC_STACK      = -7,
   MEM_ID_NEWDYNAMICAREA = -99,
 } memory_area_t;
 
@@ -84,5 +85,10 @@ memory_area_t mem_where(void *_ptr);
 
 #define MEM_PLACE_ENVIRONMENT 0x1000
 #define MEM_MODULE_PRIVATES   0x2000
+
+#define VERY_BAD_POINTER  ((void *)0x8000000000000000);
+
+void mem_set_environment_handler(int handler, WORD routine, WORD r12, WORD buffer);
+void mem_get_environment_handler(int handler, WORD *routine, WORD *r12, WORD *buffer);
 
 #endif

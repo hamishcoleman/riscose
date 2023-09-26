@@ -17,9 +17,11 @@
 #include "armsupp.h"
 #include "armemu.h"
 #include "mem.h"
+#include "map.h"
 #include "swi.h"
 #include "arm.h"
 #include <rom/rom.h>
+#include <assert.h>
 
 static ARMul_State *arm;
 
@@ -61,6 +63,11 @@ arm_init(void)
   ARMul_SetR15(arm, (arm->Reg[15] & 0xfffffffc));
   ARMul_R15Altered(arm);
   arm_run_depth=0;
+
+  /* Set SVC mode stack */
+  arm_set_reg(15, 0x8003);
+  arm_set_reg(13, MMAP_SVCSTACK_BASE+MMAP_SVCSTACK_SIZE);
+  arm_set_reg(15, 0x8000);
 }
 
 void
@@ -86,7 +93,7 @@ arm_run_routine(WORD addr)
   ARMul_DoProg(arm);
   arm_run_depth--;
   ARM_SET_R14(old_r14);
-  arm_set_pc(old_pc+4);
+  arm_set_reg(15, (old_pc+4) | (arm_get_r15_all() & 0xf0000000));
   if (arm_run_depth)
     arm->Emulate = RUN;
 }
@@ -114,7 +121,13 @@ arm_get_r15_all(void)
 void
 arm_set_reg(WORD num, WORD val)
 {
-  arm->Reg[num] = val;
+  assert(num >= 0 && num <= 15);
+  if (num == 15) {
+    ARMul_SetR15(arm, val);
+  }
+  else {
+    arm->Reg[num] = val;
+  }
 }
 
 void
@@ -159,7 +172,7 @@ ARMul_OSException(ARMul_State *state, ARMword vector, ARMword pc)
 ARMword
 ARMul_Debug(ARMul_State *state, ARMword pc, ARMword instr)
 {
-  return 0;
+  return instr;
 }
 
 unsigned

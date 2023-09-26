@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "riscostypes.h"
 #include "arm.h"
@@ -21,12 +22,12 @@
 
 #define MAX_MODULES 256
 
-static int modules;
+static int modules = 0;
 /* So I'm not being entirely consistent here-- these are native pointers
 ** to tables of ARM addresses, since that's the most common access pattern.
 */
-static WORD* module_bases;
-static WORD  module_privates;
+static WORD* module_bases = NULL;
+static WORD  module_privates = -1;
 
 void
 module_init(void)
@@ -34,6 +35,11 @@ module_init(void)
   modules = 1;
   module_privates = MEM_TOARM(mem_rma_alloc(MAX_MODULES*4));
   module_bases    = mem_rma_alloc(MAX_MODULES*4);  
+}
+
+WORD module_private_word_ptr(int num) {
+  assert(num >= 1 && num < MAX_MODULES);
+  return module_privates + num*4;
 }
 
 int
@@ -77,6 +83,8 @@ module_load(char *name)
   }
   file_loadat(name, base);
 
+  printf("Setting up module %d at %p %s\n", modules, base, name);
+
   module_bases[modules] = MEM_TOARM(base);
 
     WORD init = MODULE_INIT(module_bases[modules]);
@@ -85,8 +93,11 @@ module_load(char *name)
             fprintf(stderr, "Compressed modules are not currently supported.\n");
             exit(1);
         }
-        ARM_SET_R12(module_privates + modules * 4);
+        ARM_SET_R12(module_private_word_ptr(modules));
+        WORD old_r15 = ARM_R15_ALL;
+        arm_set_reg(15, old_r15 | 0x3);
         arm_run_routine(init);
+        arm_set_reg(15, old_r15-4);
     }
 
   if (ARM_V_SET) {
@@ -106,7 +117,7 @@ module_kill(int num)
 
     final = MODULE_FINAL(module_bases[num]);
     if (final) {
-        ARM_SET_R12(module_privates + num * 4);
+        ARM_SET_R12(module_private_word_ptr(num));
         arm_run_routine(final);
     }
 

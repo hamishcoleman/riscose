@@ -11,6 +11,8 @@
 #include "monty/monty.h"
 #include "types.h"
 #include "ddeutils.h"
+#include "map.h"
+#include "mem.h"
 
 /* ---- ddeutils_swi_register_extra --------------------------------- */
 
@@ -52,7 +54,7 @@ os_error *xddeutils_set_cl(char *tail)
 
 os_error *xddeutils_get_cl_size(int *size)
 {
-    error("swi XDDEUtils_GetCLSize unimplemented.\n");
+    *size = strlen((char*) mem_f_tohost(MMAP_USRSTACK_BASE));
 
     return NULL;
 }
@@ -61,7 +63,7 @@ os_error *xddeutils_get_cl_size(int *size)
 
 os_error *xddeutils_get_cl(char *tail)
 {
-    error("swi XDDEUtils_GetCl unimplemented.\n");
+    *tail = mem_f_tohost(MMAP_USRSTACK_BASE);
 
     return NULL;
 }

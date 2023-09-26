@@ -1,0 +1,31 @@
+---
+name: CI
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+  pull_request:
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Fix Checkout
+        run: |
+          git fetch --force --tags
+
+      - name: Install required packages
+        run: |
+          sudo apt-get -y install autoconf libgdbm-dev
+
+      - name: Run minimal compile
+        run: |
+          autoreconf -if
+          ./configure
+          make
+

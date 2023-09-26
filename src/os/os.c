@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 #include <monty/monty.h>
 #include <readline/readline.h>
 #include "types.h"
@@ -22,6 +23,10 @@
 #include "mem.h"
 #include "arm.h"
 #include "swi.h"
+#include "rom/rom.h"
+
+// From crcany
+#include "crc16arc.h"
 
 static const int Sys$RCLimit = 256;
 
@@ -47,7 +52,7 @@ os_error* os_write_s(WORD n)
     pc++;
   }
   pc = (pc + 3) & ~3;
-  arm_set_pc(pc);
+  arm_set_reg(15, pc | (ARM_R15_ALL & 0x3));
 
   return 0;
 }
@@ -88,7 +93,10 @@ os_error *xos_read_var_val_size (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  error("*** SWI unimplemented\n");
+  fprintf(stderr, "Pretending environment variable %s does not exist\n", var);
+  *used = 0;
+  *context_out = 0;
+  *var_type_out = 0;
   return 0;
 }
 
@@ -163,7 +171,18 @@ os_error *xos_new_line (void)
 os_error *xos_readc (char *c,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
+  char r;
+  c[0] = 0;
+  c[1] = 0;
+  c[2] = 0;
+  c[3] = 0;
+  if (read(STDIN_FILENO, &r, 1)==1) {
+    *psr = 0;
+    c[0] = r;
+  }
+  else {
+    *psr = ARM_C_FLAG;
+  }
   return 0;
 }
 
@@ -470,7 +489,27 @@ os_error *xos_set_env (void *exit_handler,
       void **old_data_abort_handler,
       void **old_address_exception_handler)
 {
-  error("*** SWI unimplemented\n");
+  os_error *e = NULL;
+  byte *oh = NULL, *ob = NULL;
+
+  e = xos_change_environment(0, exit_handler, NULL, NULL, old_exit_handler, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(0, (void*) ram_limit, NULL, NULL, (void **) old_ram_limit, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(1, undefined_instruction_handler, NULL, NULL, old_undefined_instruction_handler, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(2, prefetch_abort_handler, NULL, NULL, old_prefetch_abort_handler, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(3, data_abort_handler, NULL, NULL, old_data_abort_handler, &oh, &ob);
+  if (e) return e;
+
+  e = xos_change_environment(4, address_exception_handler, NULL, NULL, old_address_exception_handler, &oh, &ob);
+  if (e) return e;
+
   return 0;
 }
 
@@ -742,7 +781,10 @@ os_error *xos_read_var_val (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  error("*** SWI unimplemented\n");
+  fprintf(stderr, "Pretending environment variable %s does not exist\n", var);
+  *used = 0;
+  *context_out = 0;
+  *var_type_out = 0;
   return 0;
 }
 
@@ -773,7 +815,10 @@ os_error *xos_set_var_val (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  error("*** SWI unimplemented\n");
+  printf("Pretending to do OS_SetVarVal\n");
+  *context_out = 0;
+  *var_type_out = var_type;
+
   return 0;
 }
 
@@ -1131,11 +1176,9 @@ os_error *xos_swi_number_to_string (int swi,
 os_error *xos_swi_number_from_string (char *swi_name,
       int *swi)
 {
-  if (strcmp("OS_Write0", swi_name)==0) {
-    *swi = 0x02;
-  }
-  else {
-    error("*** SWI unimplemented\n");
+  *swi = swi_name_to_number(swi_name);
+  if (swi == 0) {
+      return ERR_NO_SUCH_SWI();
   }
   return 0;
 }
@@ -1296,12 +1339,18 @@ os_error *xos_change_environment (os_handler_type handler_type,
       byte **old_handle,
       byte **old_buffer)
 {
+  WORD arm_old_handler, arm_old_r12, arm_old_buffer;
+  mem_get_environment_handler(handler_type, &arm_old_handler, &arm_old_r12, &arm_old_buffer);
 
-  fprintf(stderr, "FIXME --- OS_ChangeEnvironment %d unimplemented\n", handler_type);
+  *old_handler = mem_f_tohost(arm_old_handler);
+  *old_handle  = mem_f_tohost(arm_old_r12);
+  *old_buffer  = mem_f_tohost(arm_old_buffer);
 
-  *old_handler = 0;
-  *old_handle  = 0;
-  *old_buffer  = 0;
+  if (handler == NULL) handler = *old_handler;
+  if (handle  == NULL) handle  = *old_handle;
+  if (buffer  == NULL) buffer = *old_buffer;
+
+  mem_set_environment_handler(handler_type, mem_f_toarm(handler), mem_f_toarm(handle), mem_f_toarm(buffer));
 
   return 0;
 }
@@ -1863,7 +1912,11 @@ os_error *xos_crc (int crc_in,
       int stride,
       int *crc)
 {
-  error("*** SWI unimplemented\n");
+  if (stride != 1) {
+    error("Stride of !1 not implemented");
+  }
+  *crc = crc16arc_byte(crc_in, block, ((byte *)end-block));
+
   return 0;
 }
 
@@ -2607,8 +2660,7 @@ os_error *xos_mmu_control (bits eor_mask,
 os_error *xosplatformfeatures_get_features (os_platform_feature_flags *flags,
       void **predisable_fn)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------

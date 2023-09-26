@@ -9,9 +9,14 @@
 */
 
 #include <stdio.h>
+#include <assert.h>
+#include <sys/time.h>
+#include <stdlib.h>
+#include <string.h>
 #include <monty/monty.h>
 #include "types.h"
 #include "osword.h"
+#include <rom/rom.h>
 
 void osword_swi_register_extra(void)
 {
@@ -30,7 +35,14 @@ void osword_swi_register_extra(void)
 
 os_error *xosword_read_system_clock (osword_timer_block *clock)
 {
-  error("*** SWI unimplemented\n");
+  struct timeval tv;
+  if (gettimeofday(&tv, NULL)!=0) abort();
+  unsigned long int time_ros = tv.tv_sec * 100UL + 613608L*3600L*100L;
+  time_ros += tv.tv_usec / 1000UL;
+
+  assert(sizeof(time_ros)==8);
+  memcpy(((void*) &time_ros)+3, clock, 5);
+
   return 0;
 }
 
@@ -164,8 +176,7 @@ os_error *xosword_read_cursor_position (osword_cursor_position_block *position)
 
 os_error *xoswordreadclock_local_string (oswordreadclock_local_string_block *string)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------

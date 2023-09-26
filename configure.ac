@@ -1,10 +1,10 @@
-AC_INIT([riscose], [0.01])
+AC_INIT([riscose],[0.01])
 AC_CONFIG_SRCDIR([src/monty/monty.c])
 AC_CONFIG_AUX_DIR(util)
 AM_INIT_AUTOMAKE
 AM_CONFIG_HEADER(config.h)
 
-CFLAGS+="-Wall -Werror"
+CFLAGS+="-Wall"
 
 AC_PROG_CC
 AC_PROG_YACC
@@ -39,7 +39,7 @@ AC_CHECK_HEADERS(readline.h readline/readline.h)
 
 AC_C_INLINE
 
-AC_OUTPUT([ \
+AC_CONFIG_FILES([ \
         Makefile \
         man/Makefile \
         src/Makefile \
@@ -59,6 +59,8 @@ AC_OUTPUT([ \
         util/Makefile \
         ro-utils/Makefile \
         ro-utils/unmodsqz/Makefile \
-    ], \
-    [chmod +x src/rom/compilerom tests/armas]
-    )
+    ])
+AC_CONFIG_COMMANDS([default],[\
+    chmod +x src/rom/compilerom tests/armas
+    ],[])
+AC_OUTPUT

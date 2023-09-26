@@ -10,6 +10,7 @@
 #include "monty/monty.h"
 #include "types.h"
 #include "wimpreadsysinfo.h"
+#include "rom/rom.h"
 
 /* ---- wimpreadsysinfo_swi_register_extra -------------------------- */
 
@@ -22,9 +23,8 @@ void wimpreadsysinfo_swi_register_extra(void)
 
 os_error *xwimpreadsysinfo_task_count(int *task_count)
 {
-    error("swi XWimpReadSysInfo_TaskCount unimplemented.\n");
 
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xwimpreadsysinfo_wimp_mode ---------------------------------- */

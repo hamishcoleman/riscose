@@ -76,7 +76,7 @@ enum target_signal {
     character. Adding the EOS allows us to print out the packet as a
     string. So at least NUMREGBYTES*2 + 1 (for the 'G' or the EOS) are needed
     for register packets */
-#define GDB_BUF_MAX 1024
+#define GDB_BUF_MAX 2048
 
 /*! Size of the matchpoint hash table. Largest prime < 2^10 */
 #define MP_HASH_SIZE  1021

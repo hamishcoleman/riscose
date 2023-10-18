@@ -1494,6 +1494,10 @@ rsp_read_reg (struct rsp_buf *buf)
     {
       reg2hex (arm_get_reg(regnum), buf->data);
     }
+  else if (regnum == 15)
+    {
+      reg2hex ((arm_get_r15_all() & ~0xfc000003) - 8, buf->data);
+    }
   else if (regnum == 25)
     {
       reg2hex (arm_get_r15_all() & 0xfc000003, buf->data);

@@ -2075,11 +2075,13 @@ rsp_insert_matchpoint (struct rsp_buf *buf)
 
 extern void  rsp_check_instruction ( ARMword pc ) {
     if (rsp.single_stepping) {
+        rsp.sigval = TARGET_SIGNAL_TRAP;
         return handle_rsp();
     }
     else {
         struct mp_entry *m = mp_hash_lookup( BP_HARDWARE, pc );
         if (m) {
+            rsp.sigval = TARGET_SIGNAL_TRAP;
             handle_rsp();
         }
     }
@@ -2089,6 +2091,7 @@ extern void  rsp_check_memory_read( ARMword addr ) {
     int m = mp_hash_lookup( WP_READ, addr )
          || mp_hash_lookup( WP_ACCESS, addr );
     if (m) {
+        rsp.sigval = TARGET_SIGNAL_TRAP;
         handle_rsp();
     }
 }
@@ -2097,6 +2100,7 @@ extern void  rsp_check_memory_write( ARMword addr ) {
     int m = mp_hash_lookup( WP_WRITE, addr )
          || mp_hash_lookup( WP_ACCESS, addr );
     if (m) {
+        rsp.sigval = TARGET_SIGNAL_TRAP;
         handle_rsp();
     }
 }

@@ -47,6 +47,7 @@ main(int argc, char **argv)
         {"module", no_argument, NULL, 'm'},
         {"utility", no_argument, NULL, 'u'},
         {"wimpslot", required_argument, NULL, 'w'},
+        {"gdb", no_argument, NULL, 'g'},
         {0}
     };
   int module=0, c;
@@ -59,6 +60,7 @@ main(int argc, char **argv)
     WORD wimpslot = 0;
     int rmload_count = 0;
     char **to_rmload = malloc(sizeof(char*));
+    int gdb = 0;
 
     (progname = strrchr(*argv, '/')) ? progname++ : (progname = *argv);
     *argv = progname;
@@ -66,7 +68,7 @@ main(int argc, char **argv)
 
     wimpslot = 640*1024;
 
-    while ((c = getopt_long(argc, argv, "+hVvD:muw:r:", long_options,
+    while ((c = getopt_long(argc, argv, "+hVvD:muw:r:g", long_options,
         NULL)) != EOF) {
         switch (c) {
         case 'h':
@@ -83,6 +85,7 @@ RISCOSE_DEBUG_HELP
 "    -u, --utility     binary is a utility.\n"
 "    -w, --wimpslot=K  allocates K kilobytes for execution.\n"
 "    -r, --rmload=s    load this relocatable module.\n"
+"    -g, --gdb         provide gdb remote target on port 53415.\n"
 "binary is the risc os executable to run.  args are its arguments.\n",
                 progname);
             return 0;
@@ -128,6 +131,9 @@ RISCOSE_DEBUG_HELP
             to_rmload[rmload_count] = optarg;
             rmload_count++;
             break;
+        case 'g':
+            gdb = 1;
+            break;
         default: 
             error("try `%s -h' for more information.\n", progname);
             break;
@@ -155,6 +161,8 @@ RISCOSE_DEBUG_HELP
   module_init();
   swi_init();
   arm_init();
+
+  arm_set_debug(gdb);
 
     mem_task_switch(mem_task_new(wimpslot,
         module || utility ? NULL : file, NULL));

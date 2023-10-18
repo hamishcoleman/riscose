@@ -71,8 +71,14 @@ arm_init(void)
   arm_set_reg(15, 0x8003);
   arm_set_reg(13, MMAP_SVCSTACK_BASE+MMAP_SVCSTACK_SIZE);
   arm_set_reg(15, 0x8000);
+  arm->CallDebug = 1;
 
   rsp_init();
+}
+
+void
+arm_set_debug(int state) {
+  arm->CallDebug = state;
 }
 
 void

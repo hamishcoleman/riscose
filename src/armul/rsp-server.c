@@ -1240,7 +1240,7 @@ rsp_continue (struct rsp_buf *buf)
 
   rsp.single_stepping = 0;
 
-  if (0 == strcmp ("c", buf->data) || 0 == strcmp("vCont;c", buf->data))
+  if (0 == strcmp("c", buf->data) || 0 == strcmp("vCont;c", buf->data) || 0 == strcmp("vCont;c:1", buf->data) || 0 == strcmp("vCont;c:0001", buf->data))
     {
     }
   else if (1 != sscanf (buf->data, "c%lx", &addr))
@@ -1767,7 +1767,7 @@ rsp_step (struct rsp_buf *buf)
 
   rsp.single_stepping = 1;
 
-  if (0 == strcmp ("s", buf->data) || 0 == strcmp("i", buf->data) || 0 == strcmp("vCont;s", buf->data) || 0 == strcmp("vCont;s:1", buf->data))
+  if (0 == strcmp ("s", buf->data) || 0 == strcmp("i", buf->data) || 0 == strcmp("vCont;s", buf->data) || 0 == strcmp ("vCont;s:1", buf->data) || 0 == strcmp ("vCont;s:0001", buf->data))
     {
     }
   else if (1 != sscanf (buf->data, "s%lx", &addr))
@@ -1812,12 +1812,12 @@ rsp_vpkt (struct rsp_buf *buf)
       put_str_packet ("vCont;c;s");
       return;
     }
-  else if (0 == strcmp ("vCont;s", buf->data) || 0 == strcmp ("vCont;s:1", buf->data))
+  else if (0 == strcmp ("vCont;s", buf->data) || 0 == strcmp ("vCont;s:1", buf->data) || 0 == strcmp ("vCont;s:0001", buf->data))
     {
       rsp_step(buf);
       return;
     }
-  else if (0 == strcmp ("vCont;c", buf->data) || 0 ==strcmp ("vCont;c:1", buf->data))
+  else if (0 == strcmp ("vCont;c", buf->data) || 0 ==strcmp ("vCont;c:1", buf->data) || 0 ==strcmp ("vCont;c:0001", buf->data))
     {
       rsp_continue(buf);
       return;

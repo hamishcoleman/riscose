@@ -1202,8 +1202,7 @@ os_error *xos_validate_address (byte *min,
       byte *max,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------

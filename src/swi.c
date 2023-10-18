@@ -193,7 +193,7 @@ void swi_trap(WORD num)
         {
           char buf[64];
           swi_number_to_name(SWI_NUM(num), buf);
-          printf("Unregistered SWI %s called at %08x\n", buf, (unsigned) ARM_R15);
+          printf("Unregistered SWI %s called at %08x\n", buf, (unsigned) ARM_R15-8);
           e = ERR_NO_SUCH_SWI();
         }
         else {

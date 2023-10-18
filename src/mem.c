@@ -85,7 +85,7 @@ static mem_wimp_task* ctask() {
     }
 }
 
-int
+memory_area_t
 mem_where(void *_ptr)
 {
   BYTE *ptr = (BYTE*) _ptr;
@@ -121,6 +121,34 @@ void *mem_get_private(void) {
 
 #else
 
+memory_area_t mem_arm_where(WORD arm)
+{
+    if (arm == 0xffffffff) {
+        return MEM_ID_BAD;
+    }
+    if (arm == 0) {
+        return MEM_ID_BAD;
+    }
+    // wimpslot+1 is valid so that the end of memory can be passed as an address.
+    if (ctask() && (arm >= MMAP_APP_BASE && arm < MMAP_APP_BASE + ctask()->wimpslot+1)) {
+        return MEM_ID_TASKHEAP;
+    }
+    if (arm >= MMAP_RMA_BASE && arm < MMAP_RMA_BASE + MMAP_RMA_SIZE) {
+        return MEM_ID_RMA;
+    }
+    if (ctask() && (arm >= MMAP_USRSTACK_BASE &&
+        arm < MMAP_USRSTACK_BASE + MMAP_USRSTACK_SIZE)) {
+        return MEM_ID_USRSTACK;
+    }
+    if (arm >= MMAP_ROM_BASE && arm < MMAP_ROM_BASE + MMAP_ROM_SIZE) {
+        return MEM_ID_ROM;
+    }
+    if (arm >= MMAP_SVCSTACK_BASE && arm < MMAP_SVCSTACK_BASE + MMAP_SVCSTACK_SIZE) {
+        return MEM_ID_SVC_STACK;
+    }
+    return MEM_ID_BAD;
+}
+
 BYTE *mem_f_tohost(WORD arm)
 {
     if (arm == 0xffffffff) {
@@ -130,25 +158,29 @@ BYTE *mem_f_tohost(WORD arm)
     if (arm == 0) {
         return NULL;
     }
-    // wimpslot+1 is valid so that the end of memory can be passed as an address.
-    if (ctask() && (arm >= MMAP_APP_BASE && arm < MMAP_APP_BASE + ctask()->wimpslot+1)) {
-        return ctask()->app + (arm - MMAP_APP_BASE);
-    }
-    if (arm >= MMAP_RMA_BASE && arm < MMAP_RMA_BASE + MMAP_RMA_SIZE) {
-        return mem->rma + (arm - MMAP_RMA_BASE);
-    }
-    if (ctask() && (arm >= MMAP_USRSTACK_BASE &&
-        arm < MMAP_USRSTACK_BASE + MMAP_USRSTACK_SIZE)) {
-        return ctask()->stack + (arm - MMAP_USRSTACK_BASE);
-    }
-    if (arm >= MMAP_ROM_BASE && arm < MMAP_ROM_BASE + MMAP_ROM_SIZE) {
-        return mem->rom + (arm - MMAP_ROM_BASE);
-    }
-    if (arm >= MMAP_SVCSTACK_BASE && arm < MMAP_SVCSTACK_BASE + MMAP_SVCSTACK_SIZE)
-        return mem->svc_stack + (arm - MMAP_SVCSTACK_BASE);
 
-    error("mem_f_tohost: %#x invalid address\n", arm);
-    abort();
+    memory_area_t area = mem_arm_where(arm);
+
+    // wimpslot+1 is valid so that the end of memory can be passed as an address.
+    switch (area) {
+        case MEM_ID_TASKHEAP:
+            return ctask()->app + (arm - MMAP_APP_BASE);
+
+        case MEM_ID_RMA:
+            return mem->rma + (arm - MMAP_RMA_BASE);
+
+        case MEM_ID_USRSTACK:
+            return ctask()->stack + (arm - MMAP_USRSTACK_BASE);
+
+        case MEM_ID_ROM:
+            return mem->rom + (arm - MMAP_ROM_BASE);
+
+        case MEM_ID_SVC_STACK:
+            return mem->svc_stack + (arm - MMAP_SVCSTACK_BASE);
+        default:
+            error("mem_f_tohost: %#x invalid address\n", arm);
+            abort();
+    }
 }
 
 WORD mem_f_toarm(void *host)

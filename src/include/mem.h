@@ -71,6 +71,7 @@ void*   mem_get_private(void);
 /* +ve IDs indicate dynamic area numbers */
 typedef enum {
   MEM_ID_USER_MAX       = INT_MAX,
+  MEM_ID_BAD            = 0,
   MEM_ID_PRIVATE        = -1,
   MEM_ID_RMA            = -2,
   MEM_ID_READONLY       = -3,
@@ -82,6 +83,7 @@ typedef enum {
 } memory_area_t;
 
 memory_area_t mem_where(void *_ptr);
+memory_area_t mem_arm_where(WORD arm);
 
 #define MEM_PLACE_ENVIRONMENT 0x1000
 #define MEM_MODULE_PRIVATES   0x2000

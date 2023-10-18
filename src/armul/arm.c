@@ -23,6 +23,9 @@
 #include <rom/rom.h>
 #include <assert.h>
 
+#include "monty/monty.h"
+#include "rsp-server.h"
+
 static ARMul_State *arm;
 
 /*static
@@ -68,6 +71,8 @@ arm_init(void)
   arm_set_reg(15, 0x8003);
   arm_set_reg(13, MMAP_SVCSTACK_BASE+MMAP_SVCSTACK_SIZE);
   arm_set_reg(15, 0x8000);
+
+  rsp_init();
 }
 
 void
@@ -159,7 +164,14 @@ arm_set_c(void)
 unsigned inline
 ARMul_OSHandleSWI(ARMul_State *state, ARMword number)
 {
-  swi_trap(number);
+  // Magic breakpoint SWI which gdb can insert by explicit memory writes.
+  if (number == 0x9f0001) {
+      error("We have hit SWI 0x9f0001, which is injected by gdb as a breakpoint. We cannot currently recover from this, the instruction pipeline makes it complicated.");
+      abort();
+  }
+  else {
+      swi_trap(number);
+  }
   return 1; /* tells ARMulator not to try OS SWI trap */
 }
 
@@ -172,6 +184,7 @@ ARMul_OSException(ARMul_State *state, ARMword vector, ARMword pc)
 ARMword
 ARMul_Debug(ARMul_State *state, ARMword pc, ARMword instr)
 {
+  rsp_check_instruction(pc);
   return instr;
 }
 
@@ -199,30 +212,38 @@ inline ARMword ARMul_LoadInstrN(ARMul_State *state,ARMword address)
 }
 inline ARMword ARMul_LoadWordS(ARMul_State *state,ARMword address)
 {
+  rsp_check_memory_read(address);
   return MEM_READ_WORD(address);
 }
 inline ARMword ARMul_LoadWordN(ARMul_State *state,ARMword address)
 {
+  rsp_check_memory_read(address);
   return MEM_READ_WORD(address);
 }
 inline ARMword ARMul_LoadByte(ARMul_State *state,ARMword address)
 {
+  rsp_check_memory_read(address);
   return MEM_READ_BYTE(address);
 }
 inline void ARMul_StoreWordS(ARMul_State *state,ARMword address, ARMword data)
 {
+  rsp_check_memory_write(address);
   MEM_WRITE_WORD(address, data);
 }
 inline void ARMul_StoreWordN(ARMul_State *state, ARMword address, ARMword data)
 {
+  rsp_check_memory_write(address);
   MEM_WRITE_WORD(address, data);
 }
 inline void ARMul_StoreByte(ARMul_State *state, ARMword address, ARMword data)
 {
+  rsp_check_memory_write(address);
   MEM_WRITE_BYTE(address, data);
 }
 ARMword ARMul_SwapWord(ARMul_State *state, ARMword address, ARMword data)
 {
+  rsp_check_memory_read(address);
+  rsp_check_memory_write(address);
   WORD t = MEM_READ_WORD(address);
   MEM_WRITE_WORD(address, data);
   
@@ -230,6 +251,8 @@ ARMword ARMul_SwapWord(ARMul_State *state, ARMword address, ARMword data)
 }
 inline ARMword ARMul_SwapByte(ARMul_State *state, ARMword address, ARMword data)
 {
+  rsp_check_memory_read(address);
+  rsp_check_memory_write(address);
   BYTE t = MEM_READ_BYTE(address);
   MEM_WRITE_BYTE(address, data);
   
@@ -245,6 +268,8 @@ inline void ARMul_Ccycles(ARMul_State *state, unsigned number, ARMword address)
   state->NumCcycles += number ;
   ARMul_CLEARABORT ;
 }
+
+// Used for reading instructions
 inline ARMword ARMul_ReadWord(ARMul_State *state, ARMword address)
 {
   return MEM_READ_WORD(address);
@@ -255,9 +280,11 @@ inline ARMword ARMul_ReadByte(ARMul_State *state, ARMword address)
 }
 inline void ARMul_WriteWord(ARMul_State *state, ARMword address, ARMword data)
 {
+  rsp_check_memory_write(address);
   MEM_WRITE_WORD(address, data);
 }
 inline void ARMul_WriteByte(ARMul_State *state, ARMword address, ARMword data)
 {
+  rsp_check_memory_write(address);
   MEM_WRITE_BYTE(address, data);
 }

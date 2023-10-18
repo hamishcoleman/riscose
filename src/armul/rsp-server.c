@@ -4,7 +4,8 @@
 
    Contributor Jeremy Bennett <jeremy.bennett@embecosm.com>
 
-   This file is part of Or1ksim, the OpenRISC 1000 Architectural Simulator.
+   This file was originally part of Or1ksim, the OpenRISC 1000 Architectural
+   Simulator.
 
    This program is free software; you can redistribute it and/or modify it
    under the terms of the GNU General Public License as published by the Free
@@ -23,9 +24,11 @@
    with Doxygen. */
 
 
-/* Autoconf and/or portability configuration */
-#include "config.h"
-#include "port.h"
+#include "riscostypes.h"
+#include "mem.h"
+#include "armdefs.h"
+#include "arm.h"
+#include "rom/rom.h"
 
 /* System includes */
 #include <stdlib.h>
@@ -40,40 +43,16 @@
 #include <poll.h>
 #include <netinet/tcp.h>
 #include <signal.h>
-
-/* Package includes */
-#include "sim-config.h"
-#include "except.h"
-#include "opcode/or32.h"
-#include "spr-defs.h"
-#include "execute.h"
-#include "debug-unit.h"
-#include "sprs.h"
-#include "toplevel-support.h"
-#include "dcache-model.h"
-#include "icache-model.h"
-
+#include <string.h>
+#include <assert.h>
 
 /* Define to log each packet */
-/*#define RSP_TRACE  1*/
-
-/*! Name of the Or1ksim RSP service */
-#define OR1KSIM_RSP_SERVICE  "or1ksim-rsp"
-
-/*! Protocol used by Or1ksim */
-#define OR1KSIM_RSP_PROTOCOL  "tcp"
+#define RSP_TRACE  0
 
 /*! Thread ID used by Or1ksim */
 #define OR1KSIM_TID  1
 
-/* Indices of GDB registers that are not GPRs. Must match GDB settings! */
-#define PPC_REGNUM  (MAX_GPRS + 0)	/*!< Previous PC */
-#define NPC_REGNUM  (MAX_GPRS + 1)	/*!< Next PC */
-#define SR_REGNUM   (MAX_GPRS + 2)	/*!< Supervision Register */
-#define NUM_REGS    (MAX_GRPS + 3)	/*!< Total GDB registers */
-
-/*! Trap instruction for OR32 */
-#define OR1K_TRAP_INSTR  0x21000001
+#define NUM_REGS 17 /*!< Total GDB registers */
 
 /*! Definition of GDB target signals. Data taken from the GDB 6.8
     source. Only those we use defined here. */
@@ -97,7 +76,7 @@ enum target_signal {
     character. Adding the EOS allows us to print out the packet as a
     string. So at least NUMREGBYTES*2 + 1 (for the 'G' or the EOS) are needed
     for register packets */
-#define GDB_BUF_MAX  ((NUM_REGS) * 8 + 1)
+#define GDB_BUF_MAX 1024
 
 /*! Size of the matchpoint hash table. Largest prime < 2^10 */
 #define MP_HASH_SIZE  1021
@@ -116,7 +95,8 @@ struct rsp_buf
 /*! Enumeration of different types of matchpoint. These have explicit values
     matching the second digit of 'z' and 'Z' packets. */
 enum mp_type {
-  BP_MEMORY   = 0,
+  // No need for software breakpoints, we can hook into the ARM emulator. */
+  //BP_MEMORY   = 0,
   BP_HARDWARE = 1,
   WP_WRITE    = 2,
   WP_READ     = 3,
@@ -127,8 +107,7 @@ enum mp_type {
 struct mp_entry
 {
   enum mp_type       type;		/*!< Type of matchpoint */
-  unsigned long int  addr;		/*!< Address with the matchpoint */
-  unsigned long int  instr;		/*!< Substituted instruction */
+  ARMword            addr;		/*!< Address with the matchpoint */
   struct mp_entry   *next;		/*!< Next entry with this hash */
 };
 
@@ -136,10 +115,11 @@ struct mp_entry
 static struct
 {
   int                client_waiting;	/*!< Is client waiting a response? */
+  int                single_stepping;
+  int                stalled;
   int                proto_num;		/*!< Number of the protocol used */
   int                client_fd;		/*!< FD for talking to GDB */
   int                sigval;		/*!< GDB signal for any exception */
-  unsigned long int  start_addr;	/*!< Start of last run */
   struct mp_entry   *mp_hash[MP_HASH_SIZE];	/*!< Matchpoint hash table */
 } rsp;
 
@@ -156,26 +136,18 @@ static int                rsp_unescape (char *data,
 					int   len);
 static void               mp_hash_init ();
 static void               mp_hash_add (enum mp_type       type,
-				       unsigned long int  addr,
-				       unsigned long int  instr);
+				       unsigned long int  addr);
 static struct mp_entry   *mp_hash_lookup (enum mp_type       type,
 					  unsigned long int  addr);
 static struct mp_entry   *mp_hash_delete (enum mp_type       type,
 					  unsigned long int  addr);
 static int                hex (int  c);
-static void               reg2hex (unsigned long int  val,
+static void               reg2hex (ARMword  val,
 				   char              *buf);
-static unsigned long int  hex2reg (char *buf);
-static void               ascii2hex (char *dest,
-				     char *src);
-static void               hex2ascii (char *dest,
-				     char *src);
-static void               set_npc (unsigned long int  addr);
+static ARMword  hex2reg (char *buf);
+static void               set_npc (ARMword  addr);
 static void               rsp_report_exception ();
 static void               rsp_continue (struct rsp_buf *buf);
-static void               rsp_continue_with_signal (struct rsp_buf *buf);
-static void               rsp_continue_generic (unsigned long int  addr,
-						unsigned long int  except);
 static void               rsp_read_all_regs ();
 static void               rsp_write_all_regs (struct rsp_buf *buf);
 static void               rsp_read_mem (struct rsp_buf *buf);
@@ -183,18 +155,41 @@ static void               rsp_write_mem (struct rsp_buf *buf);
 static void               rsp_read_reg (struct rsp_buf *buf);
 static void               rsp_write_reg (struct rsp_buf *buf);
 static void               rsp_query (struct rsp_buf *buf);
-static void               rsp_command (struct rsp_buf *buf);
 static void               rsp_set (struct rsp_buf *buf);
-static void               rsp_restart ();
 static void               rsp_step (struct rsp_buf *buf);
-static void               rsp_step_with_signal (struct rsp_buf *buf);
-static void               rsp_step_generic (unsigned long int  addr,
-					    unsigned long int  except);
 static void               rsp_vpkt (struct rsp_buf *buf);
 static void               rsp_write_mem_bin (struct rsp_buf *buf);
 static void               rsp_remove_matchpoint (struct rsp_buf *buf);
 static void               rsp_insert_matchpoint (struct rsp_buf *buf);
 
+extern char _binary_arm_core_xml_start[];
+extern char _binary_arm_core_xml_end[];
+
+
+typedef struct
+{
+  uint32_t a_type;              /* Entry type */
+  union
+    {
+      uint32_t a_val;           /* Integer value */
+      /* We use to have pointer elements added here.  We cannot do that,
+         though, since it does not work when using 32-bit definitions
+         on 64-bit platforms and vice versa.  */
+    } a_un;
+} Elf32_auxv_t;
+
+
+Elf32_auxv_t auxv[] = {
+    { 16, { 1<<3 } },  // AT_HWCAP (26 bit)
+    { 15, { STRING_auxv_platform_string } },        // AT_PLATFORM
+    { 9, { 0x8000 } }, // AT_ENTRY
+    { 10, { 0x1} },    // AT_NOTELF
+    { 0, { 0 } },
+};
+
+static void set_stall_state(int state) {
+    rsp.stalled = state;
+}
 
 /*---------------------------------------------------------------------------*/
 /*!Initialize the Remote Serial Protocol connection
@@ -204,11 +199,13 @@ static void               rsp_insert_matchpoint (struct rsp_buf *buf);
 void
 rsp_init ()
 {
+  assert(((NUM_REGS) * 8 + 1) < GDB_BUF_MAX);
   /* Clear out the central data structure */
   rsp.client_waiting =  0;		/* GDB client is not waiting for us */
+  rsp.single_stepping=  1;
+  rsp.stalled        =  0;
   rsp.client_fd      = -1;		/* i.e. invalid */
   rsp.sigval         =  0;		/* No exception */
-  rsp.start_addr     = EXCEPT_RESET;	/* Default restart point */
 
   /* Set up the matchpoint hash table */
   mp_hash_init ();
@@ -235,6 +232,7 @@ void
 handle_rsp ()
 {
   /* If we have no RSP client, wait until we get one. */
+  set_stall_state(1);
   while (-1 == rsp.client_fd)
     {
       rsp_get_client ();
@@ -245,18 +243,14 @@ handle_rsp ()
      exception was a trap due to a memory breakpoint, then adjust the NPC. */
   if (rsp.client_waiting)
     {
-      if ((TARGET_SIGNAL_TRAP == rsp.sigval) &&
-	  (NULL != mp_hash_lookup (BP_MEMORY, cpu_state.sprs[SPR_PPC])))
-	{
-	  set_npc (cpu_state.sprs[SPR_PPC]);
-	}
-
       rsp_report_exception();
       rsp.client_waiting = 0;		/* No longer waiting */
     }
 
   /* Get a RSP client request */
-  rsp_client_request ();
+  while (rsp.stalled) {
+    rsp_client_request ();
+  }
 
 }	/* handle_rsp () */
 
@@ -280,21 +274,6 @@ rsp_exception (unsigned long int  except)
 
   switch (except)
     {
-    case EXCEPT_RESET:    sigval = TARGET_SIGNAL_PWR;  break;
-    case EXCEPT_BUSERR:   sigval = TARGET_SIGNAL_BUS;  break;
-    case EXCEPT_DPF:      sigval = TARGET_SIGNAL_SEGV; break;
-    case EXCEPT_IPF:      sigval = TARGET_SIGNAL_SEGV; break;
-    case EXCEPT_TICK:     sigval = TARGET_SIGNAL_ALRM; break;
-    case EXCEPT_ALIGN:    sigval = TARGET_SIGNAL_BUS;  break;
-    case EXCEPT_ILLEGAL:  sigval = TARGET_SIGNAL_ILL;  break;
-    case EXCEPT_INT:      sigval = TARGET_SIGNAL_INT;  break;
-    case EXCEPT_DTLBMISS: sigval = TARGET_SIGNAL_SEGV; break;
-    case EXCEPT_ITLBMISS: sigval = TARGET_SIGNAL_SEGV; break;
-    case EXCEPT_RANGE:    sigval = TARGET_SIGNAL_FPE;  break;
-    case EXCEPT_SYSCALL:  sigval = TARGET_SIGNAL_USR2; break;
-    case EXCEPT_FPE:      sigval = TARGET_SIGNAL_FPE;  break;
-    case EXCEPT_TRAP:     sigval = TARGET_SIGNAL_TRAP; break;
-
     default:
       fprintf (stderr, "Warning: Unknown RSP exception %lu: Ignored\n", except);
       return;
@@ -336,29 +315,12 @@ rsp_get_client ()
   struct sockaddr_in  sock_addr;	/* Socket address */
   socklen_t           len;		/* Size of the socket address */
 
-  /* 0 is used as the RSP port number to indicate that we should use the
-     service name instead. */
-  if (0 == config.debug.rsp_port)
-    {
-      struct servent *service =
-	getservbyname (OR1KSIM_RSP_SERVICE, "tcp");
-
-      if (NULL == service)
-	{
-	  fprintf (stderr, "Warning: RSP unable to find service \"%s\": %s\n",
-		   OR1KSIM_RSP_SERVICE, strerror (errno));
-	  return;
-	}
-
-      config.debug.rsp_port = ntohs (service->s_port);
-    }
-
   /* Open a socket on which we'll listen for clients */
   tmp_fd = socket (PF_INET, SOCK_STREAM, IPPROTO_TCP);
   if (tmp_fd < 0)
     {
       fprintf (stderr, "ERROR: Cannot open RSP socket\n");
-      sim_done ();
+      abort();
     }
 
   /* Allow rapid reuse of the port on this socket */
@@ -366,24 +328,26 @@ rsp_get_client ()
   setsockopt (tmp_fd, SOL_SOCKET, SO_REUSEADDR, (char *)&optval,
 	      sizeof (optval));
 
+  int rsp_port = 53415;
+
   /* Bind the port to the socket */
   sock_addr.sin_family      = PF_INET;
-  sock_addr.sin_port        = htons (config.debug.rsp_port);
+  sock_addr.sin_port        = htons (rsp_port);
   sock_addr.sin_addr.s_addr = INADDR_ANY;
   if (bind (tmp_fd, (struct sockaddr *) &sock_addr, sizeof (sock_addr)))
     {
       fprintf (stderr, "ERROR: Cannot bind to RSP socket\n");
-      sim_done ();
+      abort();
     }
       
   /* Listen for (at most one) client */
   if (listen (tmp_fd, 1))
     {
       fprintf (stderr, "ERROR: Cannot listen on RSP socket\n");
-      sim_done ();
+      abort();
     }
 
-  printf ("Listening for RSP on port %d\n", config.debug.rsp_port);
+  printf ("Listening for RSP on port %d\n", rsp_port);
   fflush (stdout);
 
   /* Accept a client which connects */
@@ -484,15 +448,16 @@ rsp_client_request ()
       rsp_continue (buf);
       return;
 
-    case 'C':
-      /* Continue with signal */
-      rsp_continue_with_signal (buf);
-      return;
+//    case 'C':
+//      /* Continue with signal */
+//      rsp_continue_with_signal (buf);
+//      return;
 
     case 'd':
       /* Disable debug using a general query */
       fprintf (stderr, "Warning: RSP 'd' packet is deprecated (define a 'Q' "
 	       "packet instead: ignored\n");
+      set_stall_state(0);
       return;
 
     case 'D':
@@ -528,9 +493,7 @@ rsp_client_request ()
 
     case 'i':
       /* Single instruction step */
-      fprintf (stderr, "Warning: RSP cycle stepping not supported: target "
-	       "stopped immediately\n");
-      rsp.client_waiting = 1;			/* Stop reply will be sent */
+      rsp_step (buf);
       return;
 
     case 'I':
@@ -580,21 +543,10 @@ rsp_client_request ()
 	       "packet instead): ignored\n");
       return;
 
-    case 'R':
-      /* Restart the program being debugged. */
-      rsp_restart ();
-      return;
-
     case 's':
       /* Single step (one high level instruction). This could be hard without
 	 DWARF2 info */
       rsp_step (buf);
-      return;
-
-    case 'S':
-      /* Single step (one high level instruction) with signal. This could be
-	 hard without DWARF2 info */
-      rsp_step_with_signal (buf);
       return;
 
     case 't':
@@ -1039,8 +991,7 @@ mp_hash_init ()
 /*---------------------------------------------------------------------------*/
 static void
 mp_hash_add (enum mp_type       type,
-	     unsigned long int  addr,
-	     unsigned long int  instr)
+	     unsigned long int  addr)
 {
   int              hv    = addr % MP_HASH_SIZE;
   struct mp_entry *curr;
@@ -1059,7 +1010,6 @@ mp_hash_add (enum mp_type       type,
 
   curr->type  = type;
   curr->addr  = addr;
-  curr->instr = instr;
   curr->next  = rsp.mp_hash[hv];
 
   rsp.mp_hash[hv] = curr;
@@ -1183,7 +1133,7 @@ hex (int  c)
    @param[out] buf  The buffer for the text string                           */
 /*---------------------------------------------------------------------------*/
 static void
-reg2hex (unsigned long int  val,
+reg2hex (ARMword  val,
 	 char              *buf)
 {
   int  n;			/* Counter for digits */
@@ -1191,9 +1141,9 @@ reg2hex (unsigned long int  val,
   for (n = 0; n < 8; n++)
     {
 #ifdef WORDS_BIGENDIAN
-      int  nyb_shift = (n ^ 1) * 4;
-#else
       int  nyb_shift = 28 - (n * 4);
+#else
+      int  nyb_shift = (n ^ 1) * 4;
 #endif
       buf[n] = hexchars[(val >> nyb_shift) & 0xf];
     }
@@ -1213,7 +1163,7 @@ reg2hex (unsigned long int  val,
 
    @return  The value to convert                                             */
 /*---------------------------------------------------------------------------*/
-static unsigned long int
+static ARMword
 hex2reg (char *buf)
 {
   int                n;		/* Counter for digits */
@@ -1222,9 +1172,9 @@ hex2reg (char *buf)
   for (n = 0; n < 8; n++)
     {
 #ifdef WORDS_BIGENDIAN
-      int  nyb_shift = (n ^ 1) * 4;
-#else
       int  nyb_shift = 28 - (n * 4);
+#else
+      int  nyb_shift = (n ^ 1) * 4;
 #endif
       val |= hex (buf[n]) << nyb_shift;
     }
@@ -1232,57 +1182,6 @@ hex2reg (char *buf)
   return val;
 
 }	/* hex2reg () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Convert an ASCII character string to pairs of hex digits
-
-   Both source and destination are null terminated.
-
-   @param[out] dest  Buffer to store the hex digit pairs (null terminated)
-   @param[in]  src   The ASCII string (null terminated)                      */
-/*---------------------------------------------------------------------------*/
-static void  ascii2hex (char *dest,
-			char *src)
-{
-  int  i;
-
-  /* Step through converting the source string */
-  for (i = 0; src[i] != '\0'; i++)
-    {
-      char  ch = src[i];
-
-      dest[i * 2]     = hexchars[ch >> 4 & 0xf];
-      dest[i * 2 + 1] = hexchars[ch      & 0xf];
-    }
-
-  dest[i * 2] = '\0';
-	
-}	/* ascii2hex () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Convert pairs of hex digits to an ASCII character string
-
-   Both source and destination are null terminated.
-
-   @param[out] dest  The ASCII string (null terminated)
-   @param[in]  src   Buffer holding the hex digit pairs (null terminated)    */
-/*---------------------------------------------------------------------------*/
-static void  hex2ascii (char *dest,
-			char *src)
-{
-  int  i;
-
-  /* Step through convering the source hex digit pairs */
-  for (i = 0; src[i * 2] != '\0' && src[i * 2 + 1] != '\0'; i++)
-    {
-      dest[i] = ((hex (src[i * 2]) & 0xf) << 4) | (hex (src[i * 2 + 1]) & 0xf);
-    }
-
-  dest[i] = '\0';
-
-}	/* hex2ascii () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -1298,14 +1197,9 @@ static void  hex2ascii (char *dest,
    @param[in] addr  The address to use                                       */
 /*---------------------------------------------------------------------------*/
 static void
-set_npc (unsigned long int  addr)
+set_npc (ARMword addr)
 {
-  if (cpu_state.pc != addr)
-    {
-      cpu_state.pc         = addr;
-      cpu_state.delay_insn = 0;
-      pcnext               = addr + 4;
-    }
+  arm_set_pc(addr);
 }	/* set_npc () */
 
 
@@ -1344,78 +1238,28 @@ rsp_continue (struct rsp_buf *buf)
 {
   unsigned long int  addr;		/* Address to continue from, if any */
 
-  if (0 == strcmp ("c", buf->data))
+  rsp.single_stepping = 0;
+
+  if (0 == strcmp ("c", buf->data) || 0 == strcmp("vCont;c", buf->data))
     {
-      addr = cpu_state.pc;	/* Default uses current NPC */
     }
   else if (1 != sscanf (buf->data, "c%lx", &addr))
     {
       fprintf (stderr,
 	       "Warning: RSP continue address %s not recognized: ignored\n",
 	       buf->data);
-      addr = cpu_state.pc;	/* Default uses current NPC */
     }
-
-  rsp_continue_generic (addr, EXCEPT_NONE);
-
-}	/* rsp_continue () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Handle a RSP continue with signal request
-
-   Currently null. Will use the underlying generic continue function.
-
-   @param[in] buf  The full continue with signal packet                      */
-/*---------------------------------------------------------------------------*/
-static void
-rsp_continue_with_signal (struct rsp_buf *buf)
-{
-  printf ("RSP continue with signal '%s' received\n", buf->data);
-
-}	/* rsp_continue_with_signal () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Generic processing of a continue request
-
-   The signal may be EXCEPT_NONE if there is no exception to be
-   handled. Currently the exception is ignored.
-
-   The single step flag is cleared in the debug registers and then the
-   processor is unstalled.
-
-   @param[in] addr    Address from which to step
-   @param[in] except  The exception to use (if any)                          */
-/*---------------------------------------------------------------------------*/
-static void
-rsp_continue_generic (unsigned long int  addr,
-		      unsigned long int  except)
-{
-  /* Set the address as the value of the next program counter */
-  set_npc (addr);
-
-  /* Clear Debug Reason Register and watchpoint break generation in Debug Mode
-     Register 2 */
-  cpu_state.sprs[SPR_DRR]   = 0;
-  cpu_state.sprs[SPR_DMR2] &= ~SPR_DMR2_WGB;
-
-  /* Clear the single step trigger in Debug Mode Register 1 and set traps to be
-     handled by the debug unit in the Debug Stop Register */
-  cpu_state.sprs[SPR_DMR1] &= ~SPR_DMR1_ST;
-  cpu_state.sprs[SPR_DSR]  |= SPR_DSR_TE;
+  else
+    {
+      set_npc(addr);
+    }
 
   /* Unstall the processor */
   set_stall_state (0);
 
-  /* Any signal is cleared. */
-  rsp.sigval = TARGET_SIGNAL_NONE;
-
   /* Note the GDB client is now waiting for a reply. */
   rsp.client_waiting = 1;
-
-}	/* rsp_continue_generic () */
-
+}	/* rsp_continue () */
 
 /*---------------------------------------------------------------------------*/
 /*!Handle a RSP read all registers request
@@ -1432,20 +1276,17 @@ rsp_read_all_regs ()
   struct rsp_buf  buf;			/* Buffer for the reply */
   int             r;			/* Register index */
 
-  /* The GPRs */
-  for (r = 0; r < MAX_GPRS; r++)
+  for (r = 0; r < 15; r++)
     {
-      reg2hex (cpu_state.reg[r], &(buf.data[r * 8]));
+      reg2hex (arm_get_reg(r), &(buf.data[r * 8]));
     }
 
-  /* PPC, NPC and SR */
-  reg2hex (cpu_state.sprs[SPR_PPC], &(buf.data[PPC_REGNUM * 8]));
-  reg2hex (cpu_state.pc,            &(buf.data[NPC_REGNUM * 8]));
-  reg2hex (cpu_state.sprs[SPR_SR],  &(buf.data[SR_REGNUM  * 8]));
+  reg2hex ((arm_get_r15_all() - 8) &  0x03fffffc, &(buf.data[15 * 8]));
+
+  // gdb requests the CPSR separately as the register numbers are not continuous.
 
   /* Finalize the packet and send it */
-  buf.data[NUM_REGS * 8] = 0;
-  buf.len                = NUM_REGS * 8;
+  buf.len                = 16 * 8;
 
   put_packet (&buf);
 
@@ -1473,15 +1314,12 @@ rsp_write_all_regs (struct rsp_buf *buf)
   int             r;			/* Register index */
 
   /* The GPRs */
-  for (r = 0; r < MAX_GPRS; r++)
+  for (r = 0; r < 15; r++)
     {
-      cpu_state.reg[r] = hex2reg (&(buf->data[r * 8]));
+      arm_set_reg(r, hex2reg (&(buf->data[r * 8])));
     }
 
-  /* PPC, NPC and SR */
-  cpu_state.sprs[SPR_PPC] = hex2reg (&(buf->data[PPC_REGNUM * 8]));
-  cpu_state.sprs[SPR_SR]  = hex2reg (&(buf->data[SR_REGNUM  * 8]));
-  set_npc (hex2reg (&(buf->data[NPC_REGNUM * 8])));
+  arm_set_reg(15, hex2reg (&(buf->data[25 * 8])));
 
   /* Acknowledge. TODO: We always succeed at present, even if the data was
      defective. */
@@ -1511,7 +1349,7 @@ rsp_read_mem (struct rsp_buf *buf)
 {
   unsigned int    addr;			/* Where to read the memory */
   int             len;			/* Number of bytes to read */
-  int             off;			/* Offset into the memory */
+  unsigned int    off;			/* Offset into the memory */
 
   if (2 != sscanf (buf->data, "m%x,%x:", &addr, &len))
     {
@@ -1535,7 +1373,7 @@ rsp_read_mem (struct rsp_buf *buf)
       unsigned char  ch;		/* The byte at the address */
 
       /* Check memory area is valid */
-      if (NULL == verify_memoryarea (addr + off))
+      if (mem_arm_where(addr+off)==0)
 	{
 	  /* The error number doesn't matter. The GDB client will substitute
 	     its own */
@@ -1543,8 +1381,7 @@ rsp_read_mem (struct rsp_buf *buf)
 	  return;
 	}
 
-      // Get the memory direct - no translation.
-      ch = eval_direct8 (addr + off, 0, 0);
+      ch = MEM_READ_BYTE(addr+off);
 
       buf->data[off * 2]     = hexchars[ch >>   4];
       buf->data[off * 2 + 1] = hexchars[ch &  0xf];
@@ -1606,7 +1443,7 @@ rsp_write_mem (struct rsp_buf *buf)
   /* Write the bytes to memory */
   for (off = 0; off < len; off++)
     {
-      if (NULL == verify_memoryarea (addr + off))
+      if (mem_arm_where(addr + off)==0)
 	{
 	  /* The error number doesn't matter. The GDB client will substitute
 	     its own */
@@ -1618,14 +1455,7 @@ rsp_write_mem (struct rsp_buf *buf)
 	  unsigned char  nyb1 = hex (symdat[off * 2]);
 	  unsigned char  nyb2 = hex (symdat[off * 2 + 1]);
 
-	  /* circumvent the read-only check usually done for mem accesses
-	     data is in host order, because that's what set_direct32 needs
-
-	     We make sure both data and instruction cache are invalidated
-	     first, so that the write goes through the cache. */
-	  dc_inv (addr + off);
-	  ic_inv (addr + off);
-	  set_program8 (addr + off, (nyb1 << 4) | nyb2);
+          MEM_WRITE_BYTE(addr+off, (nyb1 << 4) | nyb2);
 	}
     }
 
@@ -1660,21 +1490,13 @@ rsp_read_reg (struct rsp_buf *buf)
     }
 
   /* Get the relevant register */
-  if (regnum < MAX_GPRS)
+  if (regnum < 15)
     {
-      reg2hex (cpu_state.reg[regnum], buf->data);
+      reg2hex (arm_get_reg(regnum), buf->data);
     }
-  else if (PPC_REGNUM == regnum)
+  else if (regnum == 25)
     {
-      reg2hex (cpu_state.sprs[SPR_PPC], buf->data);
-    }
-  else if (NPC_REGNUM == regnum)
-    {
-      reg2hex (cpu_state.pc, buf->data);
-    }
-  else if (SR_REGNUM == regnum)
-    {
-      reg2hex (cpu_state.sprs[SPR_SR], buf->data);
+      reg2hex (arm_get_r15_all() & 0xfc000003, buf->data);
     }
   else
     {
@@ -1718,21 +1540,9 @@ rsp_write_reg (struct rsp_buf *buf)
     }
   
   /* Set the relevant register */
-  if (regnum < MAX_GPRS)
+  if (regnum < 16)
     {
-      cpu_state.reg[regnum] = hex2reg (valstr);
-    }
-  else if (PPC_REGNUM == regnum)
-    {
-      cpu_state.sprs[SPR_PPC] = hex2reg (valstr);
-    }
-  else if (NPC_REGNUM == regnum)
-    {
-      set_npc (hex2reg (valstr));
-    }
-  else if (SR_REGNUM == regnum)
-    {
-      cpu_state.sprs[SPR_SR] = hex2reg (valstr);
+      arm_set_reg(regnum, hex2reg(valstr));
     }
   else
     {
@@ -1814,11 +1624,6 @@ rsp_query (struct rsp_buf *buf)
       fprintf (stderr, "Warning: RSP qP deprecated: no info returned\n");
       put_str_packet ("");
     }
-  else if (0 == strncmp ("qRcmd,", buf->data, strlen ("qRcmd,")))
-    {
-      /* This is used to interface to commands to do "stuff" */
-      rsp_command (buf);
-    }
   else if (0 == strncmp ("qSupported", buf->data, strlen ("qSupported")))
     {
       /* Report a list of the features we support. For now we just ignore any
@@ -1829,7 +1634,7 @@ rsp_query (struct rsp_buf *buf)
 
       char  reply[GDB_BUF_MAX];
 
-      sprintf (reply, "PacketSize=%x", GDB_BUF_MAX);
+      sprintf (reply, "PacketSize=%x;xmlRegisters=arm;swbreak-;hwbreak+;qXfer:features:read+;qXfer:auxv:read+;qHostInfo:+", GDB_BUF_MAX);
       put_str_packet (reply);
     }
   else if (0 == strncmp ("qSymbol:", buf->data, strlen ("qSymbol:")))
@@ -1854,92 +1659,64 @@ rsp_query (struct rsp_buf *buf)
       /* We don't support tracing, so return empty packet. */
       put_str_packet ("");
     }
+  else if (0 == strcmp ("qHostInfo", buf->data))
+    {
+      put_str_packet("cputype:12;cpusubtype:0;ostype:riscos;triple:arm-unknown-riscos;vendor:acorn;endian:little;ptrsize:4;");
+    }
   else if (0 == strncmp ("qXfer:", buf->data, strlen ("qXfer:")))
     {
-      /* For now we support no 'qXfer' requests, but these should not be
-	 expected, since they were not reported by 'qSupported' */
-      fprintf (stderr, "Warning: RSP 'qXfer' not supported: ignored\n");
+    unsigned int offset;
+    int filesize = -1;
+    unsigned int size = -1;
+
+    const char *file;
+
+    if (0 == strncmp ("qXfer:features:read:target.xml:", buf->data, strlen ("qXfer:features:read:target.xml:")) &&
+        sscanf(buf->data + strlen ("qXfer:features:read:target.xml:"), "%x,%x", &offset, &size)==2) {
+      filesize = _binary_arm_core_xml_end - _binary_arm_core_xml_start;
+      file     = _binary_arm_core_xml_start;
+    }
+    else if (0 == strncmp ("qXfer:auxv:read::", buf->data, strlen ("qXfer:auxv:read::")) &&
+        sscanf(buf->data + strlen ("qXfer:auxv:read::"), "%x,%x", &offset, &size)==2) {
+      filesize = sizeof(auxv);
+      file     = (char *) auxv;
+    }
+
+    if (filesize > 0) {
+      if (offset >= filesize) offset = filesize;
+      if (size >= GDB_BUF_MAX-3) {
+          fprintf (stderr, "Warning: RSP 'qXfer' size too big\n");
+
+          put_str_packet ("E01");
+      }
+      else if (offset == filesize) {
+          put_str_packet("l");
+      }
+      else {
+          if (offset+size > filesize) {
+              size = filesize - offset;
+          }
+
+          struct rsp_buf buf;
+          buf.data[0] = 'm';
+          assert(size+1 <= sizeof(buf.data));
+          memcpy(buf.data+1, file + offset, size);
+          buf.data[size+1] = 0;
+          buf.len = size+1;
+          put_packet(&buf);
+      }
+    }
+    else {
+      fprintf (stderr, "Warning: RSP 'qXfer' bad: ignored\n");
+
       put_str_packet ("");
     }
+  }
   else
     {
       fprintf (stderr, "Unrecognized RSP query: ignored\n");
     }
 }	/* rsp_query () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Handle a RSP qRcmd request
-
-  The actual command follows the "qRcmd," in ASCII encoded to hex
-
-   @param[in] buf  The request in full                                       */
-/*---------------------------------------------------------------------------*/
-static void
-rsp_command (struct rsp_buf *buf)
-{
-  char  cmd[GDB_BUF_MAX];
-
-  hex2ascii (cmd, &(buf->data[strlen ("qRcmd,")]));
-
-  /* Work out which command it is */
-  if (0 == strncmp ("readspr ", cmd, strlen ("readspr")))
-    {
-      unsigned int       regno;
-
-      /* Parse and return error if we fail */
-      if( 1 != sscanf (cmd, "readspr %4x", &regno))
-	{
-	  fprintf (stderr, "Warning: qRcmd %s not recognized: ignored\n",
-		   cmd);
-	  put_str_packet ("E01");
-	  return;
-	}
-
-      /* SPR out of range */
-      if (regno > MAX_SPRS)
-	{
-	  fprintf (stderr, "Warning: qRcmd readspr %x too large: ignored\n",
-		   regno);
-	  put_str_packet ("E01");
-	  return;
-	}
-
-      /* Construct the reply */
-      sprintf (cmd, "%8lx", (unsigned long int)mfspr (regno));
-      ascii2hex (buf->data, cmd);
-      buf->len = strlen (buf->data);
-      put_packet (buf);
-    }
-  else if (0 == strncmp ("writespr ", cmd, strlen ("writespr")))
-    {
-      unsigned int       regno;
-      unsigned long int  val;
-
-      /* Parse and return error if we fail */
-      if( 2 != sscanf (cmd, "writespr %4x %8lx", &regno, &val))
-	{
-	  fprintf (stderr, "Warning: qRcmd %s not recognized: ignored\n",
-		   cmd);
-	  put_str_packet ("E01");
-	  return;
-	}
-
-      /* SPR out of range */
-      if (regno > MAX_SPRS)
-	{
-	  fprintf (stderr, "Warning: qRcmd writespr %x too large: ignored\n",
-		   regno);
-	  put_str_packet ("E01");
-	  return;
-	}
-
-      /* Update the SPR and reply "OK" */
-      mtspr (regno, val);
-      put_str_packet ("OK");
-    }
-      
-}	/* rsp_command () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -1960,6 +1737,7 @@ rsp_set (struct rsp_buf *buf)
 	   (0 == strcmp  ("QTStart", buf->data))                    ||
 	   (0 == strcmp  ("QTStop",  buf->data))                    ||
 	   (0 == strcmp  ("QTinit",  buf->data))                    ||
+	   (0 == strcmp  ("QStartNoAckMode",  buf->data))           ||
 	   (0 == strncmp ("QTro",    buf->data, strlen ("QTro"))))
     {
       /* All tracepoint features are not supported. This reply is really only
@@ -1969,24 +1747,9 @@ rsp_set (struct rsp_buf *buf)
     }
   else
     {
-      fprintf (stderr, "Unrecognized RSP set request: ignored\n");
+      fprintf (stderr, "Unrecognized RSP set request '%s': ignored\n", buf->data);
     }
 }	/* rsp_set () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Handle a RSP restart request
-
-   For now we just put the program counter back to the one used with the last
-   vRun request. There is no point in unstalling the processor, since we'll
-   never get control back.                                                   */
-/*---------------------------------------------------------------------------*/
-static void
-rsp_restart ()
-{
-  set_npc (rsp.start_addr);
-
-}	/* rsp_restart () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -2002,77 +1765,28 @@ rsp_step (struct rsp_buf *buf)
 {
   unsigned long int  addr;		/* The address to step from, if any */
 
-  if (0 == strcmp ("s", buf->data))
+  rsp.single_stepping = 1;
+
+  if (0 == strcmp ("s", buf->data) || 0 == strcmp("i", buf->data) || 0 == strcmp("vCont;s", buf->data) || 0 == strcmp("vCont;s:1", buf->data))
     {
-      addr = cpu_state.pc;	/* Default uses current NPC */
     }
   else if (1 != sscanf (buf->data, "s%lx", &addr))
     {
       fprintf (stderr,
 	       "Warning: RSP step address %s not recognized: ignored\n",
 	       buf->data);
-      addr = cpu_state.pc;	/* Default uses current NPC */
     }
-
-  rsp_step_generic (addr, EXCEPT_NONE);
-
-}	/* rsp_step () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Handle a RSP step with signal request
-
-   Currently null. Will use the underlying generic step function.
-
-   @param[in] buf  The full step with signal packet              */
-/*---------------------------------------------------------------------------*/
-static void
-rsp_step_with_signal (struct rsp_buf *buf)
-{
-  printf ("RSP step with signal '%s' received\n", buf->data);
-
-}	/* rsp_step_with_signal () */
-
-
-/*---------------------------------------------------------------------------*/
-/*!Generic processing of a step request
-
-   The signal may be EXCEPT_NONE if there is no exception to be
-   handled. Currently the exception is ignored.
-
-   The single step flag is set in the debug registers and then the processor
-   is unstalled.
-
-   @param[in] addr    Address from which to step
-   @param[in] except  The exception to use (if any)                          */
-/*---------------------------------------------------------------------------*/
-static void
-rsp_step_generic (unsigned long int  addr,
-		  unsigned long int  except)
-{
-  /* Set the address as the value of the next program counter */
-  set_npc (addr);
-
-  /* Clear Debug Reason Register and watchpoint break generation in Debug Mode
-     Register 2 */
-  cpu_state.sprs[SPR_DRR]   = 0;
-  cpu_state.sprs[SPR_DMR2] &= ~SPR_DMR2_WGB;
-
-  /* Set the single step trigger in Debug Mode Register 1 and set traps to be
-     handled by the debug unit in the Debug Stop Register */
-  cpu_state.sprs[SPR_DMR1] |= SPR_DMR1_ST;
-  cpu_state.sprs[SPR_DSR]  |= SPR_DSR_TE;
-
+  else
+    {
+      set_npc(addr);
+    }
   /* Unstall the processor */
   set_stall_state (0);
-
-  /* Any signal is cleared. */
-  rsp.sigval = TARGET_SIGNAL_NONE;
 
   /* Note the GDB client is now waiting for a reply. */
   rsp.client_waiting = 1;
 
-}	/* rsp_step_generic () */
+}	/* rsp_step () */
 
 
 /*---------------------------------------------------------------------------*/
@@ -2095,14 +1809,25 @@ rsp_vpkt (struct rsp_buf *buf)
   else if (0 == strcmp ("vCont?", buf->data))
     {
       /* For now we don't support this. */
-      put_str_packet ("");
+      put_str_packet ("vCont;c;s");
+      return;
+    }
+  else if (0 == strcmp ("vCont;s", buf->data) || 0 == strcmp ("vCont;s:1", buf->data))
+    {
+      rsp_step(buf);
+      return;
+    }
+  else if (0 == strcmp ("vCont;c", buf->data) || 0 ==strcmp ("vCont;c:1", buf->data))
+    {
+      rsp_continue(buf);
       return;
     }
   else if (0 == strncmp ("vCont", buf->data, strlen ("vCont")))
     {
       /* This shouldn't happen, because we've reported non-support via vCont?
 	 above */
-      fprintf (stderr, "Warning: RSP vCont not supported: ignored\n" );
+      fprintf (stderr, "Warning: RSP vCont not supported\n" );
+      put_str_packet("E01");
       return;
     }
   else if (0 == strncmp ("vFile:", buf->data, strlen ("vFile:")))
@@ -2132,21 +1857,6 @@ rsp_vpkt (struct rsp_buf *buf)
       fprintf (stderr, "Warning: RSP vFlashDone not supported: ignored\n" );
       put_str_packet ("E01");
       return;
-    }
-  else if (0 == strncmp ("vRun;", buf->data, strlen ("vRun;")))
-    {
-      /* We shouldn't be given any args, but check for this */
-      if (buf->len > strlen ("vRun;"))
-	{
-	  fprintf (stderr, "Warning: Unexpected arguments to RSP vRun "
-		   "command: ignored\n");
-	}
-
-      /* Restart the current program. However unlike a "R" packet, "vRun"
-	 should behave as though it has just stopped. We use signal
-	 5 (TRAP). */
-      rsp_restart ();
-      put_str_packet ("S05");
     }
   else
     {
@@ -2213,7 +1923,7 @@ rsp_write_mem_bin (struct rsp_buf *buf)
   /* Write the bytes to memory */
   for (off = 0; off < len; off++)
     {
-      if (NULL == verify_memoryarea (addr + off))
+      if (mem_arm_where(addr + off)==0)
 	{
 	  /* The error number doesn't matter. The GDB client will substitute
 	     its own */
@@ -2222,13 +1932,7 @@ rsp_write_mem_bin (struct rsp_buf *buf)
 	}
       else
 	{
-	  /* Circumvent the read-only check usually done for mem accesses
-
-	     We make sure both data and instruction cache are invalidated
-	     first, so that the write goes through the cache. */
-	  dc_inv (addr + off);
-	  ic_inv (addr + off);
-	  set_program8 (addr + off, bindat[off]);
+          MEM_WRITE_BYTE(addr + off, bindat[off]);
 	}
     }
 
@@ -2255,7 +1959,6 @@ rsp_remove_matchpoint (struct rsp_buf *buf)
   int                type_for_scanf;	/* To avoid old GCC limitations */
   unsigned long int  addr;		/* Address specified */
   int                len;		/* Matchpoint length (not used) */
-  struct mp_entry   *mpe;		/* Info about the replaced instr */
 
   /* Break out the instruction. We have to use an intermediary for the type,
      since older GCCs do not like taking the address of an enum
@@ -2281,40 +1984,12 @@ rsp_remove_matchpoint (struct rsp_buf *buf)
   /* Sort out the type of matchpoint */
   switch (type)
     {
-    case BP_MEMORY:
-      /* Memory breakpoint - replace the original instruction. */
-      mpe = mp_hash_delete (type, addr);
-
-      /* If the BP hasn't yet been deleted, put the original instruction
-	 back. Don't forget to free the hash table entry afterwards.
-
-	 We make sure both the instruction cache is invalidated first, so that
-	 the write goes through the cache. */
-      if (NULL != mpe)
-	{
-	  ic_inv (addr);
-	  set_program32 (addr, mpe->instr);
-	  free (mpe);
-	}
-
-      put_str_packet ("OK");
-
-      return;
-     
     case BP_HARDWARE:
-      put_str_packet ("");		/* Not supported */
-      return;
-
     case WP_WRITE:
-      put_str_packet ("");		/* Not supported */
-      return;
-
     case WP_READ:
-      put_str_packet ("");		/* Not supported */
-      return;
-
     case WP_ACCESS:
-      put_str_packet ("");		/* Not supported */
+      mp_hash_delete(type, addr);
+      put_str_packet ("OK");
       return;
 
     default:
@@ -2370,32 +2045,12 @@ rsp_insert_matchpoint (struct rsp_buf *buf)
   /* Sort out the type of matchpoint */
   switch (type)
     {
-    case BP_MEMORY:
-      /* Memory breakpoint - substitute a TRAP instruction
-
-	 We make sure th instruction cache is invalidated first, so that the
-	 read and write always work correctly. */
-      mp_hash_add (type, addr, eval_direct32 (addr, 0, 0));
-      ic_inv (addr);
-      set_program32 (addr, OR1K_TRAP_INSTR);
-      put_str_packet ("OK");
-
-      return;
-     
     case BP_HARDWARE:
-      put_str_packet ("");		/* Not supported */
-      return;
-
     case WP_WRITE:
-      put_str_packet ("");		/* Not supported */
-      return;
-
     case WP_READ:
-      put_str_packet ("");		/* Not supported */
-      return;
-
     case WP_ACCESS:
-      put_str_packet ("");		/* Not supported */
+      mp_hash_add(type, addr);
+      put_str_packet("OK");
       return;
 
     default:
@@ -2407,4 +2062,31 @@ rsp_insert_matchpoint (struct rsp_buf *buf)
     }
 
 }	/* rsp_insert_matchpoint () */
- 
+
+extern void  rsp_check_instruction ( ARMword pc ) {
+    if (rsp.single_stepping) {
+        return handle_rsp();
+    }
+    else {
+        struct mp_entry *m = mp_hash_lookup( BP_HARDWARE, pc );
+        if (m) {
+            handle_rsp();
+        }
+    }
+}
+
+extern void  rsp_check_memory_read( ARMword addr ) {
+    int m = mp_hash_lookup( WP_READ, addr )
+         || mp_hash_lookup( WP_ACCESS, addr );
+    if (m) {
+        handle_rsp();
+    }
+}
+
+extern void  rsp_check_memory_write( ARMword addr ) {
+    int m = mp_hash_lookup( WP_WRITE, addr )
+         || mp_hash_lookup( WP_ACCESS, addr );
+    if (m) {
+        handle_rsp();
+    }
+}

@@ -2054,6 +2054,11 @@ rsp_insert_matchpoint (struct rsp_buf *buf)
       return;
 
     default:
+      // gdb docs say that we should return a black response for an unsupported
+      // breakpoint type. However, if we do that it attempts to inject a
+      // software breakpoint by writing to memory. This ends badly for us
+      // because we simulate the ARM's pipeline, so both setting the breakpoint
+      // and removing it afterwards can fail to take effect.
       fprintf (stderr, "Warning: RSP matchpoint type %d not "
 	       "recognized: ignored\n", type);
       put_str_packet ("E01");

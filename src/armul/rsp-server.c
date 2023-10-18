@@ -1719,7 +1719,7 @@ rsp_query (struct rsp_buf *buf)
   }
   else
     {
-      fprintf (stderr, "Unrecognized RSP query: ignored\n");
+      fprintf (stderr, "Unrecognized RSP query '%s': ignored\n", buf->data);
     }
 }	/* rsp_query () */
 
@@ -1831,7 +1831,7 @@ rsp_vpkt (struct rsp_buf *buf)
     {
       /* This shouldn't happen, because we've reported non-support via vCont?
 	 above */
-      fprintf (stderr, "Warning: RSP vCont not supported\n" );
+      fprintf (stderr, "Warning: RSP '%s' not supported\n", buf->data );
       put_str_packet("E01");
       return;
     }

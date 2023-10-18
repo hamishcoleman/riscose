@@ -248,7 +248,7 @@ handle_rsp ()
     }
 
   /* Get a RSP client request */
-  while (rsp.stalled) {
+  while (rsp.stalled && -1 != rsp.client_fd) {
     rsp_client_request ();
   }
 

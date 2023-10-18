@@ -174,10 +174,12 @@ void riscose_osapi_output
            if ( (s->o & (1<<i)) != 0 )
            {
              char *type = "int";
+             char *value = "0";
              if ( s->outputs[i]->tag == def_TYPE_REF || (s->ro & (1 << i)) ) {
                type = "char*";
+               value = "NULL";
              }
-             fprintf(file, "  %s r%d;\n", type, i);
+             fprintf(file, "  %s r%d = %s;\n", type, i, value);
            }
          }
 

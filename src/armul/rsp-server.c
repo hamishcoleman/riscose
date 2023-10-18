@@ -1688,6 +1688,11 @@ rsp_query (struct rsp_buf *buf)
 
     if (filesize > 0) {
       if (offset >= filesize) offset = filesize;
+
+      if (offset+size > filesize) {
+          size = filesize - offset;
+      }
+
       if (size >= GDB_BUF_MAX-3) {
           fprintf (stderr, "Warning: RSP 'qXfer' size too big\n");
 
@@ -1697,10 +1702,6 @@ rsp_query (struct rsp_buf *buf)
           put_str_packet("l");
       }
       else {
-          if (offset+size > filesize) {
-              size = filesize - offset;
-          }
-
           struct rsp_buf buf;
           buf.data[0] = 'm';
           assert(size+1 <= sizeof(buf.data));

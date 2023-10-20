@@ -59,7 +59,7 @@ void error(const char *SWIname, char *fmt, ...)
 {
     int len;
     va_list args;
-    static FILE *nullf;
+    FILE *nullf = NULL;
 
     if (nullf == NULL) nullf = fopen("/dev/null", "w");
 

@@ -17,6 +17,7 @@
 #include <unistd.h>
 #include <limits.h>
 #include <string.h>
+#include <stdint.h>
 #include <monty/monty.h>
 #include "types.h"
 #include "osfile.h"
@@ -60,8 +61,8 @@ static void stat_to_regs(struct stat *statbuf,
     *obj_type = 1;
   }
 
-  unsigned long long int mtime_ros = (unsigned long long)statbuf->st_mtim.tv_sec * 100ULL + 613608ULL*3600ULL*100ULL; // gtoal: converted to ULL to avoid overflow
-  mtime_ros += statbuf->st_mtim.tv_nsec / (1000ULL * 1000ULL * 10ULL); // gtoal: added brackets around '*' values
+  unsigned long long int mtime_ros = (unsigned long long)statbuf->st_mtim.tv_sec * 100ULL + 613608ULL*3600ULL*100ULL;
+  mtime_ros += statbuf->st_mtim.tv_nsec / (1000ULL * 1000ULL * 10ULL);
 
   *load_addr = (unsigned long)((mtime_ros >> 32ULL) & 0x000000ffULL);
   *exec_addr = (unsigned long)( mtime_ros           & 0xffffffffULL);

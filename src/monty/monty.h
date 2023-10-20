@@ -85,7 +85,12 @@ void warn(char *fmt, ...) __attribute__ ((format (printf, 1, 2)));
 
 /* printf's an error to stderr.  output is prefixed with `progname:
  * error: '.  exit(1) is then called. */
-void error(char *fmt, ...) __attribute__ ((format (printf, 1, 2), noreturn));
+#ifdef error
+#undef error
+#endif
+void error(const char *SWIname, char *fmt, ...) __attribute__ ((format (printf, 2, 3), noreturn));
+// We add the calling function as a parameter so that we can determine *which* SWI was not implemented!
+#define error(fmt...) error(__func__, fmt)
 
 /* printf's an error to stderr.  output is prefixed with `progname: '.
  * abort is then called to produce a core dump (unless something is

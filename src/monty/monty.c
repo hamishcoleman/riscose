@@ -57,29 +57,11 @@ void warn(char *fmt, ...)
 #endif
 void error(const char *SWIname, char *fmt, ...)
 {
-    int len;
     va_list args;
-    FILE *nullf = NULL;
+    char str[2048];
 
-    if (nullf == NULL) nullf = fopen("/dev/null", "w");
-
-    if (nullf == NULL) {
-      fprintf(stderr, "%s: error: ", progname);
-      va_start(args, fmt);
-      len = vfprintf(stderr, fmt, args);
-      va_end(args);
-      exit(1);
-    }
-    
-    // determine the size of the string
     va_start(args, fmt);
-    len = vfprintf(nullf, fmt, args);
-    va_end(args);
-
-    char str[len+1]; // and get the string. (gcc extension)
-    
-    va_start(args, fmt);
-    len = vsprintf(str, fmt, args);
+    vsnprintf(str, sizeof(str), fmt, args);
     va_end(args);
 
     // if it is this particulr string, add in the name of the SWI.
@@ -89,7 +71,6 @@ void error(const char *SWIname, char *fmt, ...)
       fprintf(stderr, "%s: error: %s", progname, str);
     }
     
-    fclose(nullf);    
     exit(1);
 }
 

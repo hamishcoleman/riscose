@@ -179,7 +179,7 @@ typedef struct
 } Elf32_auxv_t;
 
 
-Elf32_auxv_t auxv[] = {
+static const Elf32_auxv_t auxv[] = {
     { 16, { 1<<3 } },  // AT_HWCAP (26 bit)
     { 15, { STRING_auxv_platform_string } },        // AT_PLATFORM
     { 9, { 0x8000 } }, // AT_ENTRY

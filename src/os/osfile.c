@@ -61,11 +61,11 @@ static void stat_to_regs(struct stat *statbuf,
     *obj_type = 1;
   }
 
-  unsigned long long int mtime_ros = (unsigned long long)statbuf->st_mtim.tv_sec * 100ULL + 613608ULL*3600ULL*100ULL;
+  uint64_t mtime_ros = (uint64_t)statbuf->st_mtim.tv_sec * 100ULL + 613608ULL*3600ULL*100ULL;
   mtime_ros += statbuf->st_mtim.tv_nsec / (1000ULL * 1000ULL * 10ULL);
 
-  *load_addr = (unsigned long)((mtime_ros >> 32ULL) & 0x000000ffULL);
-  *exec_addr = (unsigned long)( mtime_ros           & 0xffffffffULL);
+  *load_addr = (uint32_t)((mtime_ros >> 32) & 0x000000ffUL);
+  *exec_addr = (uint32_t)( mtime_ros        & 0xffffffffUL);
 
   // Filetype is data
   *load_addr |=                    0xfffffd00UL;

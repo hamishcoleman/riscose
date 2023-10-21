@@ -45,19 +45,24 @@ $l=0; while (<ERRORS>)
   next if /^(\n|\#)/;
   die "Bad format in error.list at line $l"
     if ! /^(ERROR)\s+(\S*)\s+([0-9a-fA-F]*)\s+(.*)\n/ &&
+       ! /^(STRING)\s+(\S*)\s+(.+)\n/ &&
        ! /^(WORD)\s+(\S*)\s+([0-9a-fA-F]*)\n/;
   
   if ($1 eq "ERROR") {
+    &rom_align;
     print ROMHDR sprintf("static os_error* ERR_%s(void)  __attribute__ ((unused));\n", uc $2);
     print ROMHDR sprintf("static os_error* ERR_%s(void)  { return (os_error *) MEM_TOHOST(0x%08x); }\n", uc $2, &rom_current);
     print ROM pack("L", hex $3).$4."\0";
   } elsif ($1 eq "WORD") {
+    &rom_align;
     print ROMHDR sprintf("#define WORD_%s 0x%08x\n", uc $2, &rom_current);
     print ROM pack("L", hex $3);
+  } elsif ($1 eq "STRING") {
+    print ROMHDR sprintf("#define STRING_%s 0x%08x\n", uc $2, &rom_current);
+    print ROM "$3".chr(0));
   } else {
     die "Bad data type $1 at line $l\n";
   }
-  &rom_align;
 }
 close ERRORS;
 

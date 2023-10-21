@@ -7,3 +7,5 @@ ERROR em_unhandledswi                 0       Unhandled SWI
 
 ERROR sharedclibrary_badchunkid       80680   Bad chunk ID
 ERROR sharedclibrary_vectortoosmall   80681   Vector list supplied too short
+
+STRING auxv_platform_string           arm

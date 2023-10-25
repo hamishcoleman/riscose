@@ -12,6 +12,7 @@
 #include <monty/monty.h>
 #include "types.h"
 #include "messagetrans.h"
+#include "rom/rom.h"
 
 void messagetrans_swi_register_extra(void)
 {
@@ -35,8 +36,7 @@ os_error *xmessagetrans_file_info (char *file_name,
       messagetrans_file_flags *flags,
       int *size)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -55,8 +55,7 @@ os_error *xmessagetrans_open_file (messagetrans_control_block *cb,
       char *file_name,
       char *buffer)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -94,8 +93,7 @@ os_error *xmessagetrans_lookup (messagetrans_control_block *cb,
       char **result,
       int *used)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -124,8 +122,7 @@ os_error *xmessagetrans_make_menus (messagetrans_control_block *cb,
       byte **end,
       int *used)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -140,8 +137,7 @@ os_error *xmessagetrans_make_menus (messagetrans_control_block *cb,
 
 os_error *xmessagetrans_close_file (messagetrans_control_block *cb)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -173,8 +169,7 @@ os_error *xmessagetrans_enumerate_tokens (messagetrans_control_block *cb,
       int *used,
       int *context_out)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -208,8 +203,7 @@ os_error *xmessagetrans_error_lookup (os_error *err,
       char *arg3,
       os_error **out_buffer)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -246,8 +240,7 @@ os_error *xmessagetrans_gs_lookup (messagetrans_control_block *cb,
       char **result,
       int *used)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -268,8 +261,7 @@ os_error *xmessagetrans_gs_lookup (messagetrans_control_block *cb,
 os_error *xmessagetrans_copy_error (os_error *err,
       os_error **copy)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -286,7 +278,6 @@ os_error *xmessagetrans_copy_error (os_error *err,
 
 os_error *xmessagetrans_dictionary (byte **dictionary)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 

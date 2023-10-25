@@ -58,8 +58,7 @@ os_error *xosword_read_system_clock (osword_timer_block *clock)
 
 os_error *xosword_write_system_clock (osword_timer_block *clock)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -74,8 +73,7 @@ os_error *xosword_write_system_clock (osword_timer_block *clock)
 
 os_error *xosword_read_interval_timer (osword_timer_block *timer)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -90,8 +88,7 @@ os_error *xosword_read_interval_timer (osword_timer_block *timer)
 
 os_error *xosword_write_interval_timer (osword_timer_block *timer)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -107,8 +104,7 @@ os_error *xosword_write_interval_timer (osword_timer_block *timer)
 
 os_error *xosword_read_char_definition (osword_char_definition_block *definition)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -124,8 +120,7 @@ os_error *xosword_read_char_definition (osword_char_definition_block *definition
 
 os_error *xosword_read_palette (osword_palette_block *entry)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -141,8 +136,7 @@ os_error *xosword_read_palette (osword_palette_block *entry)
 
 os_error *xosword_write_palette (osword_palette_block *entry)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -158,8 +152,7 @@ os_error *xosword_write_palette (osword_palette_block *entry)
 
 os_error *xosword_read_cursor_position (osword_cursor_position_block *position)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -193,8 +186,7 @@ os_error *xoswordreadclock_local_string (oswordreadclock_local_string_block *str
 
 os_error *xoswordreadclock_local_bcd (oswordreadclock_local_bcd_block *bcd)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -210,8 +202,7 @@ os_error *xoswordreadclock_local_bcd (oswordreadclock_local_bcd_block *bcd)
 
 os_error *xoswordreadclock_convert_bcd_to_string (oswordreadclock_convert_bcd_to_string_block *convert_bcd_to_String)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -227,8 +218,7 @@ os_error *xoswordreadclock_convert_bcd_to_string (oswordreadclock_convert_bcd_to
 
 os_error *xoswordreadclock_utc (oswordreadclock_utc_block *utc)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -245,8 +235,7 @@ os_error *xoswordreadclock_utc (oswordreadclock_utc_block *utc)
 
 os_error *xoswordwriteclock_time_local_string (oswordwriteclock_block *time)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -263,8 +252,7 @@ os_error *xoswordwriteclock_time_local_string (oswordwriteclock_block *time)
 
 os_error *xoswordwriteclock_date_local_string (oswordwriteclock_block *date)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -281,8 +269,7 @@ os_error *xoswordwriteclock_date_local_string (oswordwriteclock_block *date)
 
 os_error *xoswordwriteclock_date_and_time_local_string (oswordwriteclock_block *date_and_time)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -299,8 +286,7 @@ os_error *xoswordwriteclock_date_and_time_local_string (oswordwriteclock_block *
 
 os_error *xoswordpointer_define (oswordpointer_define_block *define)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -316,8 +302,7 @@ os_error *xoswordpointer_define (oswordpointer_define_block *define)
 
 os_error *xoswordpointer_set_bbox (oswordpointer_bbox_block *bbox)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -333,8 +318,7 @@ os_error *xoswordpointer_set_bbox (oswordpointer_bbox_block *bbox)
 
 os_error *xoswordpointer_step (oswordpointer_step_block *step)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -350,8 +334,7 @@ os_error *xoswordpointer_step (oswordpointer_step_block *step)
 
 os_error *xoswordpointer_set_position (oswordpointer_position_block *pos)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -367,8 +350,7 @@ os_error *xoswordpointer_set_position (oswordpointer_position_block *pos)
 
 os_error *xoswordpointer_read_position (oswordpointer_position_block *pos)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -384,8 +366,7 @@ os_error *xoswordpointer_read_position (oswordpointer_position_block *pos)
 
 os_error *xoswordpointer_set_unlinked_position (oswordpointer_position_block *pos)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -401,8 +382,7 @@ os_error *xoswordpointer_set_unlinked_position (oswordpointer_position_block *po
 
 os_error *xoswordpointer_read_unlinked_position (oswordpointer_position_block *pos)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -418,7 +398,6 @@ os_error *xoswordpointer_read_unlinked_position (oswordpointer_position_block *p
 
 os_error *xosword_write_screen_base (osword_screen_base_block *screen_base)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 

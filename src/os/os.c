@@ -322,8 +322,7 @@ os_error *xos_read_line_suppress_invalid (char *buffer,
       int *used,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -354,8 +353,7 @@ os_error *xos_read_line_given_echo_suppress_invalid (char *buffer,
       int *used,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -386,8 +384,7 @@ os_error *xos_control (void *error_handler,
       void **old_escape_handler,
       void **old_event_handler)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -559,8 +556,7 @@ os_error *xos_call_back (os_register_block *register_block,
       os_register_block **old_register_block,
       void **old_call_back_handler)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -574,8 +570,7 @@ os_error *xos_call_back (os_register_block *register_block,
 
 os_error *xos_break_pt (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -598,8 +593,7 @@ os_error *xos_break_ctrl (os_register_block *register_block,
       os_register_block **old_register_block,
       void **old_break_pt_handler)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -620,8 +614,7 @@ os_error *xos_break_ctrl (os_register_block *register_block,
 os_error *xos_unused_swi (void *unused_swi_handler,
       void **old_unused_swi_handler)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -643,8 +636,7 @@ os_error *xos_update_memc (bits value,
       bits mask,
       bits *old_value)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -657,8 +649,7 @@ os_error *xos_update_memc (bits value,
 
 os_error *xos_set_call_back (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -679,8 +670,7 @@ os_error *xos_mouse (int *x,
       bits *buttons,
       os_t *t)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -699,8 +689,7 @@ os_error *xos_claim (int vector,
       void *routine,
       byte *handle)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -720,8 +709,7 @@ os_error *xos_release (int vector,
       void *routine,
       byte *handle)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -747,8 +735,7 @@ os_error *xos_read_unsigned (os_read_unsigned_flags flags,
       char **end,
       bits *value)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -841,8 +828,7 @@ os_error *xos_gs_init (char *s,
       int *context1,
       int *context2)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -871,8 +857,7 @@ os_error *xos_gs_read (int context1,
       int *context2_out,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -899,8 +884,7 @@ os_error *xos_gs_trans (char *s,
       int *used,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -924,8 +908,7 @@ os_error *xos_binary_to_decimal (int i,
       int size,
       int *used)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -947,8 +930,7 @@ os_error *xos_change_dynamic_area (os_dynamic_area_no area_type,
       int change,
       int *change_out)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -981,8 +963,7 @@ os_error *xos_generate_error (os_error *e)
 
 os_error *xos_read_escape_state (bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1009,8 +990,7 @@ os_error *xos_evaluate_expression (char *expr,
       osbool *expr_is_str,
       int *int_value_or_str_used)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1032,8 +1012,7 @@ os_error *xos_read_palette (os_colour_number entry,
       os_colour *on,
       os_colour *off)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1050,8 +1029,7 @@ os_error *xos_read_palette (os_colour_number entry,
 os_error *xos_read_vdu_variables (os_vdu_var_list *var_list,
       int *value_list)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1077,8 +1055,7 @@ os_error *xos_read_point (int x,
       os_tint *tint,
       osbool *off_screen)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1102,8 +1079,7 @@ os_error *xos_read_mode_variable (os_mode mode,
       int *var_val,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1116,8 +1092,7 @@ os_error *xos_read_mode_variable (os_mode mode,
 
 os_error *xos_remove_cursors (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1130,8 +1105,7 @@ os_error *xos_remove_cursors (void)
 
 os_error *xos_restore_cursors (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1155,8 +1129,7 @@ os_error *xos_swi_number_to_string (int swi,
       int size,
       int *used)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1221,8 +1194,7 @@ os_error *xos_call_after (int delay,
       void *code,
       byte *handle)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1241,8 +1213,7 @@ os_error *xos_call_every (int delay,
       void *code,
       byte *handle)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1260,8 +1231,7 @@ os_error *xos_call_every (int delay,
 os_error *xos_remove_ticker_event (void *code,
       byte *handle)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1282,8 +1252,7 @@ os_error *xos_remove_ticker_event (void *code,
 os_error *xos_install_key_handler (os_key_handler *key_handler,
       os_key_handler **old_key_handler)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1307,8 +1276,7 @@ os_error *xos_check_mode_valid (os_mode mode,
       os_mode *alternative_mode,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1376,8 +1344,7 @@ os_error *xosclaimscreenmemory_alloc (int size,
       void **blk,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1391,8 +1358,7 @@ os_error *xosclaimscreenmemory_alloc (int size,
 
 os_error *xosclaimscreenmemory_free (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1410,8 +1376,7 @@ os_error *xosclaimscreenmemory_free (void)
 
 os_error *xos_read_monotonic_time (os_t *t)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1439,8 +1404,7 @@ os_error *xos_substitute_args (char *args,
       int source_size,
       int *used)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1460,8 +1424,7 @@ os_error *xos_pretty_print (char *string,
       byte *dictionary,
       char *special)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1480,8 +1443,7 @@ os_error *xos_plot (os_plot_code plot_code,
       int x,
       int y)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1524,8 +1486,7 @@ os_error *xos_add_to_vector (int vector,
       void *routine,
       byte *handle)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1543,8 +1504,7 @@ os_error *xos_add_to_vector (int vector,
 os_error *xos_write_env (char *command,
       os_date_and_time *start)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1570,8 +1530,7 @@ os_error *xos_read_args (char *keywords,
       int size,
       int *spare)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1588,8 +1547,7 @@ os_error *xos_read_args (char *keywords,
 os_error *xos_read_ram_fs_limits (byte **start,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1612,8 +1570,7 @@ os_error *xos_claim_device_vector (os_device_type device,
       int *status,
       bits mask)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1636,8 +1593,7 @@ os_error *xos_release_device_vector (os_device_type device,
       int *status,
       bits mask)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1659,8 +1615,7 @@ os_error *xos_delink_application (byte *vector_details,
       int size,
       int *used)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1676,8 +1631,7 @@ os_error *xos_delink_application (byte *vector_details,
 
 os_error *xos_relink_application (byte *vector_details)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1704,8 +1658,7 @@ os_error *xos_heap_sort (int count,
       int object_size,
       void *workspace)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1725,8 +1678,7 @@ os_error *xos_exit_and_die (os_error *e,
       int rc,
       char *module_name)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1762,8 +1714,7 @@ os_error *xos_read_mem_map_info (int *page_size,
 
 os_error *xos_read_mem_map_entries (os_mem_map_request_list *request_list)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1779,8 +1730,7 @@ os_error *xos_read_mem_map_entries (os_mem_map_request_list *request_list)
 
 os_error *xos_set_mem_map_entries (os_mem_map_request_list *request_list)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1797,8 +1747,7 @@ os_error *xos_set_mem_map_entries (os_mem_map_request_list *request_list)
 os_error *xos_add_call_back (void *call_back,
       byte *handle)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1822,8 +1771,7 @@ os_error *xos_read_default_handler (int handler_type,
       byte **handle,
       byte **buffer)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1840,8 +1788,7 @@ os_error *xos_read_default_handler (int handler_type,
 os_error *xos_set_ecf_origin (int x,
       int y)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1860,8 +1807,7 @@ os_error *xos_set_ecf_origin (int x,
 os_error *xos_confirm (char *key,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1883,8 +1829,7 @@ os_error *xos_changed_box (os_changed_box_state state,
       osbool *enabled,
       os_change_box **change_box)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1961,8 +1906,7 @@ os_error *xos_read_dynamic_area (os_dynamic_area_no area,
 
 os_error *xos_print_char (char c)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -1985,8 +1929,7 @@ os_error *xos_change_redirectionw (os_fw input,
       os_fw *old_input,
       os_fw *old_output)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2003,8 +1946,7 @@ os_error *xos_change_redirectionw (os_fw input,
 os_error *xos_remove_call_back (void *call_back,
       byte *handle)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2020,8 +1962,7 @@ os_error *xos_remove_call_back (void *call_back,
 
 os_error *xos_find_mem_map_entries (os_mem_map_request_list *request_list)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2038,8 +1979,7 @@ os_error *xos_find_mem_map_entries (os_mem_map_request_list *request_list)
 os_error *xos_set_colour (os_colour_flags flags,
       os_colour_number colour_number)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2064,8 +2004,7 @@ os_error *xos_read_colour (os_colour_flags flags,
       os_colour_flags *flags_out,
       os_colour_number *colour_number)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2083,8 +2022,7 @@ os_error *xos_read_colour (os_colour_flags flags,
 
 os_error *xospointer_get (os_pointer_type *pointer_type)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2100,8 +2038,7 @@ os_error *xospointer_get (os_pointer_type *pointer_type)
 
 os_error *xospointer_set (os_pointer_type pointer_type)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2116,8 +2053,7 @@ os_error *xospointer_set (os_pointer_type pointer_type)
 
 os_error *xosscreenmode_select (os_mode mode)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2135,8 +2071,7 @@ os_error *xosscreenmode_select (os_mode mode)
 
 os_error *xosscreenmode_current (os_mode *mode)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2166,8 +2101,7 @@ os_error *xosscreenmode_enumerate (int context,
       byte **end,
       int *free)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2192,8 +2126,7 @@ os_error *xosscreenmode_cache_control (osscreenmode_cache_flags flags,
       osscreenmode_cache_flags *current_flags,
       osscreenmode_cleaner_laziness *current_laziness)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2206,8 +2139,7 @@ os_error *xosscreenmode_cache_control (osscreenmode_cache_flags flags,
 
 os_error *xosscreenmode_request_clean (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2220,8 +2152,7 @@ os_error *xosscreenmode_request_clean (void)
 
 os_error *xosscreenmode_force_clean (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2259,8 +2190,7 @@ os_error *xosdynamicarea_create (os_dynamic_area_no area,
       byte **base_address_out,
       int *size_limit_out)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2275,8 +2205,7 @@ os_error *xosdynamicarea_create (os_dynamic_area_no area,
 
 os_error *xosdynamicarea_delete (os_dynamic_area_no area)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2306,8 +2235,7 @@ os_error *xosdynamicarea_read (os_dynamic_area_no area,
       void **workspace,
       char **description)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2327,8 +2255,7 @@ os_error *xosdynamicarea_read (os_dynamic_area_no area,
 os_error *xosdynamicarea_enumerate (int context,
       int *context_out)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2345,8 +2272,7 @@ os_error *xosdynamicarea_enumerate (int context,
 os_error *xosdynamicarea_renumber (os_dynamic_area_no old_area,
       os_dynamic_area_no new_area)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2367,8 +2293,7 @@ os_error *xosdynamicarea_renumber (os_dynamic_area_no old_area,
 os_error *xosdynamicarea_free_space (os_dynamic_area_no exclude_area,
       int *free_space)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2395,8 +2320,7 @@ os_error *xosdynamicarea_set_clamps (int unlimited_area_clamp,
       int *old_limited_area_clamp,
       int *old_sparse_area_clamp)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2416,8 +2340,7 @@ os_error *xosdynamicarea_ensure_region (os_dynamic_area_no area,
       byte *base_address,
       int size)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2437,8 +2360,7 @@ os_error *xosdynamicarea_release_region (os_dynamic_area_no area,
       byte *base_address,
       int size)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2457,8 +2379,7 @@ os_error *xosmemory_page_op (osmemory_flags flags,
       os_page_block *page_block,
       int page_count)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2478,8 +2399,7 @@ os_error *xosmemory_page_op (osmemory_flags flags,
 os_error *xosmemory_read_arrangement_table_size (int *table_size,
       int *page_size)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2495,8 +2415,7 @@ os_error *xosmemory_read_arrangement_table_size (int *table_size,
 
 os_error *xosmemory_read_arrangement_table (byte *arrangement_table)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2517,8 +2436,7 @@ os_error *xosmemory_read_size (osmemory_type_flags type,
       int *page_count,
       int *page_size)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2537,8 +2455,7 @@ os_error *xosmemory_read_size (osmemory_type_flags type,
 os_error *xosmemory_read_controller (osmemory_controller_flags controller,
       void **controller_addr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2560,8 +2477,7 @@ os_error *xosmemory_read_controller (osmemory_controller_flags controller,
 os_error *xosmemory_find_contiguous (int size,
       int *page_number)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2583,8 +2499,7 @@ os_error *xosclaimprocessorvector_alloc (bits vector,
       void *routine,
       void **old_routine)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2601,8 +2516,7 @@ os_error *xosclaimprocessorvector_alloc (bits vector,
 os_error *xosclaimprocessorvector_free (bits vector,
       void *old_routine)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2615,8 +2529,7 @@ os_error *xosclaimprocessorvector_free (bits vector,
 
 os_error *xos_reset (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2639,8 +2552,7 @@ os_error *xos_mmu_control (bits eor_mask,
       bits and_mask,
       bits *old_value)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2710,8 +2622,7 @@ os_error *xossynchronisecodeareas_all ()
 
 os_error *xos_enter_usr32 (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2724,8 +2635,7 @@ os_error *xos_enter_usr32 (void)
 
 os_error *xos_enter_usr26 (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2750,8 +2660,7 @@ os_error *xos_convert_standard_date_and_time (os_date_and_time *date_and_time,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2778,8 +2687,7 @@ os_error *xos_convert_date_and_time (os_date_and_time *date_and_time,
       char *format,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2803,8 +2711,7 @@ os_error *xos_convert_hex1 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2828,8 +2735,7 @@ os_error *xos_convert_hex2 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2853,8 +2759,7 @@ os_error *xos_convert_hex4 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2878,8 +2783,7 @@ os_error *xos_convert_hex6 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2903,8 +2807,7 @@ os_error *xos_convert_hex8 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2928,8 +2831,7 @@ os_error *xos_convert_cardinal1 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2953,8 +2855,7 @@ os_error *xos_convert_cardinal2 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -2978,8 +2879,7 @@ os_error *xos_convert_cardinal3 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3003,8 +2903,7 @@ os_error *xos_convert_cardinal4 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3028,8 +2927,7 @@ os_error *xos_convert_integer1 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3053,8 +2951,7 @@ os_error *xos_convert_integer2 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3078,8 +2975,7 @@ os_error *xos_convert_integer3 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3103,8 +2999,7 @@ os_error *xos_convert_integer4 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3128,8 +3023,7 @@ os_error *xos_convert_binary1 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3153,8 +3047,7 @@ os_error *xos_convert_binary2 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3178,8 +3071,7 @@ os_error *xos_convert_binary3 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3203,8 +3095,7 @@ os_error *xos_convert_binary4 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3229,8 +3120,7 @@ os_error *xos_convert_spaced_cardinal1 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3255,8 +3145,7 @@ os_error *xos_convert_spaced_cardinal2 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3281,8 +3170,7 @@ os_error *xos_convert_spaced_cardinal3 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3307,8 +3195,7 @@ os_error *xos_convert_spaced_cardinal4 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3333,8 +3220,7 @@ os_error *xos_convert_spaced_integer1 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3359,8 +3245,7 @@ os_error *xos_convert_spaced_integer2 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3385,8 +3270,7 @@ os_error *xos_convert_spaced_integer3 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3411,8 +3295,7 @@ os_error *xos_convert_spaced_integer4 (int value,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3437,8 +3320,7 @@ os_error *xos_convert_fixed_net_station (os_station_number *station_number,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3463,8 +3345,7 @@ os_error *xos_convert_net_station (os_station_number *station_number,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3489,8 +3370,7 @@ os_error *xos_convert_fixed_file_size (int file_size,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3514,8 +3394,7 @@ os_error *xos_convert_file_size (int file_size,
       int size,
       char **end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3528,8 +3407,7 @@ os_error *xos_convert_file_size (int file_size,
 
 os_error *xos_null (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3543,8 +3421,7 @@ os_error *xos_null (void)
 
 os_error *xos_char_to_printer (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3557,8 +3434,7 @@ os_error *xos_char_to_printer (void)
 
 os_error *xos_printer_on (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3572,8 +3448,7 @@ os_error *xos_printer_on (void)
 
 os_error *xos_printer_off (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3586,8 +3461,7 @@ os_error *xos_printer_off (void)
 
 os_error *xos_split_cursors (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3600,8 +3474,7 @@ os_error *xos_split_cursors (void)
 
 os_error *xos_join_cursors (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3614,8 +3487,7 @@ os_error *xos_join_cursors (void)
 
 os_error *xos_vdu_on (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3628,8 +3500,7 @@ os_error *xos_vdu_on (void)
 
 os_error *xos_bell (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3642,8 +3513,7 @@ os_error *xos_bell (void)
 
 os_error *xos_backspace (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3656,8 +3526,7 @@ os_error *xos_backspace (void)
 
 os_error *xos_tab (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3670,8 +3539,7 @@ os_error *xos_tab (void)
 
 os_error *xos_line_feed (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3684,8 +3552,7 @@ os_error *xos_line_feed (void)
 
 os_error *xos_vertical_tab (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3698,8 +3565,7 @@ os_error *xos_vertical_tab (void)
 
 os_error *xos_cls (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3712,8 +3578,7 @@ os_error *xos_cls (void)
 
 os_error *xos_return (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3726,8 +3591,7 @@ os_error *xos_return (void)
 
 os_error *xos_page_mode_on (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3740,8 +3604,7 @@ os_error *xos_page_mode_on (void)
 
 os_error *xos_page_mode_off (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3754,8 +3617,7 @@ os_error *xos_page_mode_off (void)
 
 os_error *xos_clg (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3769,8 +3631,7 @@ os_error *xos_clg (void)
 
 os_error *xos_set_text_colour (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3784,8 +3645,7 @@ os_error *xos_set_text_colour (void)
 
 os_error *xos_set_gcol (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3799,8 +3659,7 @@ os_error *xos_set_gcol (void)
 
 os_error *xos_set_palette (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3813,8 +3672,7 @@ os_error *xos_set_palette (void)
 
 os_error *xos_reset_colours (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3827,8 +3685,7 @@ os_error *xos_reset_colours (void)
 
 os_error *xos_vdu_off (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3842,8 +3699,7 @@ os_error *xos_vdu_off (void)
 
 os_error *xos_set_mode (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3857,8 +3713,7 @@ os_error *xos_set_mode (void)
 
 os_error *xos_misc (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3872,8 +3727,7 @@ os_error *xos_misc (void)
 
 os_error *xos_set_graphics_window (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3887,8 +3741,7 @@ os_error *xos_set_graphics_window (void)
 
 os_error *xos_plot_vdu (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3901,8 +3754,7 @@ os_error *xos_plot_vdu (void)
 
 os_error *xos_reset_windows (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3915,8 +3767,7 @@ os_error *xos_reset_windows (void)
 
 os_error *xos_escape (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3930,8 +3781,7 @@ os_error *xos_escape (void)
 
 os_error *xos_set_text_window (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3945,8 +3795,7 @@ os_error *xos_set_text_window (void)
 
 os_error *xos_set_graphics_origin (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3959,8 +3808,7 @@ os_error *xos_set_graphics_origin (void)
 
 os_error *xos_home_text_cursor (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3974,8 +3822,7 @@ os_error *xos_home_text_cursor (void)
 
 os_error *xos_set_text_cursor (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -3988,8 +3835,7 @@ os_error *xos_set_text_cursor (void)
 
 os_error *xos_space (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -4002,7 +3848,6 @@ os_error *xos_space (void)
 
 os_error *xos_delete (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 

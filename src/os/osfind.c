@@ -10,6 +10,7 @@
 #include "monty/monty.h"
 #include "types.h"
 #include "osfind.h"
+#include "rom/rom.h"
 
 /* ---- osfind_swi_register_extra ----------------------------------- */
 
@@ -37,9 +38,7 @@ os_error *xosfind_openoutw(osfind_flags flags,
     char *path,
     os_fw *file)
 {
-    error("swi XOSFind_OpenoutW unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xosfind_openupw --------------------------------------------- */
@@ -49,17 +48,13 @@ os_error *xosfind_openupw(osfind_flags flags,
     char *path,
     os_fw *file)
 {
-    error("swi XOSFind_OpenupW unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xosfind_closew ---------------------------------------------- */
 
 os_error *xosfind_closew(os_fw file)
 {
-    error("swi XOSFind_CloseW unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 

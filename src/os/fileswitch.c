@@ -12,6 +12,7 @@
 #include <monty/monty.h>
 #include "types.h"
 #include "fileswitch.h"
+#include "rom/rom.h"
 
 void fileswitch_swi_register_extra(void)
 {
@@ -37,8 +38,7 @@ os_error *xos_bgetw (os_fw file,
       char *c,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -60,8 +60,7 @@ os_error *xbgetvw (os_fw file,
       char *c,
       bits *psr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -78,8 +77,7 @@ os_error *xbgetvw (os_fw file,
 os_error *xos_bputw (char c,
       os_fw file)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -96,7 +94,6 @@ os_error *xos_bputw (char c,
 os_error *xbputvw (char c,
       os_fw file)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 

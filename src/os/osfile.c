@@ -160,8 +160,7 @@ os_error *xosfile_write (char *file_name,
       bits exec_addr,
       fileswitch_attr attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -199,8 +198,7 @@ os_error *xosfile_write_load (char *file_name,
 os_error *xosfile_write_exec (char *file_name,
       bits exec_addr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -217,8 +215,7 @@ os_error *xosfile_write_exec (char *file_name,
 os_error *xosfile_write_attr (char *file_name,
       fileswitch_attr attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -253,8 +250,7 @@ os_error *xosfile_stamp (char *file_name)
 os_error *xosfile_set_type (char *file_name,
       bits file_type)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -282,8 +278,7 @@ os_error *xosfile_delete (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -302,8 +297,7 @@ os_error *xosfile_create_stamped (char *file_name,
       bits file_type,
       int size)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -320,8 +314,7 @@ os_error *xosfile_create_stamped (char *file_name,
 os_error *xosfile_create_dir (char *dir_name,
       int entry_count)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -425,8 +418,7 @@ os_error *xosfile_load_stamped_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -459,8 +451,7 @@ os_error *xosfile_load_stamped_path_var (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -508,8 +499,7 @@ os_error *xosfile_load_stamped_no_path (char *file_name,
 os_error *xosfile_make_error (char *file_name,
       fileswitch_object_type obj_type)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -540,8 +530,7 @@ os_error *xosfile_read_stamped (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -574,8 +563,7 @@ os_error *xosfile_read_stamped_path (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -609,8 +597,7 @@ os_error *xosfile_read_stamped_path_var (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -641,8 +628,7 @@ os_error *xosfile_read_stamped_no_path (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -662,8 +648,7 @@ os_error *xosfile_read_stamped_no_path (char *file_name,
 os_error *xosfile_read_block_size (char *file_name,
       int *block_size)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -687,8 +672,7 @@ os_error *xosfile_save (char *file_name,
       byte *data,
       byte *end)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -767,8 +751,7 @@ os_error *xosfile_read_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -800,8 +783,7 @@ os_error *xosfile_read_path_var (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -853,8 +835,7 @@ os_error *xosfile_create (char *file_name,
       bits exec_addr,
       int size)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -883,8 +864,7 @@ os_error *xosfile_load (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -915,8 +895,7 @@ os_error *xosfile_load_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -948,8 +927,7 @@ os_error *xosfile_load_path_var (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -978,7 +956,6 @@ os_error *xosfile_load_no_path (char *file_name,
       int *size,
       fileswitch_attr *attr)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 

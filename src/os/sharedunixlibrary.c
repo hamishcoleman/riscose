@@ -12,6 +12,7 @@
 #include "sharedunixlibrary.h"
 #include "arm.h"
 #include "mem.h"
+#include "rom/rom.h"
 
 /* ---- sharedunixlibrary_swi_register_extra ------------------------ */
 
@@ -24,36 +25,28 @@ void sharedunixlibrary_swi_register_extra(void)
 
 os_error *xsharedunixlibrary_register_up_call(void)
 {
-    error("swi XSharedUnixLibrary_RegisterUpCall unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xsharedunixlibrary_de_register_up_call ---------------------- */
 
 os_error *xsharedunixlibrary_de_register_up_call(void)
 {
-    error("swi XSharedUnixLibrary_DeRegisterUpCall unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xsharedunixlibrary_set_value -------------------------------- */
 
 os_error *xsharedunixlibrary_set_value(void)
 {
-    error("swi XSharedUnixLibrary_SetValue unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xsharedunixlibrary_count ------------------------------------ */
 
 os_error *xsharedunixlibrary_count(void)
 {
-    error("swi XSharedUnixLibrary_Count unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xsharedunixlibrary_initialise ------------------------------- */

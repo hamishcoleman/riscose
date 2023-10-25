@@ -10,6 +10,7 @@
 #include "monty/monty.h"
 #include "types.h"
 #include "resourcefs.h"
+#include "rom/rom.h"
 
 /* ---- resourcefs_swi_register_extra ------------------------------- */
 
@@ -36,8 +37,6 @@ os_error *xresourcefs_register_files(resourcefs_file_list *file_list)
 
 os_error *xresourcefs_deregister_files(resourcefs_file_list *file_list)
 {
-    error("swi XResourceFS_DeregisterFiles unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 

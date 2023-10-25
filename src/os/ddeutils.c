@@ -13,6 +13,7 @@
 #include "ddeutils.h"
 #include "map.h"
 #include "mem.h"
+#include "rom/rom.h"
 
 /* ---- ddeutils_swi_register_extra --------------------------------- */
 
@@ -36,18 +37,14 @@ os_error *xddeutils_prefix(char *dir_name)
 
 os_error *xddeutils_set_cl_size(int size)
 {
-    error("swi XDDEUtils_SetCLSize unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xddeutils_set_cl -------------------------------------------- */
 
 os_error *xddeutils_set_cl(char *tail)
 {
-    error("swi XDDEUtils_SetCL unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xddeutils_get_cl_size --------------------------------------- */
@@ -72,27 +69,21 @@ os_error *xddeutils_get_cl(char *tail)
 
 os_error *xddeutils_throwback_register(wimp_t task)
 {
-    error("swi XDDEUtils_ThrowbackRegister unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xddeutils_throwback_un_register ----------------------------- */
 
 os_error *xddeutils_throwback_un_register(wimp_t task)
 {
-    error("swi XDDEUtils_ThrowbackUnRegister unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xddeutils_throwback_start ----------------------------------- */
 
 os_error *xddeutils_throwback_start(void)
 {
-    error("swi XDDEUtils_ThrowbackStart unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xddeutils_throwback_send ------------------------------------ */
@@ -103,17 +94,13 @@ os_error *xddeutils_throwback_send(int reason,
     int severity,
     char *message)
 {
-    error("swi XDDEUtils_ThrowbackSend unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xddeutils_throwback_end ------------------------------------- */
 
 os_error *xddeutils_throwback_end(void)
 {
-    error("swi XDDEUtils_ThrowbackEnd unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 

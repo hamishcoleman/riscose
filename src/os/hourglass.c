@@ -12,6 +12,7 @@
 #include <monty/monty.h>
 #include "types.h"
 #include "hourglass.h"
+#include "rom/rom.h"
 
 void hourglass_swi_register_extra(void)
 {
@@ -28,8 +29,7 @@ void hourglass_swi_register_extra(void)
 
 os_error *xhourglass_on (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -42,8 +42,7 @@ os_error *xhourglass_on (void)
 
 os_error *xhourglass_off (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -56,8 +55,7 @@ os_error *xhourglass_off (void)
 
 os_error *xhourglass_smash (void)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -72,8 +70,7 @@ os_error *xhourglass_smash (void)
 
 os_error *xhourglass_start (int delay)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -88,8 +85,7 @@ os_error *xhourglass_start (int delay)
 
 os_error *xhourglass_percentage (int percent)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -112,8 +108,7 @@ os_error *xhourglass_leds (bits eor_mask,
       bits and_mask,
       bits *old_leds)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -135,7 +130,6 @@ os_error *xhourglass_colours (os_colour sand,
       os_colour *old_sand,
       os_colour *old_glass)
 {
-  error("*** SWI unimplemented\n");
-  return 0;
+  return ERR_NO_SUCH_SWI();
 }
 

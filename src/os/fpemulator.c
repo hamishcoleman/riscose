@@ -30,18 +30,14 @@ os_error *xfpemulator_version(int *version)
 
 os_error *xfpemulator_deactivate_context(fpemulator_context *old_context)
 {
-    error("swi XFPEmulator_DeactivateContext unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xfpemulator_activate_context -------------------------------- */
 
 os_error *xfpemulator_activate_context(fpemulator_context new_context)
 {
-    error("swi XFPEmulator_ActivateContext unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xfpemulator_changed_context --------------------------------- */
@@ -49,36 +45,28 @@ os_error *xfpemulator_activate_context(fpemulator_context new_context)
 os_error *xfpemulator_changed_context(fpemulator_context new_context,
     fpemulator_context *old_context)
 {
-    error("swi XFPEmulator_ChangedContext unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xfpemulator_context_length ---------------------------------- */
 
 os_error *xfpemulator_context_length(int *context_length)
 {
-    error("swi XFPEmulator_ContextLength unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xfpemulator_init_context ------------------------------------ */
 
 os_error *xfpemulator_init_context(fpemulator_context context)
 {
-    error("swi XFPEmulator_InitContext unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xfpemulator_exception_dump ---------------------------------- */
 
 os_error *xfpemulator_exception_dump(fpemulator_register_dump **register_dump)
 {
-    error("swi XFPEmulator_ExceptionDump unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xfpemulator_abort ------------------------------------------- */
@@ -88,9 +76,7 @@ os_error *xfpemulator_abort(fpemulator_context context,
     int pc_value,
     byte **frame)
 {
-    error("swi XFPEmulator_Abort unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xfpemulator_load_context ------------------------------------ */
@@ -98,9 +84,7 @@ os_error *xfpemulator_abort(fpemulator_context context,
 os_error *xfpemulator_load_context(fpemulator_context context,
     fpemulator_register_dump *register_dump)
 {
-    error("swi XFPEmulator_LoadContext unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
 /* ---- xfpemulator_save_context ------------------------------------ */
@@ -110,8 +94,6 @@ os_error *xfpemulator_save_context(fpemulator_context context,
     int pc_value,
     osbool *has_exception)
 {
-    error("swi XFPEmulator_SaveContext unimplemented.\n");
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 

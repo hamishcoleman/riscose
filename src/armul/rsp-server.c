@@ -1214,11 +1214,7 @@ rsp_report_exception ()
   struct rsp_buf  buf;
 
   /* Construct a signal received packet */
-  buf.data[0] = 'S';
-  buf.data[1] = hexchars[rsp.sigval >> 4];
-  buf.data[2] = hexchars[rsp.sigval % 16];
-  buf.data[3] = 0;
-  buf.len     = strlen (buf.data);
+  buf.len = snprintf(buf.data, sizeof(buf.data), "T%02xthread:%x;", rsp.sigval, OR1KSIM_TID);
 
   put_packet (&buf);
 
@@ -1819,7 +1815,10 @@ rsp_vpkt (struct rsp_buf *buf)
     {
       /* Attaching is a null action, since we have no other process. We just
 	 return a stop packet (using TRAP) to indicate we are stopped. */
-      put_str_packet ("T05thread:1");
+      char buf[256];
+      snprintf(buf, sizeof(buf), "T%x02thread:%x", 5, OR1KSIM_TID);
+
+      put_str_packet (buf);
       return;
     }
   else if (0 == strcmp ("vCont?", buf->data))

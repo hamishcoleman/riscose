@@ -59,7 +59,7 @@ $l=0; while (<ERRORS>)
     print ROM pack("L", hex $3);
   } elsif ($1 eq "STRING") {
     print ROMHDR sprintf("#define STRING_%s 0x%08x\n", uc $2, &rom_current);
-    print ROM "$3".chr(0));
+    print ROM "$3".chr(0);
   } else {
     die "Bad data type $1 at line $l\n";
   }

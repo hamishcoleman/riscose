@@ -55,6 +55,7 @@ void riscose_template_output(char *title, char *author,
         "\n"
         "#include \"monty/monty.h\"\n"
         "#include \"types.h\"\n"
+        "#include \"rom/rom.h\"\n"
         "#include \"%s.h\"\n"
         "\n", c_name);
 
@@ -124,8 +125,7 @@ void riscose_template_output(char *title, char *author,
 
         P("{\n");
         INDENT;
-        DPF("error(\"swi X%s unimplemented.\\n\");\n\n", swi);
-        DP("return NULL;\n");
+        DP("return ERR_NO_SUCH_SWI();\n");
         OUTDENT;
         P("}\n\n");
     }

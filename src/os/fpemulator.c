@@ -23,10 +23,7 @@ void fpemulator_swi_register_extra(void)
 
 os_error *xfpemulator_version(int *version)
 {
-    *version = 0x411;
     return ERR_NO_SUCH_SWI();
-
-    return NULL;
 }
 
 /* ---- xfpemulator_deactivate_context ------------------------------ */

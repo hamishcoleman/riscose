@@ -189,15 +189,20 @@ void swi_trap(WORD num)
 
     /* Look up the SWI's details and call it if found */
     if (!swi_handled_by_arm) {
+        char buf[64];
         if (r == NULL)
         {
-          char buf[64];
           swi_number_to_name(SWI_NUM(num), buf);
           printf("Unregistered SWI %s called at %08x\n", buf, (unsigned) ARM_R15-8);
           e = ERR_NO_SUCH_SWI();
         }
         else {
             e = r->handler(num);
+
+            if (e && e->errnum == 0x1e6 && SWI_NUM(num) != 0x39) {
+                swi_number_to_name(SWI_NUM(num), buf);
+                printf("Unhandled SWI %s called at %08x\n", buf, (unsigned) ARM_R15-8);
+            }
         }
     }
 

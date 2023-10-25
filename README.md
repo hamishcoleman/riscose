@@ -1,5 +1,4 @@
-Riscose -- a RISC OS emulator
------------------------------
+# Riscose -- a RISC OS emulator
 
 Some of us ex-Acorn users miss Zap, but here's your chance to do something
 about it!  I've cobbled together this emulation which runs some simple RISC
@@ -25,16 +24,12 @@ binary, e.g.
     cd src && ./riscose grep -n free ../README
 
 If you're inspired by that, and know a bit about RISC OS check out the ToDo
-file, join the mailing list by emailing:
+file and get hacking.
 
-   riscose-subscribe@lists.soup-kitchen.net
-
-and get hacking.
-
-If you've acquired riscose from CVS then you need to have maintainer
+If you've acquired riscose from git then you need to have maintainer
 tools available.
 
     aclocal && autoheader && automake --add-missing && autoconf
 
 -- 
-Matthew
+Matthew (and Dave)

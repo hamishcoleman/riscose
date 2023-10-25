@@ -1237,12 +1237,18 @@ static void
 rsp_continue (struct rsp_buf *buf)
 {
   unsigned long int  addr;		/* Address to continue from, if any */
+  int thread;
 
   rsp.single_stepping = 0;
 
-  if (0 == strcmp("c", buf->data) || 0 == strcmp("vCont;c", buf->data) || 0 == strcmp("vCont;c:1", buf->data) || 0 == strcmp("vCont;c:0001", buf->data))
-    {
-    }
+  if (0 == strcmp("c", buf->data) || 0 == strcmp("vCont;c", buf->data)) {
+  }
+  else if (sscanf(buf->data, "vCont;c:%x;c", &thread) == 1 || sscanf(buf->data, "vCont;c:%x", &thread) == 1)
+  {
+        if (thread != OR1KSIM_TID) {
+          fprintf (stderr, "Cannot continue bad thread %d", thread);
+        }
+  }
   else if (1 != sscanf (buf->data, "c%lx", &addr))
     {
       fprintf (stderr,
@@ -1638,7 +1644,7 @@ rsp_query (struct rsp_buf *buf)
 
       char  reply[GDB_BUF_MAX];
 
-      sprintf (reply, "PacketSize=%x;xmlRegisters=arm;swbreak-;hwbreak+;qXfer:features:read+;qXfer:auxv:read+;qHostInfo:+", GDB_BUF_MAX);
+      sprintf (reply, "PacketSize=%x;xmlRegisters=arm;swbreak-;hwbreak+;qXfer:features:read+;qXfer:auxv:read+;qHostInfo:+;vContSupported+", GDB_BUF_MAX);
       put_str_packet (reply);
     }
   else if (0 == strncmp ("qSymbol:", buf->data, strlen ("qSymbol:")))
@@ -1769,11 +1775,16 @@ static void
 rsp_step (struct rsp_buf *buf)
 {
   unsigned long int  addr;		/* The address to step from, if any */
+  int thread;
 
   rsp.single_stepping = 1;
 
-  if (0 == strcmp ("s", buf->data) || 0 == strcmp("i", buf->data) || 0 == strcmp("vCont;s", buf->data) || 0 == strcmp ("vCont;s:1", buf->data) || 0 == strcmp ("vCont;s:0001", buf->data))
-    {
+  if (0 == strcmp ("s", buf->data) || 0 == strcmp("i", buf->data) || 0 == strcmp("vCont;s", buf->data)) {
+  }
+  else if (sscanf(buf->data, "vCont;s:%x;c", &thread)==1 || sscanf(buf->data, "vCont;s:%x;c", &thread)==1) {
+        if (thread != OR1KSIM_TID) {
+          fprintf (stderr, "Cannot step bad thread %d", thread);
+        }
     }
   else if (1 != sscanf (buf->data, "s%lx", &addr))
     {
@@ -1814,15 +1825,15 @@ rsp_vpkt (struct rsp_buf *buf)
   else if (0 == strcmp ("vCont?", buf->data))
     {
       /* For now we don't support this. */
-      put_str_packet ("vCont;c;s");
+      put_str_packet ("vCont;c;s;C");
       return;
     }
-  else if (0 == strcmp ("vCont;s", buf->data) || 0 == strcmp ("vCont;s:1", buf->data) || 0 == strcmp ("vCont;s:0001", buf->data))
+  else if (0 == strncmp ("vCont;s", buf->data, 7))
     {
       rsp_step(buf);
       return;
     }
-  else if (0 == strcmp ("vCont;c", buf->data) || 0 ==strcmp ("vCont;c:1", buf->data) || 0 ==strcmp ("vCont;c:0001", buf->data))
+  else if (0 == strncmp ("vCont;c", buf->data, 7))
     {
       rsp_continue(buf);
       return;

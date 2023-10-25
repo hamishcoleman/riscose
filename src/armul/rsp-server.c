@@ -1819,12 +1819,13 @@ rsp_vpkt (struct rsp_buf *buf)
     {
       /* Attaching is a null action, since we have no other process. We just
 	 return a stop packet (using TRAP) to indicate we are stopped. */
-      put_str_packet ("S05");
+      put_str_packet ("T05thread:1");
       return;
     }
   else if (0 == strcmp ("vCont?", buf->data))
     {
-      /* For now we don't support this. */
+      // We don't actually support "vCont;C", however if you don't support "c"
+      // and "C", gdb (git master) will not use vCont.
       put_str_packet ("vCont;c;s;C");
       return;
     }
@@ -1840,8 +1841,6 @@ rsp_vpkt (struct rsp_buf *buf)
     }
   else if (0 == strncmp ("vCont", buf->data, strlen ("vCont")))
     {
-      /* This shouldn't happen, because we've reported non-support via vCont?
-	 above */
       fprintf (stderr, "Warning: RSP '%s' not supported\n", buf->data );
       put_str_packet("E01");
       return;
